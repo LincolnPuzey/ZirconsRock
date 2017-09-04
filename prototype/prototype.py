@@ -15,6 +15,9 @@ from tkinter import S
 from tkinter import E
 from tkinter import W
 
+from tkinter import SINGLE
+from tkinter import EXTENDED
+
 from tkinter import PhotoImage
 
 from tkinter import filedialog
@@ -47,9 +50,9 @@ class SampleApp(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
-        for F in (DemoStartPage, PageOne, PageTwo, StartPage,
-                  FilterStandardsPage, ConfigureStandardsPage, NameStandardsPage,
-                  InputOutputPage, LoadingPage, FinishedPage):
+        for F in (StartPage, FilterStandardsPage, ConfigureStandardsPage,
+                    NameStandardsPage, InputOutputPage, LoadingPage,
+                    FinishedPage):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -71,10 +74,10 @@ class SampleApp(tk.Tk):
 
         #----Method 2----
         #Remove all frames THEN draw the target frame
-    #    for frame in self.frames.values():
-    #        frame.grid_remove()
-    #    frame = self.frames[page_name]
-    #    frame.grid()
+        # for frame in self.frames.values():
+        #     frame.grid_remove()
+        # frame = self.frames[page_name]
+        # frame.grid()
 
     #returns either 'U-Pb' or 'TE'
     def getProcessName(self):
@@ -94,6 +97,8 @@ class Header(ttk.Frame):
         title = ttk.Label(self, text=title_txt, font=controller.bigFont).grid(column=0, row=0, sticky=(W))
         subtitle = ttk.Label(self, text=subtitle_txt, font=controller.smallFont).grid(column=0, row=1, sticky=(W))
 
+        print(self.controller.isUpb)
+        print(self.controller.getProcessName())
 
 class Content(ttk.Frame):
 
@@ -107,10 +112,10 @@ class Content(ttk.Frame):
 class Footer(ttk.Frame):
 
     def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
+        ttk.Frame.__init__(self, parent, padding="0 25 0 0")
         self.controller = controller
 
-        self.grid(column=0, row=2, sticky=(W,E))
+        self.grid(column=0, row=2, sticky=(E))
 
 
 class StartPage(ttk.Frame):
@@ -160,7 +165,6 @@ class StartPage(ttk.Frame):
         self.controller.show_frame("FilterStandardsPage")
 
 
-
 class FilterStandardsPage(ttk.Frame):
 
      def __init__(self, parent, controller):
@@ -186,7 +190,6 @@ class FilterStandardsPage(ttk.Frame):
         continueButton = ttk.Button(footerFrame, text="Continue", command=lambda: controller.show_frame("ConfigureStandardsPage"))
         backButton.grid(column=0, row=0, sticky=(W))
         continueButton.grid(column=1,row=0, sticky=(E))
-
 
 
 
@@ -235,27 +238,57 @@ class InputOutputPage(ttk.Frame):
         footerFrame = Footer(self, controller)
 
         inputLabel = ttk.Label(contentFrame, text="Input files (Glitter csv) (drag and drop / open)")
-        inputList = tk.Listbox(contentFrame, listvariable=self.inFilePathStr, height=5)
-        openButton = ttk.Button(contentFrame, text="Open", command=self.addInputFile)
+        self.inputList = tk.Listbox(contentFrame, listvariable=self.inFilePathStr, selectmode=EXTENDED, height=5, relief="ridge")
+
+        inputButtonFrame = ttk.Frame(contentFrame)
+        removeButton = ttk.Button(inputButtonFrame, text="Remove", command=self.removeSelectedInputFiles)
+        openButton = ttk.Button(inputButtonFrame, text="Open", command=self.addInputFile)
+
         outputLabel = ttk.Label(contentFrame, text="Output location")
-        outputList = tk.Listbox(contentFrame, listvariable=self.outFilePathStr, height=1)
+        self.outputList = tk.Listbox(contentFrame, listvariable=self.outFilePathStr, selectmode=SINGLE, height=1, relief="ridge")
         chooseButton = ttk.Button(contentFrame, text="Choose", command=self.setOutputPath)
 
-        inputLabel.grid(column=0, row=0, sticky=(E))
-        inputList.grid(column=0, row=1, sticky=(W,E))
-        openButton.grid(column=0, row=2, sticky=(E))
-        outputLabel.grid(column=0, row=3, sticky=(W))
-        outputList.grid(column=0, row=4, sticky=(W,E))
-        chooseButton.grid(column=0, row=5, sticky=(E))
+        inputLabel.grid(        column=0, row=0, sticky=(W))
+        self.inputList.grid(    column=0, row=1, sticky=(W,E))
+
+        inputButtonFrame.grid(  column=0, row=2, sticky=(E))
+        removeButton.grid(      column=0, row=0, sticky=(E))
+        openButton.grid(        column=1, row=0, sticky=(E))
+
+        outputLabel.grid(       column=0, row=3, sticky=(W))
+        self.outputList.grid(   column=0, row=4, sticky=(W,E))
+        chooseButton.grid(      column=0, row=5, sticky=(E))
 
         backButton = ttk.Button(footerFrame, text="Back", command=lambda: controller.show_frame("ConfigureStandardsPage"))
         goButton = ttk.Button(footerFrame, text="Go", command=lambda: controller.show_frame("LoadingPage"))
-        backButton.grid(column=0, row=0, sticky=(W))
-        goButton.grid(column=1,row=0, sticky=(E))
+
+        backButton.grid(        column=0, row=0, sticky=(E))
+        goButton.grid(          column=1, row=0, sticky=(E))
+
+        contentFrame.columnconfigure(0, weight=1)
+        contentFrame.rowconfigure(1, weight=1)
+
+        #remove input files by selecting items and pressing the backspace button
+        self.inputList.bind("<BackSpace>", self.removeSelectedInputFiles)
 
      def addInputFile(self):
-         newPath = filedialog.askopenfilename()
-         self.inFilePathList.append(newPath)
+         #paths is a tuple of filenames
+         paths = filedialog.askopenfilenames()
+         #split the tuple into a list
+         pathList = self.controller.tk.splitlist(paths)
+         for path in pathList:
+            self.inFilePathList.append(path)
+         self.inFilePathStr.set(self.inFilePathList)
+
+     # gui button press: passes 1 argument
+     # bound backspace press: passes 2 arguments
+     # use *event to accept 1 or 2 parameters
+     def removeSelectedInputFiles(self, *event):
+         selection = self.inputList.curselection()
+         for index in selection:
+             #remove the selected filePath from the filePathList
+             self.inFilePathList.remove(self.inputList.get(index))
+         #update the listBox
          self.inFilePathStr.set(self.inFilePathList)
 
      def setOutputPath(self):
@@ -301,50 +334,6 @@ class FinishedPage(ttk.Frame):
         backButton = ttk.Button(contentFrame, text="Back", command=lambda: controller.show_frame("LoadingPage"))
         backButton.grid(column=0, row=4, sticky=(W))
 
-
-
-#-------------------Begin tutorial stuff--------------------------
-
-class DemoStartPage(ttk.Frame):
-
-    def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
-        self.controller = controller
-        label = ttk.Label(self, text="This is the start page", font=controller.bigFont)
-        label.pack(side="top", fill="x", pady=10)
-
-        button1 = ttk.Button(self, text="Go to Page One",
-                            command=lambda: controller.show_frame("PageOne"))
-        button2 = ttk.Button(self, text="Go to Page Two",
-                            command=lambda: controller.show_frame("PageTwo"))
-        button1.pack()
-        button2.pack()
-
-
-class PageOne(ttk.Frame):
-
-    def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
-        self.controller = controller
-        label = ttk.Label(self, text="This is page 1", font=controller.bigFont)
-        label.pack(side="top", fill="x", pady=10)
-        button = ttk.Button(self, text="Go to the start page",
-                           command=lambda: controller.show_frame("DemoStartPage"))
-        button.pack()
-
-
-class PageTwo(ttk.Frame):
-
-    def __init__(self, parent, controller):
-        ttk.Frame.__init__(self, parent)
-        self.controller = controller
-        label = ttk.Label(self, text="This is page 2", font=controller.bigFont)
-        label.pack(side="top", fill="x", pady=10)
-        button = ttk.Button(self, text="Go to the start page",
-                           command=lambda: controller.show_frame("DemoStartPage"))
-        button.pack()
-
-#----------------------End tutorial stuff-----------------------------
 
 if __name__ == "__main__":
     app = SampleApp()
