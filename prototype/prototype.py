@@ -31,9 +31,12 @@ from tkinter import PhotoImage
 
 # For file I/O
 from tkinter import filedialog
+import subprocess
+import platform
 
 # For text widget
 from tkinter import INSERT
+
 
 
 
@@ -59,12 +62,12 @@ class App(tk.Tk):
         container = ttk.Frame(self, padding="20 20 20 20")
         container.grid(column=0, row=0, sticky=(N, W, E, S))
 
-        container.rowconfigure(0, weight=1)
-        container.rowconfigure(1, weight=1)
-        container.rowconfigure(2, weight=1)
-        container.columnconfigure(0, weight=1)
-        container.columnconfigure(1, weight=1)
-        container.columnconfigure(2, weight=1)
+        # container.rowconfigure(0, weight=1)
+        # container.rowconfigure(1, weight=1)
+        # container.rowconfigure(2, weight=1)
+        # container.columnconfigure(0, weight=1)
+        # container.columnconfigure(1, weight=1)
+        # container.columnconfigure(2, weight=1)
 
         self.frames = {}
         for F in (StartPage, FilterStandardsPage, ConfigureStandardsPage,
@@ -101,6 +104,15 @@ class App(tk.Tk):
             return 'U-Pb'
         return 'TE'
 
+class Button(ttk.Button):
+
+    def __init__(self, *args, **kwargs):
+        ttk.Button.__init__(self, *args, **kwargs)
+        self.bind("<Return>", self.onPress)
+
+    def onPress(self, *event):
+        self.invoke()
+
 class Header(ttk.Frame):
 
     def __init__(self, parent, controller, title_txt, subtitle_txt):
@@ -128,36 +140,51 @@ class Content(ttk.Frame):
 
 class Footer(ttk.Frame):
 
-    def __init__(self, parent, controller, backButtonName, nextButtonName, prevPageName, nextPageName):
+    def __init__(self, parent, controller, showButtons, prevButtonName, nextButtonName, prevPageName, nextPageName):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
+        self.nextPageName = nextPageName
+        self.prevPageName = prevPageName
 
-        backButton = ttk.Button(self, text=backButtonName, command=lambda: controller.show_frame(prevPageName))
-        continueButton = ttk.Button(self, text=nextButtonName, command=lambda: controller.show_frame(nextPageName))
+        if showButtons:
+            prevButton = Button(self, text=prevButtonName, command=self.goToPrevPage)
+            nextButton = Button(self, text=nextButtonName, command=self.goToNextPage)
 
-        self.grid(          column=0, row=2, sticky=(E))
-        backButton.grid(    column=0, row=0, sticky=(W))
-        continueButton.grid(column=1, row=0, sticky=(E))
+            self.grid(          column=0, row=2, sticky=(E))
+            prevButton.grid(    column=0, row=0, sticky=(W))
+            nextButton.grid(    column=1, row=0, sticky=(E))
+
+        parent.parent.bind("<Right>", self.goToNextPage)
+        parent.parent.bind("<Left>", self.goToPrevPage)
+
+    #need *event to accept extra parameter from key bindings
+    def goToPrevPage(self, *event):
+        self.controller.show_frame(self.prevPageName)
+
+    def goToNextPage(self, *event):
+        self.controller.show_frame(self.nextPageName)
 
 class StartPage(ttk.Frame):
 
     def __init__(self, parent, controller):
         #initialising the base Frame class
         ttk.Frame.__init__(self, parent)
+        self.parent = parent
         self.controller = controller
 
         #distinguishes between the frame's header and the frame's content
         headerFrame = Header(self, controller, "1. Select a process", "")
         contentFrame = Content(self, controller)
+        footerFrame = Footer(self, controller, False, "","", "StartPage", "FilterStandardsPage")
 
         #can use GIF, PPM/PGP - http://effbot.org/tkinterbook/photoimage.html
         uraniumImg = PhotoImage(file='placeholder.gif')
         traceImg = PhotoImage(file='placeholder.gif')
 
         #define buttons
-        uraniumButton = ttk.Button(contentFrame, text="U-Pb", image=uraniumImg, compound="top",
+        uraniumButton = Button(contentFrame, text="U-Pb", image=uraniumImg, compound="top",
                         command=self.onPressUpb, padding="5 20 5 20")
-        traceButton = ttk.Button(contentFrame, text="Trace Element", image=traceImg, compound="top",
+        traceButton = Button(contentFrame, text="Trace Element", image=traceImg, compound="top",
                         command=self.onPressTE, padding="5 20 5 20")
 
         #need to maintain references to images like this
@@ -171,7 +198,6 @@ class StartPage(ttk.Frame):
         uraniumButton.grid( column=0, row=1)
         orLabel.grid(       column=1, row=1)
         traceButton.grid(   column=2, row=1)
-
 
 
     def onPressUpb(self):
@@ -200,7 +226,7 @@ class TableOfEntries(ttk.Frame):
         self.tableTextFrame.configure(yscrollcommand=self.scrollBar.set)
 
         self.entryList = []
-        self.addButton = ttk.Button(self, text="Add 5 lines", command=lambda: self.addRows(5))
+        self.addButton = Button(self, text="Add 5 lines", command=lambda: self.addRows(5))
 
         titleLabel.grid(            column=0, row=0)
         self.tableTextFrame.grid(   column=0, row=1, sticky=(W,E,N,S))
@@ -246,11 +272,12 @@ class FilterStandardsPage(ttk.Frame):
 
      def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)
+        self.parent = parent
         self.controller = controller
 
         headerFrame = Header(self, controller, "2. Filter standards for " + self.controller.getProcessName(), "")
         contentFrame = Content(self, controller)
-        footerFrame = Footer(self, controller, "Back", "Continue", "StartPage", "ConfigureStandardsPage")
+        footerFrame = Footer(self, controller, True, "Back", "Continue", "StartPage", "ConfigureStandardsPage")
 
         includeAllLabel = ttk.Label(contentFrame, text="Include all standards")
         includeOnlyTable = TableOfEntries(contentFrame, controller, "Only include these standards", 10)
@@ -270,12 +297,13 @@ class ConfigureStandardsPage(ttk.Frame):
 
      def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)
+        self.parent = parent
         self.controller = controller
 
         headerFrame = Header(self, controller, "3. Configure standards for " + self.controller.getProcessName(),
                         "Select 'Custom standards' to create aliases for standards.")
         contentFrame = Content(self, controller)
-        footerFrame = Footer(self, controller, "Back", "Continue", "FilterStandardsPage", "InputOutputPage")
+        footerFrame = Footer(self, controller, True, "Back", "Continue", "FilterStandardsPage", "InputOutputPage")
 
         defaultFrame = ttk.Frame(contentFrame)
         customFrame = ttk.Frame(contentFrame)
@@ -286,12 +314,12 @@ class ConfigureStandardsPage(ttk.Frame):
         defaultInfoLabel = ttk.Label(defaultFrame, text="(Leave the names of standards unchanged)", padding="15 0 0 0")
         customLabel = ttk.Label(customTitleFrame, text="Custom standards")
         customInfoLabel = ttk.Label(customTitleFrame, text="(Create aliases for some standards)", padding="15 0 0 0")
-        createButton = ttk.Button(customButtonFrame, text="Create new configuration", command=lambda: print("Create new configuration"))
-        openButton = ttk.Button(customButtonFrame, text="Open existing configuration", command=self.setOutputPath)
+        createButton = Button(customButtonFrame, text="Create new configuration", command=lambda: print("Create new configuration"))
+        openButton = Button(customButtonFrame, text="Open existing configuration", command=self.setOutputPath)
 
         homeDir = os.path.expanduser('~/')
         self.filePathStr = StringVar(value=homeDir)
-        self.filePath = tk.Listbox(customFrame, listvariable=self.filePathStr, selectmode=SINGLE, height=1, relief="ridge")
+        self.filePath = ttk.Label(customFrame, textvariable=self.filePathStr)
 
         orLabel = ttk.Label(contentFrame, text="or", padding="0 15 0 15")
 
@@ -335,6 +363,7 @@ class InputOutputPage(ttk.Frame):
 
      def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)
+        self.parent = parent
         self.controller = controller
 
         self.inFilePathList = []
@@ -346,9 +375,9 @@ class InputOutputPage(ttk.Frame):
 
         headerFrame = Header(self, controller, "4. Input / Output for " + self.controller.getProcessName(), "")
         contentFrame = Content(self, controller)
-        footerFrame = Footer(self, controller, "Back", "Go", "ConfigureStandardsPage", "LoadingPage")
+        footerFrame = Footer(self, controller, True, "Back", "Go", "ConfigureStandardsPage", "LoadingPage")
 
-        inputLabel = ttk.Label(contentFrame, text="Input files (Glitter csv) (drag and drop / open)")
+        inputTitleLabel = ttk.Label(contentFrame, text="Input files (Glitter csv) (drag and drop / open)")
 
         inputListFrame = ttk.Frame(contentFrame)
         self.inputList = tk.Listbox(inputListFrame, listvariable=self.inFilePathStr, selectmode=EXTENDED, height=5, relief="ridge")
@@ -356,20 +385,20 @@ class InputOutputPage(ttk.Frame):
         self.inputList.configure(yscrollcommand=scrollBar.set)
 
         inputButtonFrame = ttk.Frame(contentFrame)
-        removeButton = ttk.Button(inputButtonFrame, text="Remove", command=self.removeSelectedInputFiles)
-        openButton = ttk.Button(inputButtonFrame, text="Open", command=self.addInputFile)
+        removeButton = Button(inputButtonFrame, text="Remove", command=self.removeSelectedInputFiles)
+        openButton = Button(inputButtonFrame, text="Open", command=self.addInputFile)
 
-        outputLabel = ttk.Label(contentFrame, text="Output location")
-        self.outputList = tk.Listbox(contentFrame, listvariable=self.outFilePathStr, selectmode=SINGLE, height=1, relief="ridge")
-        chooseButton = ttk.Button(contentFrame, text="Choose", command=self.setOutputPath)
+        outputTitleLabel = ttk.Label(contentFrame, text="Output location")
+        self.outputPathLabel = ttk.Label(contentFrame, textvariable=self.outFilePathStr)
+        chooseButton = Button(contentFrame, text="Choose", command=self.setOutputPath)
 
         #contentFrame children
-        inputLabel.grid(        column=0, row=0, sticky=(W))
-        inputListFrame.grid(    column=0, row=1, sticky=(W,E))
-        inputButtonFrame.grid(  column=0, row=2, sticky=(E))
-        outputLabel.grid(       column=0, row=3, sticky=(W))
-        self.outputList.grid(   column=0, row=4, sticky=(W,E))
-        chooseButton.grid(      column=0, row=5, sticky=(E))
+        inputTitleLabel.grid(       column=0, row=0, sticky=(W))
+        inputListFrame.grid(        column=0, row=1, sticky=(W,E))
+        inputButtonFrame.grid(      column=0, row=2, sticky=(E))
+        outputTitleLabel.grid(      column=0, row=3, sticky=(W))
+        self.outputPathLabel.grid(  column=0, row=4, sticky=(W,E))
+        chooseButton.grid(          column=0, row=5, sticky=(E))
 
         #inputListFrame children
         self.inputList.grid(    column=0, row=0, sticky=(W,E))
@@ -411,15 +440,15 @@ class InputOutputPage(ttk.Frame):
          self.outFilePathStr.set(newPath)
 
 
-
 class LoadingPage(ttk.Frame):
 
      def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)
+        self.parent = parent
         self.controller = controller
 
         contentFrame = Content(self, controller)
-        footerFrame = Footer(self, controller, "Back", "Continue", "InputOutputPage", "FinishedPage")
+        footerFrame = Footer(self, controller, True, "Back", "Continue", "InputOutputPage", "FinishedPage")
 
         processingLabel = ttk.Label(contentFrame, text="Processing")
         progressBar = ttk.Progressbar(contentFrame, orient=HORIZONTAL, length=200, mode='determinate')
@@ -434,22 +463,44 @@ class FinishedPage(ttk.Frame):
 
      def __init__(self, parent, controller):
         ttk.Frame.__init__(self, parent)
+        self.parent = parent
         self.controller = controller
 
         contentFrame = Content(self, controller)
+        footerFrame = Footer(self, controller, False, "","", "InputOutputPage", "FinishedPage")
 
         doneLabel = ttk.Label(contentFrame, text="Done.", font=controller.bigFont)
-        locationLabel = ttk.Label(contentFrame, text="Location of results: C://user/documents/...", font=controller.mediumFont)
-        showInFolderButton = ttk.Button(contentFrame, text="Show in folder")
-        startAgainButton = ttk.Button(contentFrame, text="Start again", command=lambda: controller.show_frame("StartPage"))
 
-        doneLabel.grid(column=0, row=0, sticky=(W))
-        locationLabel.grid(column=0, row=1, sticky=(W))
+        locationFrame = ttk.Frame(contentFrame)
+        locationLabel = ttk.Label(locationFrame, text="Location of results: ", font=controller.mediumFont)
+        #use a StringVar so the Label updates when the user changes the file path
+        outPathStr = controller.frames["InputOutputPage"].outFilePathStr
+        outPathLabel = ttk.Label(locationFrame, textvariable=outPathStr, font=controller.mediumFont)
+
+        showInFolderButton = Button(contentFrame, text="Show in folder", command=lambda: self.showInFolder(outPathLabel.cget('text')))
+        startAgainButton = Button(contentFrame, text="Start again", command=lambda: controller.show_frame("StartPage"))
+        backButton = Button(contentFrame, text="Back", command=lambda: controller.show_frame("LoadingPage"))
+
+        #contentFrame children
+        doneLabel.grid(         column=0, row=0, sticky=(W))
+        locationFrame.grid(     column=0, row=1, sticky=(W))
         showInFolderButton.grid(column=0, row=2, sticky=(W))
-        startAgainButton.grid(column=0,row=3, sticky=(W))
+        startAgainButton.grid(  column=0,row=3, sticky=(W))
+        backButton.grid(        column=0, row=4, sticky=(W))
 
-        backButton = ttk.Button(contentFrame, text="Back", command=lambda: controller.show_frame("LoadingPage"))
-        backButton.grid(column=0, row=4, sticky=(W))
+        #locationFrame children
+        locationLabel.grid(     column=0, row=0)
+        outPathLabel.grid(   column=1, row=0)
+
+     # https://stackoverflow.com/questions/6631299/python-opening-a-folder-in-explorer-nautilus-mac-thingie
+     def showInFolder(self, path):
+        if platform.system() == "Windows":
+            os.startfile(path)
+        elif platform.system() == "Darwin":
+            subprocess.Popen(["open", path])
+        else:
+            subprocess.Popen(["xdg-open", path])
+
 
 
 if __name__ == "__main__":
