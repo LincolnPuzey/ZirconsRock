@@ -32,6 +32,9 @@ from tkinter import PhotoImage
 # For file I/O
 from tkinter import filedialog
 
+# For text widget
+from tkinter import INSERT
+
 
 
 #inheriting from ttk makes 'SampleApp' the root window
@@ -74,12 +77,8 @@ class App(tk.Tk):
             # put all of the pages in the same location;
             # the one on the top of the stacking order
             # will be the one that is visible.
-            print("boo")
             frame.grid(row=0, column=0, sticky="nsew")
-            print("boo2")
-        print("Boo3")
         self.show_frame("StartPage")
-        print("boo4")
 
     def show_frame(self, page_name):
         '''Show a frame for the given page name'''
@@ -129,11 +128,16 @@ class Content(ttk.Frame):
 
 class Footer(ttk.Frame):
 
-    def __init__(self, parent, controller):
+    def __init__(self, parent, controller, backButtonName, nextButtonName, prevPageName, nextPageName):
         ttk.Frame.__init__(self, parent)
         self.controller = controller
 
-        self.grid(column=0, row=2, sticky=(E))
+        backButton = ttk.Button(self, text=backButtonName, command=lambda: controller.show_frame(prevPageName))
+        continueButton = ttk.Button(self, text=nextButtonName, command=lambda: controller.show_frame(nextPageName))
+
+        self.grid(          column=0, row=2, sticky=(E))
+        backButton.grid(    column=0, row=0, sticky=(W))
+        continueButton.grid(column=1, row=0, sticky=(E))
 
 class StartPage(ttk.Frame):
 
@@ -145,7 +149,6 @@ class StartPage(ttk.Frame):
         #distinguishes between the frame's header and the frame's content
         headerFrame = Header(self, controller, "1. Select a process", "")
         contentFrame = Content(self, controller)
-        footerFrame = Footer(self, controller)
 
         #can use GIF, PPM/PGP - http://effbot.org/tkinterbook/photoimage.html
         uraniumImg = PhotoImage(file='placeholder.gif')
@@ -153,11 +156,9 @@ class StartPage(ttk.Frame):
 
         #define buttons
         uraniumButton = ttk.Button(contentFrame, text="U-Pb", image=uraniumImg, compound="top",
-                                   command=self.onPressUpb,
-                                   padding="5 20 5 20")
+                        command=self.onPressUpb, padding="5 20 5 20")
         traceButton = ttk.Button(contentFrame, text="Trace Element", image=traceImg, compound="top",
-                                 command=self.onPressTE,
-                                 padding="5 20 5 20")
+                        command=self.onPressTE, padding="5 20 5 20")
 
         #need to maintain references to images like this
         #http://effbot.org/pyfaq/why-do-my-tkinter-images-not-appear.htm
@@ -183,39 +184,6 @@ class StartPage(ttk.Frame):
         print(self.controller.isUpb)
         self.controller.show_frame("FilterStandardsPage")
 
-# https://stackoverflow.com/questions/3085696/adding-a-scrollbar-to-a-group-of-widgets-in-tkinter/3092341#3092341
-class TableFrame(tk.Frame):
-    def __init__(self, parent):
-
-        tk.Frame.__init__(self, parent)
-        self.canvas = tk.Canvas(parent, width=200, borderwidth=0, background="#ffffff")
-        self.frame = tk.Frame(self.canvas, background="#ffffff")
-        self.vsb = tk.Scrollbar(parent, orient="vertical", command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=self.vsb.set)
-
-        self.vsb.grid(column=1, row=1, sticky=(W,E,N,S))
-        # self.vsb.pack(side="right", fill="y")
-        self.canvas.grid(column=0, row=1, sticky=(W,E,N))
-        # self.canvas.pack(side="left", fill="both", expand=True)
-        self.canvas.create_window((4,4), window=self.frame, anchor="nw",
-                                  tags="self.frame")
-
-        self.frame.bind("<Configure>", self.onFrameConfigure)
-
-        # self.populate()
-
-    def populate(self):
-        '''Put in some fake data'''
-        for row in range(100):
-            tk.Label(self.frame, text="%s" % row, width=3, borderwidth="1",
-                     relief="solid").grid(row=row, column=0)
-            t="this is the second column for row %s" %row
-            tk.Label(self.frame, text=t).grid(row=row, column=1)
-
-    def onFrameConfigure(self, event):
-        '''Reset the scroll region to encompass the inner frame'''
-        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
-
 class TableOfEntries(ttk.Frame):
 
     def __init__(self, parent, controller, title, numRows):
@@ -227,30 +195,29 @@ class TableOfEntries(ttk.Frame):
         # IMPORTANT: using a TEXT widget as a FRAME to enable scrolling across a group of widgets
         # see 'Images and widgets': http://www.tkdocs.com/tutorial/text.html#images
         # see answer: https://stackoverflow.com/questions/16840660/scroll-a-group-of-widgets-in-tkinter
-        self.tableFrame = tk.Text(self, height=5, width=10)
-        self.scrollBar = ttk.Scrollbar(self, orient=VERTICAL, command=self.tableFrame.yview)
-        self.tableFrame.configure(yscrollcommand=self.scrollBar.set)
+        self.tableTextFrame = tk.Text(self, height=5, width=10)
+        self.scrollBar = ttk.Scrollbar(self, orient=VERTICAL, command=self.tableTextFrame.yview)
+        self.tableTextFrame.configure(yscrollcommand=self.scrollBar.set)
 
         self.entryList = []
         self.addButton = ttk.Button(self, text="Add 5 lines", command=lambda: self.addRows(5))
 
-        titleLabel.grid(        column=0, row=0)
-        self.tableFrame.grid(   column=0, row=1, sticky=(W,E,N,S))
-        self.scrollBar.grid(    column=1, row=1, sticky=(W,E,N,S))
-
-
+        titleLabel.grid(            column=0, row=0)
+        self.tableTextFrame.grid(   column=0, row=1, sticky=(W,E,N,S))
+        self.scrollBar.grid(        column=1, row=1, sticky=(W,E,N,S))
+        self.addButton.grid(        column=0, row=2, sticky=(W,E))
         self.addRows(numRows)
-        self.addButton.grid(    column=0, row=2, sticky=(W,E))
 
 
     # Adds num rows to the table
     def addRows(self, num):
         for i in range(num):
-            entry = ttk.Entry(self.tableFrame)
+            entry = ttk.Entry(self.tableTextFrame)
             self.entryList.append(entry)
             #add entry widget to the tableFrame (text widget)
-            self.tableFrame.window_create(str(i+1.0), window=entry)
-            self.tableFrame.configure(height=20)
+            self.tableTextFrame.window_create(INSERT, window=entry)
+            #must add a newline so the scrollbar works
+            self.tableTextFrame.insert(INSERT, '\n')
             entry.grid(column=0, row=len(self.entryList), sticky=(W,E,N,S))
             entry.bind("<Up>", self.goToPreviousEntry)
             entry.bind("<Shift-Return>", self.goToPreviousEntry)
@@ -283,9 +250,9 @@ class FilterStandardsPage(ttk.Frame):
 
         headerFrame = Header(self, controller, "2. Filter standards for " + self.controller.getProcessName(), "")
         contentFrame = Content(self, controller)
-        footerFrame = Footer(self, controller)
+        footerFrame = Footer(self, controller, "Back", "Continue", "StartPage", "ConfigureStandardsPage")
 
-        includeAllTable = TableOfEntries(contentFrame, controller, "Include all standards", 0)
+        includeAllLabel = ttk.Label(contentFrame, text="Include all standards")
         includeOnlyTable = TableOfEntries(contentFrame, controller, "Only include these standards", 10)
         excludeTable = TableOfEntries(contentFrame, controller, "Exclude these standards", 10)
 
@@ -293,17 +260,11 @@ class FilterStandardsPage(ttk.Frame):
         orLabel2 = ttk.Label(contentFrame, text="or")
         orLabel3 = ttk.Label(contentFrame, text="or")
 
-        includeAllTable.grid(       column=0, row=0, sticky=(N))
+        includeAllLabel.grid(       column=0, row=0, sticky=(N))
         orLabel1.grid(              column=1, row=0)
         includeOnlyTable.grid(      column=2, row=0, sticky=(N))
         orLabel2.grid(              column=3, row=0)
         excludeTable.grid(          column=4, row=0, sticky=(N))
-
-        backButton = ttk.Button(footerFrame, text="Back", command=lambda: controller.show_frame("StartPage"))
-        continueButton = ttk.Button(footerFrame, text="Continue", command=lambda: controller.show_frame("ConfigureStandardsPage"))
-        backButton.grid(column=0, row=0, sticky=(W))
-        continueButton.grid(column=1,row=0, sticky=(E))
-
 
 class ConfigureStandardsPage(ttk.Frame):
 
@@ -314,39 +275,47 @@ class ConfigureStandardsPage(ttk.Frame):
         headerFrame = Header(self, controller, "3. Configure standards for " + self.controller.getProcessName(),
                         "Select 'Custom standards' to create aliases for standards.")
         contentFrame = Content(self, controller)
-        footerFrame = Footer(self, controller)
+        footerFrame = Footer(self, controller, "Back", "Continue", "FilterStandardsPage", "InputOutputPage")
 
         defaultFrame = ttk.Frame(contentFrame)
         customFrame = ttk.Frame(contentFrame)
+        customTitleFrame = ttk.Frame(customFrame)
+        customButtonFrame = ttk.Frame(customFrame, padding="0 5 0 5")
 
         defaultLabel = ttk.Label(defaultFrame, text="Default standards")
-        defaultInfoLabel = ttk.Label(defaultFrame, text="(Leave the names of standards unchanged)")
-        customLabel = ttk.Label(customFrame, text="Custom standards")
-        customInfoLabel = ttk.Label(customFrame, text="(Create aliases for some standards)")
-        createButton = ttk.Button(customFrame, text="Create new configuration", command=lambda: print("Create new configuration"))
-        openButton = ttk.Button(customFrame, text="Open existing configuration", command=self.setOutputPath)
+        defaultInfoLabel = ttk.Label(defaultFrame, text="(Leave the names of standards unchanged)", padding="15 0 0 0")
+        customLabel = ttk.Label(customTitleFrame, text="Custom standards")
+        customInfoLabel = ttk.Label(customTitleFrame, text="(Create aliases for some standards)", padding="15 0 0 0")
+        createButton = ttk.Button(customButtonFrame, text="Create new configuration", command=lambda: print("Create new configuration"))
+        openButton = ttk.Button(customButtonFrame, text="Open existing configuration", command=self.setOutputPath)
 
         homeDir = os.path.expanduser('~/')
         self.filePathStr = StringVar(value=homeDir)
         self.filePath = tk.Listbox(customFrame, listvariable=self.filePathStr, selectmode=SINGLE, height=1, relief="ridge")
 
-        orLabel = ttk.Label(contentFrame, text="or")
+        orLabel = ttk.Label(contentFrame, text="or", padding="0 15 0 15")
 
+        #contentFrame children
         defaultFrame.grid(      column=0, row=0, sticky=(W,E))
-        defaultLabel.grid(      column=0, row=0, sticky=(W))
-        defaultInfoLabel.grid(  column=1, row=0, sticky=(W))
-        orLabel.grid(           column=0, row=1)
         customFrame.grid(       column=0, row=2, sticky=(W,E))
+        orLabel.grid(           column=0, row=1)
+
+        #defaultFrame children
+        defaultLabel.grid(      column=0, row=0, sticky=(W,E))
+        defaultInfoLabel.grid(  column=1, row=0, sticky=(W,E))
+
+        #customFrame children
+        customTitleFrame.grid(  column=0, row=0, sticky=(W,E))
+        customButtonFrame.grid( column=0, row=1, sticky=(W,E))
+        self.filePath.grid(     column=0, row=2, sticky=(W,E))
+
+        #customTitleFrame children
         customLabel.grid(       column=0, row=0, sticky=(W))
         customInfoLabel.grid(   column=1, row=0, sticky=(W))
+
+        #customButtonFrame children
         createButton.grid(      column=0, row=1, sticky=(W,E))
         openButton.grid(        column=1, row=1, sticky=(W,E))
-        self.filePath.grid(          column=0, row=2, sticky=(W,E), columnspan=2)
-
-        backButton = ttk.Button(footerFrame, text="Back", command=lambda: controller.show_frame("FilterStandardsPage"))
-        continueButton = ttk.Button(footerFrame, text="Continue", command=lambda: controller.show_frame("InputOutputPage"))
-        backButton.grid(column=0, row=0, sticky=(W))
-        continueButton.grid(column=1,row=0, sticky=(E))
 
      def setOutputPath(self):
          newPath = filedialog.askdirectory()
@@ -377,7 +346,7 @@ class InputOutputPage(ttk.Frame):
 
         headerFrame = Header(self, controller, "4. Input / Output for " + self.controller.getProcessName(), "")
         contentFrame = Content(self, controller)
-        footerFrame = Footer(self, controller)
+        footerFrame = Footer(self, controller, "Back", "Go", "ConfigureStandardsPage", "LoadingPage")
 
         inputLabel = ttk.Label(contentFrame, text="Input files (Glitter csv) (drag and drop / open)")
 
@@ -394,24 +363,21 @@ class InputOutputPage(ttk.Frame):
         self.outputList = tk.Listbox(contentFrame, listvariable=self.outFilePathStr, selectmode=SINGLE, height=1, relief="ridge")
         chooseButton = ttk.Button(contentFrame, text="Choose", command=self.setOutputPath)
 
+        #contentFrame children
         inputLabel.grid(        column=0, row=0, sticky=(W))
         inputListFrame.grid(    column=0, row=1, sticky=(W,E))
-        self.inputList.grid(    column=0, row=0, sticky=(W,E))
-        scrollBar.grid(    column=1, row=0, sticky=(N,S,E))
-
         inputButtonFrame.grid(  column=0, row=2, sticky=(E))
-        removeButton.grid(      column=0, row=0, sticky=(E))
-        openButton.grid(        column=1, row=0, sticky=(E))
-
         outputLabel.grid(       column=0, row=3, sticky=(W))
         self.outputList.grid(   column=0, row=4, sticky=(W,E))
         chooseButton.grid(      column=0, row=5, sticky=(E))
 
-        backButton = ttk.Button(footerFrame, text="Back", command=lambda: controller.show_frame("ConfigureStandardsPage"))
-        goButton = ttk.Button(footerFrame, text="Go", command=lambda: controller.show_frame("LoadingPage"))
+        #inputListFrame children
+        self.inputList.grid(    column=0, row=0, sticky=(W,E))
+        scrollBar.grid(    column=1, row=0, sticky=(N,S,E))
 
-        backButton.grid(        column=0, row=0, sticky=(E))
-        goButton.grid(          column=1, row=0, sticky=(E))
+        #inputButtonFrame childre
+        removeButton.grid(      column=0, row=0, sticky=(E))
+        openButton.grid(        column=1, row=0, sticky=(E))
 
         contentFrame.columnconfigure(0, weight=1)
         inputListFrame.columnconfigure(0, weight=1)
@@ -453,7 +419,7 @@ class LoadingPage(ttk.Frame):
         self.controller = controller
 
         contentFrame = Content(self, controller)
-        footerFrame = Footer(self, controller)
+        footerFrame = Footer(self, controller, "Back", "Continue", "InputOutputPage", "FinishedPage")
 
         processingLabel = ttk.Label(contentFrame, text="Processing")
         progressBar = ttk.Progressbar(contentFrame, orient=HORIZONTAL, length=200, mode='determinate')
@@ -462,12 +428,6 @@ class LoadingPage(ttk.Frame):
         processingLabel.grid(column=0, row=0, sticky=(W,E,N,S))
         progressBar.grid(column=0, row=2, sticky=(W,E,N,S))
         infoLabel.grid(column=0, row=3, sticky=(W,E,N,S))
-
-
-        backButton = ttk.Button(footerFrame, text="Back", command=lambda: controller.show_frame("InputOutputPage"))
-        continueButton = ttk.Button(footerFrame, text="Continue", command=lambda: controller.show_frame("FinishedPage"))
-        backButton.grid(column=0, row=0, sticky=(W))
-        continueButton.grid(column=1,row=0, sticky=(E))
 
 
 class FinishedPage(ttk.Frame):
@@ -482,7 +442,6 @@ class FinishedPage(ttk.Frame):
         locationLabel = ttk.Label(contentFrame, text="Location of results: C://user/documents/...", font=controller.mediumFont)
         showInFolderButton = ttk.Button(contentFrame, text="Show in folder")
         startAgainButton = ttk.Button(contentFrame, text="Start again", command=lambda: controller.show_frame("StartPage"))
-
 
         doneLabel.grid(column=0, row=0, sticky=(W))
         locationLabel.grid(column=0, row=1, sticky=(W))
