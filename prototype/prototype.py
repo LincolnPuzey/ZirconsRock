@@ -380,13 +380,19 @@ class InputOutputPage(ttk.Frame):
         inputTitleLabel = ttk.Label(contentFrame, text="Input files (Glitter csv) (drag and drop / open)")
 
         inputListFrame = ttk.Frame(contentFrame)
-        self.inputList = tk.Listbox(inputListFrame, listvariable=self.inFilePathStr, selectmode=EXTENDED, height=5, relief="ridge")
+        self.inputList = tk.Listbox(inputListFrame, listvariable=self.inFilePathStr, selectmode=EXTENDED, height=5, relief="flat") #ridge
         scrollBar = ttk.Scrollbar(inputListFrame, orient=VERTICAL, command=self.inputList.yview)
         self.inputList.configure(yscrollcommand=scrollBar.set)
 
         inputButtonFrame = ttk.Frame(contentFrame)
         removeButton = Button(inputButtonFrame, text="Remove", command=self.removeSelectedInputFiles)
         openButton = Button(inputButtonFrame, text="Open", command=self.addInputFile)
+
+        self.outNameStr = StringVar()
+
+        outputNameFrame = ttk.Frame(contentFrame, padding="0 10 0 10")
+        outputNameLabel = ttk.Label(outputNameFrame, text="Output name: ")
+        self.outputNameEntry = ttk.Entry(outputNameFrame, textvariable=self.outNameStr)
 
         outputTitleLabel = ttk.Label(contentFrame, text="Output location")
         self.outputPathLabel = ttk.Label(contentFrame, textvariable=self.outFilePathStr)
@@ -396,20 +402,26 @@ class InputOutputPage(ttk.Frame):
         inputTitleLabel.grid(       column=0, row=0, sticky=(W))
         inputListFrame.grid(        column=0, row=1, sticky=(W,E))
         inputButtonFrame.grid(      column=0, row=2, sticky=(E))
-        outputTitleLabel.grid(      column=0, row=3, sticky=(W))
-        self.outputPathLabel.grid(  column=0, row=4, sticky=(W,E))
-        chooseButton.grid(          column=0, row=5, sticky=(E))
+        outputNameFrame.grid(       column=0, row=3, sticky=(W,E))
+        outputTitleLabel.grid(      column=0, row=4, sticky=(W))
+        self.outputPathLabel.grid(  column=0, row=5, sticky=(W,E))
+        chooseButton.grid(          column=0, row=6, sticky=(E))
 
         #inputListFrame children
         self.inputList.grid(    column=0, row=0, sticky=(W,E))
-        scrollBar.grid(    column=1, row=0, sticky=(N,S,E))
+        scrollBar.grid(         column=1, row=0, sticky=(N,S,E))
 
         #inputButtonFrame childre
         removeButton.grid(      column=0, row=0, sticky=(E))
         openButton.grid(        column=1, row=0, sticky=(E))
 
+        #outputNameFrame children
+        outputNameLabel.grid(   column=0, row=0, sticky=(W))
+        self.outputNameEntry.grid(   column=1, row=0, sticky=(W,E))
+
         contentFrame.columnconfigure(0, weight=1)
         inputListFrame.columnconfigure(0, weight=1)
+        outputNameFrame.columnconfigure(1, weight=1)
         contentFrame.rowconfigure(1, weight=1)
 
         #remove input files by selecting items and pressing the backspace button
@@ -471,11 +483,16 @@ class FinishedPage(ttk.Frame):
 
         doneLabel = ttk.Label(contentFrame, text="Done.", font=controller.bigFont)
 
-        locationFrame = ttk.Frame(contentFrame)
-        locationLabel = ttk.Label(locationFrame, text="Location of results: ", font=controller.mediumFont)
+
+        outInfoFrame = ttk.Frame(contentFrame)
+        nameTitleLabel = ttk.Label(outInfoFrame, text="Name of results: ", font=controller.mediumFont)
+        #use a StringVar so the Label updates when the user changes the file name
+        outNameStr = controller.frames["InputOutputPage"].outNameStr
+        nameLabel = ttk.Label(outInfoFrame, textvariable=outNameStr, font=controller.mediumFont)
+        locationLabel = ttk.Label(outInfoFrame, text="Location of results: ", font=controller.mediumFont)
         #use a StringVar so the Label updates when the user changes the file path
         outPathStr = controller.frames["InputOutputPage"].outFilePathStr
-        outPathLabel = ttk.Label(locationFrame, textvariable=outPathStr, font=controller.mediumFont)
+        outPathLabel = ttk.Label(outInfoFrame, textvariable=outPathStr, font=controller.mediumFont)
 
         showInFolderButton = Button(contentFrame, text="Show in folder", command=lambda: self.showInFolder(outPathLabel.cget('text')))
         startAgainButton = Button(contentFrame, text="Start again", command=lambda: controller.show_frame("StartPage"))
@@ -483,14 +500,18 @@ class FinishedPage(ttk.Frame):
 
         #contentFrame children
         doneLabel.grid(         column=0, row=0, sticky=(W))
-        locationFrame.grid(     column=0, row=1, sticky=(W))
-        showInFolderButton.grid(column=0, row=2, sticky=(W))
-        startAgainButton.grid(  column=0,row=3, sticky=(W))
-        backButton.grid(        column=0, row=4, sticky=(W))
+        outInfoFrame.grid(      column=0, row=2, sticky=(W))
+        showInFolderButton.grid(column=0, row=3, sticky=(W))
+        startAgainButton.grid(  column=0, row=4, sticky=(W))
+        backButton.grid(        column=0, row=5, sticky=(W))
 
-        #locationFrame children
-        locationLabel.grid(     column=0, row=0)
-        outPathLabel.grid(   column=1, row=0)
+        #outInfoFrame children
+        nameTitleLabel.grid(    column=0, row=0, sticky=(W))
+        nameLabel.grid(         column=1, row=0, sticky=(W))
+        locationLabel.grid(     column=0, row=1, sticky=(W))
+        outPathLabel.grid(      column=1, row=1, sticky=(W))
+
+
 
      # https://stackoverflow.com/questions/6631299/python-opening-a-folder-in-explorer-nautilus-mac-thingie
      def showInFolder(self, path):
