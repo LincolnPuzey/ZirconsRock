@@ -1,5 +1,12 @@
+#virtual python directory:
+virtual-python/**
+
+.idea/**
+
 .DS_Store
 **/.DS_Store
+
+*.pyc
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

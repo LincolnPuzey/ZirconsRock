@@ -1,0 +1,2 @@
+XlsxWriter==0.9.9
+ipython==5.4.1
