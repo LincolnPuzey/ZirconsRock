@@ -8,3 +8,7 @@ virtual-python: requirements.txt
 # use this target enter an interactive python shell using the virtual python
 ipython:
 	virtual-python/bin/ipython
+
+# start the main method in main.py
+main:
+	virtual-python/bin/python software_name/main.py
