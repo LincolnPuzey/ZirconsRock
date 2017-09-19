@@ -68,10 +68,17 @@ def classify(cart,t,z="zircon eg. STDGJ-01"):
         return data(t,z,cart)
     elif cart=="CART2000":
         return "At the moment the python file only specifies CART 1 and CART 2"
-                
     else:
         return ""
+'''
+Provided the 2D array t with zircons against elements what number would I get from zircon on element?
+zircon eg = 'STDGJ-01'
+element eg = 'Ce'
+'''
 def data(t,zircon,element):
+    if "/" in element:
+        e=element.split("/")
+        return record(data(t,zircon,e[0]),data(t,zircon,e[1]))
     r=0
     c=0
     try:
@@ -79,12 +86,19 @@ def data(t,zircon,element):
             r=r+1
         while t[0][c]!=element:
             c=c+1
-        return record(t[r][c])
+        Ce = t[r][c]
+        La = t[r][c-1]
+        Pr = t[r][c+1]
+        ch = chond(element)
+        return record(Ce)
     except:
         print("For the",t[0][1],"spreadsheet:")
         print("Cannot find value for Element:",element,"for zircon",zircon,"?")
         return eval(input("Please enter the value here: "))
 
+'''
+Main function that will call everything as needed
+'''
 
 def te():
     print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
@@ -103,7 +117,7 @@ def te():
     print("Remember you must name the input csv file with a .csv extention and the output excel spreadsheet with a .xlsx extension eg. runs.xlsx")
     print("Please save and close all xlsx files and csv files before continuing!\n")
     filelist = 'Dec04_RUN[1-4]_TE.csv'#input("Enter name and number range of run files eg. run[2-4].csv : ")
-    output = 'Output.xlsx'#input("Enter the name of the new excel file with a .xlsx extension : ")
+    output = 'TEOutput.xlsx'#input("Enter the name of the new excel file with a .xlsx extension : ")
     files = getFileList(filelist)
     workbook = writer.Workbook(output)
     t = table('Chondrite values.csv')
@@ -111,16 +125,27 @@ def te():
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]),nospaces(t[i+3][2:]))
         full[0][1] = t[i][0]
         k=4
-        while t[i+k][1]=="CARTS":
-            carts = nospaces(t[i+k][3:])
-            if len(carts)>0:
-                addClassifier(full,workbook.add_worksheet(t[i+k][2]),carts)
-            k=k+1
+        try:
+            while i+k<len(t) and t[i+k][1]=="CARTS":
+                #print(i+k,"<",len(t), t)
+                carts = nospaces(t[i+k][3:])
+                if len(carts)>0:
+                    addClassifier(full,workbook.add_worksheet(t[i+k][2]),carts)
+                k=k+1
+        except:
+            print(i+k)
+            print(t)
     try:    
         workbook.close()
     except:
         input("You must close "+output+" before continuing")
         workbook.close()
+'''
+Adds a sheet based upon the outline of a Classification sheet
+full = 2D array of the table
+sheet = the actual sheet we use in the spreadsheet
+carts = the list of examples to classify
+'''
 def addClassifier(full,sheet,carts):
     sheet.write('B1','Analysis')
     sheet.write('A1','Sample')
@@ -138,17 +163,9 @@ def addClassifier(full,sheet,carts):
             sheet.write(r,c+2,content)
             classifier[r].append(content)
     return classifier
-
-def assertEquals(expected,actual,message=""):
-    if expected!=actual:
-        print(message,"Test failed")
-    else:
-        print(message,"Test passed!!")
-    print("   Expected value was:")
-    print("        ",expected)
-    print("   But the actual value is:")
-    print("        ",actual)
-    return expected
+'''
+Testing some our functions
+'''
 def test():
     assertEquals(['Hf177', 'Hf178'],listfilter(["Hf177","Hf178","Pb204"],"Hf"),"Function listfilter")
     assertEquals(['INT1-01', 'INT1-02'],listfilter(["INT1-01","INT2-01","INT1-02"],"INT1"))
@@ -159,8 +176,11 @@ def test():
     assertEquals("",record('h'))
     assertEquals(4,record(4))
     assertEquals("",record(4,""))
-    assertEquals([0,5,10,15],teSheetNamesIndicies(table('Chondrite values.csv')),"Function teSheetNamesIndicies:")
-
+    assertEquals(0.613,chond("Ce"),"Function chond")
+'''
+Add a spreadsheet of zircons against elements with it's included Chondrite values and Elements to be included in the list
+Choose particular isotopes and zircons to be excluded from this spreadsheet
+'''
 def addTESheet(files,sheet,includedElements,Chondrites,excludedZircons,excludedIsotopes):
     sheet.write('B1','Analysis')
     sheet.write('A1','Sample')
@@ -174,14 +194,12 @@ def addTESheet(files,sheet,includedElements,Chondrites,excludedZircons,excludedI
     for f in files:
         rstart = r
         t = table(f)
-        re=0
-        while t[re][0]!=BeginningCell:
-            re=re+1
+        bi=begr(t,BeginningCell)
         xe=1
         e=[]
         try:
-            while t[re+xe][0]!=EndingCell:
-                e.append(t[re+xe][0])
+            while t[bi+xe][0]!=EndingCell:
+                e.append(t[bi+xe][0])
                 xe=xe+1
         except:
             EndWhileOnError = True
@@ -198,9 +216,6 @@ def addTESheet(files,sheet,includedElements,Chondrites,excludedZircons,excludedI
                     input("Please add "+str(len(forbidden)-1)+" of them to the excludedIsotopes list!")        
         i=0 #Column Index starting after 'Element'  
         si = [] #Sample Indicies matching from the input
-        bi=0
-        while t[bi][0]!=BeginningCell:
-            bi=bi+1
         for row in t[bi]:
             inZirconList = (row not in excludedZircons) and (standard(row) not in excludedZircons)
             if inZirconList:
@@ -231,7 +246,24 @@ def teSheetNamesIndicies(Chondtable):
             sn.append(Chondtable[i][0])
             indicies.append(i)
     return indicies
-    
 
-
+'''
+Returns the Chondrite value of a specific element
+'''
+def chond(element,SheetName = 'TrElem'):
+    t=table('Chondrite values.csv')
+    r=0
+    try:
+        while t[r][0]!=SheetName:
+            r=r+1
+    except:
+        return chond(element,input("Please enter the sheet name in Chondrite values.csv that we read Chondrites from:"))
+    c=1
+    try:
+        while t[r][c]!=element:
+            c=c+1
+    except:
+        return chond(element,input("No such element "+ element + " in sheet "+ SheetName + "\n Please give another sheet name: "))
+    return record(t[r+1][c])
 te()
+
