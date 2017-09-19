@@ -57,8 +57,7 @@ def classify(cart,t,z="zircon eg. STDGJ-01"):
                             if data(t,z,"Nb")>170:
                                 return "Granitoid >75% SiO2 (76%)"
                             else:
-                                ThDivU = data(t,z,"Th")/data(t,z,"U")
-                                if ThDivU>0.44:
+                                if data(t,z,"Th/U")>0.44:
                                     return "Granitoid 65-70% SiO2 (47%)"
                                 else:
                                     return "Granitoid 70-75% SiO2 (70%)"
