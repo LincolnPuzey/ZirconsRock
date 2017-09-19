@@ -64,11 +64,27 @@ def classify(cart,t,z="zircon eg. STDGJ-01"):
                                     return "Granitoid 70-75% SiO2 (70%)"
     elif cart in t[0]:
         return data(t,z,cart)
+    elif '/' in cart:
+        return data(t,z,cart)
     elif cart=="CART2000":
         return "At the moment the python file only specifies CART 1 and CART 2"
                 
     else:
         return ""
+def data(t,zircon,element):
+    r=0
+    c=0
+    try:
+        while t[r][1]!=zircon:
+            r=r+1
+        while t[0][c]!=element:
+            c=c+1
+        return record(t[r][c])
+    except:
+        print("For the",t[0][1],"spreadsheet:")
+        print("Cannot find value for Element:",element,"for zircon",zircon,"?")
+        return eval(input("Please enter the value here: "))
+
 
 def te():
     print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
@@ -216,20 +232,6 @@ def teSheetNamesIndicies(Chondtable):
             indicies.append(i)
     return indicies
     
-def data(t,zircon,element):
-    r=0
-    c=0
-    try:
-        while t[r][1]!=zircon:
-            r=r+1
-        while t[0][c]!=element:
-            c=c+1
-        return record(t[r][c])
-    except:
-        print("For the",t[0][1],"spreadsheet:")
-        print("Cannot find value for Element:",element,"for zircon",zircon,"?")
-        return eval(input("Please enter the value here: "))
-
 
 
 te()
