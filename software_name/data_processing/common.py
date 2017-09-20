@@ -1,3 +1,5 @@
+import xlsxwriter as writer
+
 """
 File for functions common to TE and U-Pb processing
 """
