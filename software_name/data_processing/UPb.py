@@ -1,4 +1,8 @@
-from common import *
+import xlsxwriter as writer
+
+from .common import *
+
+
 csvTableNames = ['GLITTER!: Isotope ratios.',
                  'GLITTER!: Isotopic ratios: 1 sigma uncertainty.',
                  'GLITTER!: Age estimates (ma).',

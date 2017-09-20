@@ -1,5 +1,6 @@
 #virtual python directory:
 virtual-python/**
+virtual_python/**
 
 .idea/**
 

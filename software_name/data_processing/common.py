@@ -1,5 +1,8 @@
-import writer
-import copy
+"""
+File for functions common to TE and U-Pb processing
+"""
+
+
 def record(Variable,d=1):
     if d==1:
         v=str(Variable)
@@ -12,14 +15,20 @@ def record(Variable,d=1):
             return record(Variable)/record(d)
         except:
             return 0
+
+
 def getSplitter(file):
     r=read(file)
     if ';' in r:
         return ';'
     else:
         return ','
+
+
 def readln(FileName='C:/untitled.txt'):
     return read(FileName).split('\n')
+
+
 def read(FileName='C:/untitled.txt'):
     f=str(FileName)
     try:
@@ -29,32 +38,42 @@ def read(FileName='C:/untitled.txt'):
     except:
         contents="This file does not exist"
     return str(contents)
+
+
 def addSheet(sheet,t,sheetr=0,sheetc=0):
     for r in range(len(t)):
         for c in range(len(t[r])):
             sheet.write(sheetr+r,sheetc+c,evalif(t[r][c]))
     return t
+
+
 def table(FileName='C:/run.csv',Splitter=','):
     f = readln(FileName)
     t=[]
     for r in f:
         t.append(r.split(Splitter))
     return t
+
+
 def evalif(n):
     try:
         return eval(n)
     except:
         return n
+
+
 def column(t,n):
     col = []
     for row in t:
         col.append(row[n])
     return col
-'''
-Returns a list of files with their corresponding number range
-eg. getFileList('example[1-3].csv') = ['example1.csv','example2.csv','example3.csv']
-'''
+
+
 def getFileList(filename="example[1-3].csv"):
+    """
+    Returns a list of files with their corresponding number range
+    eg. getFileList('example[1-3].csv') = ['example1.csv','example2.csv','example3.csv']
+    """
     beg = filename.split('[')[0]
     end = filename.split(']')[1]
     nrange = filename.split('[')[1].split(']')[0]
@@ -64,6 +83,8 @@ def getFileList(filename="example[1-3].csv"):
     for i in range(start,finish+1):
         files.append(beg+str(i)+end)
     return files
+
+
 def nospaces(slist):
     spacelis = []
     for i in range(len(slist)):
@@ -71,13 +92,16 @@ def nospaces(slist):
         if slist[i]!='':
             spacelis.append(slist[i])
     return spacelis
-        
+
+
 def rnums(n):
     result = []
     for i in n:
         if not i.isdigit():
             result.append(i)
     return ''.join(result)
+
+
 def standard(zirconName):
     if type(zirconName)==type(["","STDGJ"]):
         stans = []

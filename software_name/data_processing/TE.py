@@ -1,6 +1,8 @@
-from common import *
+from .common import *
+
 BeginningCell = "Element" #cell where program begins reading
 EndingCell = "" #cell where program ends reading
+
 
 def classify(cart,t,z="zircon eg. STDGJ-01"):
     if cart == "CART1":

@@ -1,14 +1,14 @@
-PIP = virtual-python/bin/pip
+PIP = virtual_python/bin/pip
 
 # use this target to set up the virtual python for the project
-virtual-python: requirements.txt
-	virtualenv virtual-python
+virtual_python: requirements.txt
+	python3 -m venv ./virtual_python
 	$(PIP) install -q -r requirements.txt
 
 # use this target enter an interactive python shell using the virtual python
 ipython:
-	virtual-python/bin/ipython
+	virtual_python/bin/ipython
 
 # start the main method in main.py
 main:
-	virtual-python/bin/python software_name/main.py
+	virtual_python/bin/python software_name/main.py
