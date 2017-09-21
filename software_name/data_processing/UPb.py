@@ -1,5 +1,5 @@
 
-from .common import *
+from common import *
 csvTableNames = ['GLITTER!: Isotope ratios.',
                  'GLITTER!: Isotopic ratios: 1 sigma uncertainty.',
                  'GLITTER!: Age estimates (ma).',

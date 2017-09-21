@@ -1,8 +1,8 @@
-from .common import *
+from common import *
 
 BeginningCell = "Element" #cell where program begins reading
 EndingCell = "" #cell where program ends reading
-
+ChondriteFile = 'Chondrite values.csv'
 def classify(cart,t,z="zircon eg. STDGJ-01"):
     if cart == "CART1":
         if data(t,z,"Lu")<20.7:
@@ -117,11 +117,11 @@ def te():
     print("     Row 4: Include a list of elements that you wish to exclude")
     print("Remember you must name the input csv file with a .csv extention and the output excel spreadsheet with a .xlsx extension eg. runs.xlsx")
     print("Please save and close all xlsx files and csv files before continuing!\n")
-    filelist = 'Dec04_RUN[1-4]_TE.csv'#input("Enter name and number range of run files eg. run[2-4].csv : ")
-    output = 'TEOutput.xlsx'#input("Enter the name of the new excel file with a .xlsx extension : ")
+    filelist = input("Enter name and number range of run files eg. run[2-4].csv : ")
+    output = input("Enter the name of the new excel file with a .xlsx extension : ")
     files = getFileList(filelist)
     workbook = writer.Workbook(output)
-    t = table('Chondrite values.csv')
+    t = table(ChondriteFile)
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]),nospaces(t[i+3][2:]))
         full[0][1] = t[i][0]
@@ -252,7 +252,7 @@ def teSheetNamesIndicies(Chondtable):
 Returns the Chondrite value of a specific element
 '''
 def chond(element,SheetName = 'TrElem'):
-    t=table('Chondrite values.csv')
+    t=table(ChondriteFile)
     r=0
     try:
         while t[r][0]!=SheetName:
