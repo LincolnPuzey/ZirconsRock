@@ -279,3 +279,4 @@ def chond(element,SheetName = 'TrElem'):
         return chond(element,input("No such element "+ element + " in sheet "+ SheetName + "\n Please give another sheet name: "))
     return record(t[r+1][c])
 
+print(getAllZircons(getFileList('H:\osx\Desktop\CITS3200\CITS3200\test_files\inputs\Dec04_RUN[1-4]_TE.csv')))
