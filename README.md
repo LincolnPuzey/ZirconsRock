@@ -4,12 +4,13 @@ Repository for CITS3200 Project
 
 Project Requires Python 3.5 or later
 
-### Installation on Windows
+### Installation on WINDOWS/MAC
   * First ensure you have Python3 version 3.5 or later installed
   * Clone this git repo to your installation location
-  * Double-click windows-setup.cmd to install the program's requirements
+  * Double-click install-requirements.py to install the program's requirements
 
-### Setting up dev environment on LINUX
+
+### Installation/Setting up dev environment on LINUX
 To set up your dev environment you will need to have the following installed:
   * Python 3 (Version 3.5 or later)
 
