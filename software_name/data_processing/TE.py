@@ -179,6 +179,18 @@ def test():
     assertEquals("",record(4,""))
     assertEquals(0.613,chond("Ce"),"Function chond")
 '''
+Returns all of the zircons listed in a Trace Element File List
+'''
+def getAllZircons(files):
+    zlist = []
+    for f in files:
+        t = table(f)
+        bi=begr(t,BeginningCell)
+        for row in t[bi]:
+            if row != BeginningCell:
+                zlist.append(row)
+    return zlist
+'''
 Add a spreadsheet of zircons against elements with it's included Chondrite values and Elements to be included in the list
 Choose particular isotopes and zircons to be excluded from this spreadsheet
 '''
@@ -266,5 +278,4 @@ def chond(element,SheetName = 'TrElem'):
     except:
         return chond(element,input("No such element "+ element + " in sheet "+ SheetName + "\n Please give another sheet name: "))
     return record(t[r+1][c])
-te()
 

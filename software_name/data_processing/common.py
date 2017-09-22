@@ -2,7 +2,7 @@
 """
 File for functions common to TE and U-Pb processing
 """
-import writer
+#import writer
 import copy
 '''
 Tries to evaluate and divide a variable for each record in a table.
@@ -53,7 +53,7 @@ fileName = 'single.txt' will look in current directory
 fileName = 'C:/single.txt' will look in C directory
 '''
 def read(FileName='C:/untitled.txt'):
-    f=str(FileName)
+    f=str(FileName).replace('\\','/').replace('\t','/t').replace('\n','/n').replace('\0','/0')
     try:
         with open(f) as infile:
             contents=infile.read()
