@@ -3,6 +3,8 @@ from common import *
 BeginningCell = "Element" #cell where program begins reading
 EndingCell = "" #cell where program ends reading
 ChondriteFile = 'Chondrite values.csv'
+testInputLocation = 'C:/Users/markc_000/Google Drive/CITS3200/CITS3200/test_files/inputs/Dec04_RUN[1-4]_TE.csv'
+
 def classify(cart,t,z="zircon eg. STDGJ-01"):
     if cart == "CART1":
         if data(t,z,"Lu")<20.7:
@@ -104,7 +106,7 @@ Main function that will call everything as needed
 def te():
     print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
-    print("This program was created and developed by Mark Collier August 2017 [Contact:+61466523090]")
+    print("This program was created and developed by Mark Collier September 2017 [Contact:+61466523090]")
     print("You have to specify the name of the csv file and input the range of numbers within that name:")
     print("For example if you type run[1-3].csv then this program will read run1.csv,run2.csv and run3.csv")
     print("Data from every csv file will be added on top into your output spreadsheet.")
@@ -117,10 +119,10 @@ def te():
     print("     Row 4: Include a list of elements that you wish to exclude")
     print("Remember you must name the input csv file with a .csv extention and the output excel spreadsheet with a .xlsx extension eg. runs.xlsx")
     print("Please save and close all xlsx files and csv files before continuing!\n")
-    filelist = input("Enter name and number range of run files eg. run[2-4].csv : ")
-    output = input("Enter the name of the new excel file with a .xlsx extension : ")
+    filelist = input("Enter the location and number range of run files eg. run[2-4].csv : ")
+    output = input("Enter the location of the new excel file with a .xlsx extension : ")
     files = getFileList(filelist)
-    workbook = writer.Workbook(output)
+    workbook = xlsxwriter.Workbook(output)
     t = table(ChondriteFile)
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]),nospaces(t[i+3][2:]))
@@ -128,14 +130,12 @@ def te():
         k=4
         try:
             while i+k<len(t) and t[i+k][1]=="CARTS":
-                #print(i+k,"<",len(t), t)
                 carts = nospaces(t[i+k][3:])
                 if len(carts)>0:
                     addClassifier(full,workbook.add_worksheet(t[i+k][2]),carts)
                 k=k+1
         except:
-            print(i+k)
-            print(t)
+            Finish = True
     try:    
         workbook.close()
     except:
@@ -278,5 +278,4 @@ def chond(element,SheetName = 'TrElem'):
     except:
         return chond(element,input("No such element "+ element + " in sheet "+ SheetName + "\n Please give another sheet name: "))
     return record(t[r+1][c])
-
-print(getAllZircons(getFileList('H:\osx\Desktop\CITS3200\CITS3200\test_files\inputs\Dec04_RUN[1-4]_TE.csv')))
+te()

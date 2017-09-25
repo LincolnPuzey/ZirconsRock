@@ -13,6 +13,8 @@ shortNames = ['Istopic ratios',
 EndOfTableIndicator = ""
 denomTh = 649.9625
 denomU = 753.2491
+testInputLocation = 'C:/Users/markc_000/Google Drive/CITS3200/CITS3200/test_files/inputs/Dec04_RUN[1-4]_UPb.csv'
+testOutputLocation = 'C:/Users/markc_000/Google Drive/CITS3200/CITS3200/test_files/outputs/UPbOutput.xlsx'
 '''
 Reads a csv file then filters out the appropriate zircons and elements
 sheet = workbook.add_worksheet(f) if you wish to add this sheet to table
@@ -39,7 +41,7 @@ def test():
     assertEquals(':',getSplitter('new.csv'),"Function getSplitter")
     assertEquals(['example1.csv','example2.csv'],getFileList('example[1-2].csv'),"Function getFileList")
     assertEquals(['run1.csv','run2.csv','run3.csv'],getFileList('run[1-3].csv'),"Function getFileList")
-    assertEquals(['STDGJ', '91500', 'MT', 'INT1', 'INT2'],standard(getAllZircons(getFileList('Dec04_RUN[1-4]_UPb.csv'))),"Function standard(getAllZircons)")
+    assertEquals(['STDGJ', '91500', 'MT', 'INT1', 'INT2'],standard(getAllZircons(getFileList(testInputLocation))),"Function standard(getAllZircons)")
 '''
 Returns the table with a cetain amount of includedFields by specifying the name of table first
 t = the table that has it's name above it's contents eg. ['Table Name',['field','data','field']]
@@ -171,7 +173,8 @@ def getAllZircons(fileList):
 '''
 Main Function called to run the entire program
 '''
-def UPb():
+            
+def UPb(control,normalised):
     print("This particular python file will read the data recorded by the Laser device for U-Pb data.")
     print("You have to specify the name of the csv file and input the range of numbers within that name:")
     print("For example if you type run[1-3].csv then this program will read run1.csv,run2.csv and run3.csv")
@@ -181,10 +184,10 @@ def UPb():
     print("The Mean Raw CPS background table will include only these following fields:")
     print(IncludedFields)
     print("Remember you must name the input csv file with a .csv extention and the output excel spreadsheet with a .xlsx extension eg. runs.xlsx")
-    print("This program was created and developed by Mark Collier on 17 August 2017 [Contact:+61466523090]\n")
-    files = getFileList('Dec04_RUN[1-4]_UPb.csv')#input("Enter name and number range of run files eg. run[2-4].csv : "))
-    output = 'Output.xlsx'#input("Enter the name of the new excel file with a .xlsx extension : ")
-    workbook = writer.Workbook(output)#'C:/Users/markc_000/Google Drive/CITS3200/Project/Client/U-Pb and TE data/U-Pb/Output.xlsx')
+    print("This program was created and developed by Mark Collier in September 2017 [Contact:+61466523090]\n")
+    files = getFileList(input("Enter the location and number range of run files eg. run[2-4].csv : "))
+    output = input("Enter the location of the new excel file with a .xlsx extension : ")
+    workbook = xlsxwriter.Workbook(output)
     tlist = []
     conc = []
     for f in files:
@@ -205,6 +208,13 @@ def UPb():
         if s=='raw':
             addSheet(workbook.add_worksheet("Ratios raw"),ratios)
             addSheet(workbook.add_worksheet("Ages raw"),ages)
+            commonPb = workbook.add_worksheet("ToBeCommonLeadCorrected")
+            addSheet(commonPb,combine(tlist,4,IncludedZircons),3,len(ratios[0])-1)
+            addSheet(commonPb,ratios,3)
+            ctrl = workbook.add_worksheet("Control Report")
+            norm = workbook.add_worksheet("Normalized Report")
+            addSheet(ctrl,alternate(combine(tlist,0,control),combine(tlist,1,control)))
+            addSheet(norm,alternate(combine(tlist,0,normalised),combine(tlist,1,normalised)))
         else:
             r = sigma(copy.deepcopy(ratios),2)
             tablesToPutOnThisStandard = [r,concentrations,sigma(ages,2)]
@@ -215,7 +225,7 @@ def UPb():
         workbook.close()
     except:
         input("You must close "+output+" before continuing...")
-        UPb()
-test()
+        UPb(['STDGJ','INT1'],['INT2','MT'])
+UPb(['STDGJ','INT1'],['INT2','MT'])
 
 

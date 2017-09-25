@@ -1,9 +1,8 @@
-
 """
 File for functions common to TE and U-Pb processing
 """
-#import writer
 import copy
+import xlsxwriter
 '''
 Tries to evaluate and divide a variable for each record in a table.
 Variable = can be a string int or float to be evaluated
@@ -38,8 +37,10 @@ def getSplitter(file):
     r=read(file)
     if ';' in r:
         return ';'
-    else:
+    if ',' in r:
         return ','
+    if '\t' in r:
+        return '\t
 '''
 Returns a list of lines from a file.
 fileName = 'single.txt' will look in current directory
@@ -171,3 +172,9 @@ def standard(zirconName):
     else:
         z = str(zirconName)
         return z.split('-')[0]
+'''
+Prints and returns n
+'''
+def see(n):
+    print(n)
+    return n
