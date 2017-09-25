@@ -40,7 +40,7 @@ def getSplitter(file):
     if ',' in r:
         return ','
     if '\t' in r:
-        return '\t
+        return '\t'
 '''
 Returns a list of lines from a file.
 fileName = 'single.txt' will look in current directory
