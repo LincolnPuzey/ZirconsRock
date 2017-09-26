@@ -1,6 +1,7 @@
 import pip
 
-if __name__ == "__main__":
+
+def install_requirements():
     print("Installing requirements...")
     try:
         import pip
@@ -12,3 +13,7 @@ if __name__ == "__main__":
         print("Exception:")
         print(str(e))
         input("Press Enter to exit...")
+
+
+if __name__ == "__main__":
+    install_requirements()
