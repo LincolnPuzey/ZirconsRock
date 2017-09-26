@@ -1,12 +1,14 @@
-import subprocess
+import pip
 
 if __name__ == "__main__":
     print("Installing requirements...")
-    completed = subprocess.run(
-        ["pip", "install", "-r", "requirements.txt"],
-        stdout=subprocess.PIPE,
-        shell=True,
-        universal_newlines=True
-    )
-    print(completed.stdout)
-    input("Press Enter to exit...")
+    try:
+        import pip
+        pip.main(['install', '-r', 'requirements.txt'])
+
+        print("Success")
+        input("Press Enter to exit...")
+    except Exception as e:
+        print("Exception:")
+        print(str(e))
+        input("Press Enter to exit...")
