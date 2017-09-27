@@ -11,19 +11,17 @@ class FinishedPage(ttk.Frame):
         contentFrame = Content(self, controller)
         footerFrame = Footer(self, controller, False, "","", "FilterStandardsPage", "FinishedPage")
 
-        self.input_output_page = "UPbInputOutputPage"
-
         doneLabel = ttk.Label(contentFrame, text="Done.", font=controller.bigFont)
 
 
         outInfoFrame = ttk.Frame(contentFrame)
         nameTitleLabel = ttk.Label(outInfoFrame, text="Name of results: ", font=controller.mediumFont)
         #use a StringVar so the Label updates when the user changes the file name
-        outNameStr = controller.frames[self.input_output_page].output_filename
+        outNameStr = controller.frames[self.get_input_output_page()].output_filename
         nameLabel = ttk.Label(outInfoFrame, textvariable=outNameStr, font=controller.mediumFont)
         locationLabel = ttk.Label(outInfoFrame, text="Location of results: ", font=controller.mediumFont)
         #use a StringVar so the Label updates when the user changes the file path
-        outDirStr = controller.frames[self.input_output_page].output_dir
+        outDirStr = controller.frames[self.get_input_output_page()].output_dir
         outPathLabel = ttk.Label(outInfoFrame, textvariable=outDirStr, font=controller.mediumFont)
 
         openButton = Button(contentFrame, text="Open", command=lambda: self.open())
@@ -47,7 +45,9 @@ class FinishedPage(ttk.Frame):
 
      # https://stackoverflow.com/questions/13078071/start-another-program-from-python-separately
      def open(self):
-         filepath = self.controller.frames[self.input_output_page].output_filepath.get()
+         input_output_page = self.get_input_output_page()
+
+         filepath = self.controller.frames[input_output_page].output_filepath.get()
          try:
              if sys.platform.startswith("win"):
                  os.startfile(filepath)
@@ -62,7 +62,9 @@ class FinishedPage(ttk.Frame):
 
      # https://stackoverflow.com/questions/6631299/python-opening-a-folder-in-explorer-nautilus-mac-thingie
      def showInFolder(self):
-        dir_path = self.controller.frames[self.input_output_page].output_dir.get()
+        input_output_page = self.get_input_output_page()
+
+        dir_path = self.controller.frames[input_output_page].output_dir.get()
 
         try:
             if sys.platform.startswith("win"):
@@ -73,3 +75,9 @@ class FinishedPage(ttk.Frame):
                 subprocess.Popen(["xdg-open", dir_path])
         except:
             pass
+
+     def get_input_output_page(self):
+         if self.controller.isUpb:
+             return "UPbInputOutputPage"
+         else:
+             return "TEInputOutputPage"

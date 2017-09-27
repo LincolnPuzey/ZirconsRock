@@ -9,6 +9,7 @@ class InputOutputPage(ttk.Frame):
         self.title = title
 
         self.input_filepaths = []
+        self.valid_input_filepaths = []
         self.input_listbox_items = StringVar()
 
         home_dir = os.path.expanduser('~/')
@@ -112,6 +113,7 @@ class InputOutputPage(ttk.Frame):
          filterStandardsPage.clearStandards()
          self.errorLabel.grid_forget()
          self.numValidFiles = 0
+         self.valid_input_filepaths.clear()
 
          index=0
          for path in self.input_filepaths:
@@ -120,6 +122,7 @@ class InputOutputPage(ttk.Frame):
                  # sucessfully retrieved standards from file -> green
                  self.inputList.itemconfig(index, {'background': styles.SUCCESS_COLOUR_LIGHT, 'selectbackground': styles.SUCCESS_COLOUR_MED})
                  self.numValidFiles+=1
+                 self.valid_input_filepaths.append(path)
              except Exception as e:
                  #  unsuccessfully retrieved standards from file -> red
                  self.inputList.itemconfig(index, {'background': styles.ERROR_COLOUR_LIGHT, 'selectbackground': styles.ERROR_COLOUR_MED})

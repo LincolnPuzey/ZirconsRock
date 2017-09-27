@@ -3,7 +3,8 @@ from .common import *
 BeginningCell = "Element" #cell where program begins reading
 EndingCell = "" #cell where program ends reading
 testInputLocation = 'C:/Users/mark/Google Drive/CITS3200/CITS3200/test_files/inputs/Dec04_RUN[1-4]_TE.csv'
-
+ChondriteFile = ""
+SheetName="TrElem"
 def classify(cart,t,z="zircon eg. STDGJ-01"):
     if cart == "CART1":
         if data(t,z,"Lu")<20.7:
@@ -78,6 +79,7 @@ zircon eg = 'STDGJ-01'
 element eg = 'Ce'
 '''
 def data(t,zircon,element):
+    print("\n\n" + str(t) + "\n\n")
     if "/" in element:
         e=element.split("/")
         return record(data(t,zircon,e[0]),data(t,zircon,e[1]))
@@ -93,7 +95,8 @@ def data(t,zircon,element):
         Pr = t[r][c+1]
         ch = chond(element)
         return record(Ce)
-    except:
+    except Exception as e:
+        print(e)
         print("For the",t[0][1],"spreadsheet:")
         print("Cannot find value for Element:",element,"for zircon",zircon,"?")
         return eval(input("Please enter the value here: "))
@@ -102,7 +105,7 @@ def data(t,zircon,element):
 Main function that will call everything as needed
 '''
 
-def te(files,output,ChondriteFile):
+def te(files,output,ChondFile):
     print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
     print("This program was created and developed by Mark Collier September 2017 [Contact:+61466523090]")
@@ -118,11 +121,13 @@ def te(files,output,ChondriteFile):
     print("     Row 4: Include a list of elements that you wish to exclude")
     print("Remember you must name the input csv file with a .csv extention and the output excel spreadsheet with a .xlsx extension eg. runs.xlsx")
     print("Please save and close all xlsx files and csv files before continuing!\n")
+    ChondriteFile=ChondFile
     #filelist = testInputLocation#input("Enter the location and number range of run files eg. run[2-4].csv : ")
     #output = input("Enter the location of the new excel file with a .xlsx extension : ")
     #files = getFileList(filelist)
     workbook = xlsxwriter.Workbook(output)
     t = table(ChondriteFile)
+
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]),nospaces(t[i+3][2:]))
         full[0][1] = t[i][0]
@@ -135,7 +140,7 @@ def te(files,output,ChondriteFile):
                 k=k+1
         except:
             Finish = True
-    try:    
+    try:
         workbook.close()
     except:
         input("You must close "+output+" before continuing")
@@ -225,8 +230,8 @@ def addTESheet(files,sheet,includedElements,Chondrites,excludedZircons,excludedI
                 if len(forbidden)>1:
                     print(inc,"has",len(forbidden),"possibilities:")
                     print(forbidden)
-                    input("Please add "+str(len(forbidden)-1)+" of them to the excludedIsotopes list!")        
-        i=0 #Column Index starting after 'Element'  
+                    input("Please add "+str(len(forbidden)-1)+" of them to the excludedIsotopes list!")
+        i=0 #Column Index starting after 'Element'
         si = [] #Sample Indicies matching from the input
         for row in t[bi]:
             inZirconList = (row not in excludedZircons) and (standard(row) not in excludedZircons)
@@ -262,19 +267,20 @@ def teSheetNamesIndicies(Chondtable):
 '''
 Returns the Chondrite value of a specific element
 '''
-def chond(element,SheetName = 'TrElem'):
+def chond(element):
     t=table(ChondriteFile)
     r=0
     try:
         while t[r][0]!=SheetName:
             r=r+1
     except:
-        return chond(element,input("Please enter the sheet name in Chondrite values.csv that we read Chondrites from:"))
+        SheetName=input("Please enter the sheet name in Chondrite values.csv that we read Chondrites from:")
+        return chond(element)
     c=1
     try:
         while t[r][c]!=element:
             c=c+1
     except:
-        return chond(element,input("No such element "+ element + " in sheet "+ SheetName + "\n Please give another sheet name: "))
+        SheetName = input("No such element "+ element + " in sheet "+ SheetName + "\n Please give another sheet name: ")
+        return chond(element)
     return record(t[r+1][c])
-

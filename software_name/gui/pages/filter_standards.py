@@ -1,5 +1,6 @@
 from gui.resources import *
 
+from defaults import CHONDRITE_FILE
 
 # from data_processing.UPb import *
 import data_processing.UPb as UPb
@@ -158,8 +159,14 @@ class FilterStandardsPage(ttk.Frame):
      def onGo(self, *event):
          control_standards = self.getControlStandards()
          normalising_standards = self.getNormalisingStandards()
+         print(CHONDRITE_FILE)
          if self.controller.isUpb:
-             UPb.UPb(control_standards, normalising_standards)
+             output_filepath = self.controller.frames["UPbInputOutputPage"].output_filepath.get()
+             files = self.controller.frames["UPbInputOutputPage"].valid_input_filepaths
+             UPb.UPb(control_standards, normalising_standards, files, output_filepath)
              self.footerFrame.goToNextPage()
          else:
+             output_filepath = self.controller.frames["TEInputOutputPage"].output_filepath.get()
+             files = self.controller.frames["TEInputOutputPage"].valid_input_filepaths
+             TE.te(files, output_filepath, CHONDRITE_FILE)
              self.footerFrame.goToNextPage()
