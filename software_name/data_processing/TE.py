@@ -2,7 +2,6 @@ from .common import *
 
 BeginningCell = "Element" #cell where program begins reading
 EndingCell = "" #cell where program ends reading
-ChondriteFile = 'Chondrite values.csv'
 testInputLocation = 'C:/Users/mark/Google Drive/CITS3200/CITS3200/test_files/inputs/Dec04_RUN[1-4]_TE.csv'
 
 def classify(cart,t,z="zircon eg. STDGJ-01"):
@@ -103,7 +102,7 @@ def data(t,zircon,element):
 Main function that will call everything as needed
 '''
 
-def te(files,output):
+def te(files,output,ChondriteFile):
     print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
     print("This program was created and developed by Mark Collier September 2017 [Contact:+61466523090]")
