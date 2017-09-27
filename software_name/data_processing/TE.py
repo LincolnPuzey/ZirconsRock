@@ -103,7 +103,7 @@ def data(t,zircon,element):
 Main function that will call everything as needed
 '''
 
-def te():
+def te(files,output):
     print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
     print("This program was created and developed by Mark Collier September 2017 [Contact:+61466523090]")
@@ -119,9 +119,9 @@ def te():
     print("     Row 4: Include a list of elements that you wish to exclude")
     print("Remember you must name the input csv file with a .csv extention and the output excel spreadsheet with a .xlsx extension eg. runs.xlsx")
     print("Please save and close all xlsx files and csv files before continuing!\n")
-    filelist = testInputLocation#input("Enter the location and number range of run files eg. run[2-4].csv : ")
-    output = input("Enter the location of the new excel file with a .xlsx extension : ")
-    files = getFileList(filelist)
+    #filelist = testInputLocation#input("Enter the location and number range of run files eg. run[2-4].csv : ")
+    #output = input("Enter the location of the new excel file with a .xlsx extension : ")
+    #files = getFileList(filelist)
     workbook = xlsxwriter.Workbook(output)
     t = table(ChondriteFile)
     for i in teSheetNamesIndicies(t):

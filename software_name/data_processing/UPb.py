@@ -173,7 +173,7 @@ def getAllZircons(fileList):
 Main Function called to run the entire program
 '''
             
-def UPb(control,normalised):
+def UPb(control,normalised,files,output):
     print("This particular python file will read the data recorded by the Laser device for U-Pb data.")
     print("You have to specify the name of the csv file and input the range of numbers within that name:")
     print("For example if you type run[1-3].csv then this program will read run1.csv,run2.csv and run3.csv")
@@ -184,8 +184,8 @@ def UPb(control,normalised):
     print(IncludedFields)
     print("Remember you must name the input csv file with a .csv extention and the output excel spreadsheet with a .xlsx extension eg. runs.xlsx")
     print("This program was created and developed by Mark Collier in September 2017 [Contact:+61466523090]\n")
-    files = getFileList(testInputLocation)#getFileList(input("Enter the location and number range of run files eg. run[2-4].csv : "))
-    output = testOutputLocation#input("Enter the location of the new excel file with a .xlsx extension : ")
+    #files = getFileList(testInputLocation)#getFileList(input("Enter the location and number range of run files eg. run[2-4].csv : "))
+    #output = testOutputLocation#input("Enter the location of the new excel file with a .xlsx extension : ")
     workbook = xlsxwriter.Workbook(output)
     tlist = []
     conc = []
