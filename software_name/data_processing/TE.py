@@ -79,7 +79,6 @@ zircon eg = 'STDGJ-01'
 element eg = 'Ce'
 '''
 def data(t,zircon,element):
-    print("\n\n" + str(t) + "\n\n")
     if "/" in element:
         e=element.split("/")
         return record(data(t,zircon,e[0]),data(t,zircon,e[1]))
@@ -93,7 +92,7 @@ def data(t,zircon,element):
         Ce = t[r][c]
         La = t[r][c-1]
         Pr = t[r][c+1]
-        ch = chond(element)
+        # ch = chond(element)
         return record(Ce)
     except Exception as e:
         print(e)

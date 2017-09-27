@@ -3,6 +3,8 @@
 import os
 import sys
 import subprocess
+import pickle as pickle
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font as tkfont

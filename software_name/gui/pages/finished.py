@@ -68,7 +68,7 @@ class FinishedPage(ttk.Frame):
 
         try:
             if sys.platform.startswith("win"):
-                os.startfile(dirPath)
+                os.startfile(dir_path)
             elif sys.platform.startswith('darwin'):
                 subprocess.Popen(["open", dir_path])
             else:
