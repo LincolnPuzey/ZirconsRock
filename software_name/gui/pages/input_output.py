@@ -119,7 +119,7 @@ class InputOutputPage(ttk.Frame):
     # updates the list of standards on the FilterStandardsPage
     def updateFilterStandardsPage(self):
         filterStandardsPage = self.controller.frames["FilterStandardsPage"]
-        filterStandardsPage.clearStandards()
+        filterStandardsPage.clear_standards()
         self.errorLabel.grid_forget()
         self.numValidFiles = 0
         self.valid_input_filepaths.clear()
@@ -127,7 +127,7 @@ class InputOutputPage(ttk.Frame):
         index = 0
         for path in self.input_filepaths:
             try:
-                filterStandardsPage.populateStandards(path)
+                filterStandardsPage.populate_standards(path)
                 # sucessfully retrieved standards from file -> green
                 self.inputList.itemconfig(index, {
                                           'background': styles.SUCCESS_COLOUR_LIGHT, 'selectbackground': styles.SUCCESS_COLOUR_MED})
@@ -190,7 +190,7 @@ class InputOutputPage(ttk.Frame):
             self.disable_next_button()
 
     def disable_next_button(self):
-        self.footerFrame.nextButton.config(state=tk.DISABLED)
+        self.footerFrame.next_button.config(state=tk.DISABLED)
 
     def enable_next_button(self):
-        self.footerFrame.nextButton.config(state=tk.NORMAL)
+        self.footerFrame.next_button.config(state=tk.NORMAL)

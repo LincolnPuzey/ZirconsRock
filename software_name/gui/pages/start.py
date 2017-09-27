@@ -70,14 +70,14 @@ class StartPage(ttk.Frame):
         self.controller.isUpb = True
 
         self.controller.frames["UPbInputOutputPage"].initialise()
-        self.controller.frames["FilterStandardsPage"].initialiseUPb()
+        self.controller.frames["FilterStandardsPage"].initialise_u_pb()
         self.controller.show_frame("UPbInputOutputPage")
 
     def onPressTE(self):
         self.controller.isUpb = False
 
         self.controller.frames["TEInputOutputPage"].initialise()
-        self.controller.frames["FilterStandardsPage"].initialiseTE()
+        self.controller.frames["FilterStandardsPage"].initialise_t_e()
         self.controller.show_frame("TEInputOutputPage")
 
     def test_upb(self):
@@ -91,7 +91,7 @@ class StartPage(ttk.Frame):
         self.controller.frames["UPbInputOutputPage"].output_filename.set(
             defaults.UPB_OUTPUT_FILEPATH)
 
-        self.controller.frames["FilterStandardsPage"].footerFrame.goToNextPage()
+        self.controller.frames["FilterStandardsPage"].footerFrame.go_to_next_page()
 
     def test_te(self):
         TE.te(defaults.TE_INPUT_FILEPATHS,
@@ -104,4 +104,4 @@ class StartPage(ttk.Frame):
         self.controller.frames["TEInputOutputPage"].output_filename.set(
             defaults.TE_OUTPUT_FILEPATH)
 
-        self.controller.frames["FilterStandardsPage"].footerFrame.goToNextPage()
+        self.controller.frames["FilterStandardsPage"].footerFrame.go_to_next_page()

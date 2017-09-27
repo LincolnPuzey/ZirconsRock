@@ -2,7 +2,6 @@ from gui.resources import *
 
 from defaults import CHONDRITE_FILE
 
-# from data_processing.UPb import *
 import data_processing.UPb as UPb
 import data_processing.TE as TE
 import data_processing.common as common
@@ -15,104 +14,104 @@ class FilterStandardsPage(ttk.Frame):
         self.parent = parent
         self.controller = controller
 
-        self.headerFrame = Header(self, controller, "", "")
-        contentFrame = Content(self, controller)
+        self.header_frame = Header(self, controller, "", "")
+        content_frame = Content(self, controller)
         self.footerFrame = Footer(
             self, controller, True, "Back", "Go", "InputOutputPage", "FinishedPage")
 
-        self.footerFrame.set_next_btn_command(self.onGo)
+        self.footerFrame.set_next_btn_command(self.on_go)
 
-        titleFrame = ttk.Frame(contentFrame)
-        self.standardLabel = ttk.Label(
-            titleFrame, text="Standard", style='subtitle.TLabel', padding="0 0 10 10")
-        self.normLabel = ttk.Label(
-            titleFrame, text="N", style='subtitle.TLabel', padding="0 0 10 10")
-        self.controlLabel = ttk.Label(
-            titleFrame, text="C", style='subtitle.TLabel', padding="0 0 10 10")
+        title_frame = ttk.Frame(content_frame)
+        self.standard_label = ttk.Label(
+            title_frame, text="Standard", style='subtitle.TLabel', padding="0 0 10 10")
+        self.norm_label = ttk.Label(
+            title_frame, text="N", style='subtitle.TLabel', padding="0 0 10 10")
+        self.control_label = ttk.Label(
+            title_frame, text="C", style='subtitle.TLabel', padding="0 0 10 10")
 
         self.canvas = tk.Canvas(
-            contentFrame, highlightthickness=0, background=styles.BG_COLOUR)
+            content_frame, highlightthickness=0, background=styles.BG_COLOUR)
         self.scrollbar = ttk.Scrollbar(
-            contentFrame, orient=VERTICAL, command=self.canvas.yview)
+            content_frame, orient=VERTICAL, command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
         self.inner_canvas_frame = ttk.Frame(self.canvas)
 
-        titleFrame.grid(column=0, row=0, sticky=(W))
+        title_frame.grid(column=0, row=0, sticky=(W))
 
-        # titleFrame children
-        self.standardLabel.grid(column=0, row=0, sticky=(W, E))
-        self.normLabel.grid(column=1, row=0, sticky=(W, E))
-        self.controlLabel.grid(column=2, row=0, sticky=(W, E))
+        # title_frame children
+        self.standard_label.grid(column=0, row=0, sticky=(W, E))
+        self.norm_label.grid(column=1, row=0, sticky=(W, E))
+        self.control_label.grid(column=2, row=0, sticky=(W, E))
 
         self.canvas.grid(column=0, row=1, sticky=(N, S, E, W), columnspan=3)
         self.scrollbar.grid(column=3, row=1, sticky=(N, S, E))
 
         # Temp button
-        normButton = Button(contentFrame, text="Norm", command=lambda: print(
-            self.getNormalisingStandards()))
-        controlButton = Button(contentFrame, text="Control",
-                               command=lambda: print(self.getControlStandards()))
+        norm_button = Button(content_frame, text="Norm", command=lambda: print(
+            self.get_normalising_standards()))
+        control_button = Button(content_frame, text="Control",
+                                command=lambda: print(self.get_control_standards()))
 
-        normButton.grid(column=0, row=2)
-        controlButton.grid(column=1, row=2)
+        norm_button.grid(column=0, row=2)
+        control_button.grid(column=1, row=2)
 
         self.canvas.create_window(
             (0, 0), window=self.inner_canvas_frame, anchor="nw", tags="self.inner_canvas_frame")
-        self.inner_canvas_frame.bind("<Configure>", self.onFrameConfigure)
+        self.inner_canvas_frame.bind("<Configure>", self.on_frame_configure)
 
         # mousewheel bindings are platform dependant
         if sys.platform.startswith('linux'):
-            self.bind_all("<Button-4>", self.onMouseWheel)
-            self.bind_all("<Button-5>", self.onMouseWheel)
+            self.bind_all("<Button-4>", self.on_mouse_wheel)
+            self.bind_all("<Button-5>", self.on_mouse_wheel)
         else:
-            self.bind_all("<MouseWheel>", self.onMouseWheel)
+            self.bind_all("<MouseWheel>", self.on_mouse_wheel)
 
         self.standards = []
-        self.isNormStrVars = []
-        self.isControlStrVars = []
+        self.is_norm_str_vars = []
+        self.is_control_str_vars = []
 
-    def populateStandards(self, filepath):
+    def populate_standards(self, filepath):
 
         # set the width of columns in the canvas to match the width of columns outside the canvas
         self.inner_canvas_frame.columnconfigure(
-            0, minsize=self.standardLabel.winfo_width())
+            0, minsize=self.standard_label.winfo_width())
         self.inner_canvas_frame.columnconfigure(
-            1, minsize=self.normLabel.winfo_width())
+            1, minsize=self.norm_label.winfo_width())
         self.inner_canvas_frame.columnconfigure(
-            2, minsize=self.controlLabel.winfo_width())
+            2, minsize=self.control_label.winfo_width())
 
         # common.standard requires a list of filepaths
-        filePathList = []
-        filePathList.append(filepath)
+        file_path_list = []
+        file_path_list.append(filepath)
 
-        newStandards = []
+        new_standards = []
         if self.controller.isUpb:
-            newStandards = common.standard(UPb.getAllZircons(filePathList))
+            new_standards = common.standard(UPb.getAllZircons(file_path_list))
         else:
-            newStandards = common.standard(TE.getAllZircons(filePathList))
+            new_standards = common.standard(TE.getAllZircons(file_path_list))
 
         row = len(self.standards)
-        for s in newStandards:
+        for s in new_standards:
             if s not in self.standards:
 
                 self.standards.append(s)
-                standardNameLabel = ttk.Label(
+                standard_name_label = ttk.Label(
                     self.inner_canvas_frame, text=s, padding="10 0 10 0")
 
-                isNorm = tk.StringVar(value="")
-                isControl = tk.StringVar(value="")
+                is_norm = tk.StringVar(value="")
+                is_control = tk.StringVar(value="")
 
-                self.isNormStrVars.append(isNorm)
-                self.isControlStrVars.append(isControl)
+                self.is_norm_str_vars.append(is_norm)
+                self.is_control_str_vars.append(is_control)
 
-                isNormBtn = CustomCheckbutton(
-                    self.inner_canvas_frame, variable=isNorm, onvalue=s, offvalue="", padding="0 0 0 0")
-                isControlBtn = CustomCheckbutton(
-                    self.inner_canvas_frame, variable=isControl, onvalue=s, offvalue="", padding="0 0 0 0")
+                is_norm_btn = CustomCheckbutton(
+                    self.inner_canvas_frame, variable=is_norm, onvalue=s, offvalue="", padding="0 0 0 0")
+                is_control_btn = CustomCheckbutton(
+                    self.inner_canvas_frame, variable=is_control, onvalue=s, offvalue="", padding="0 0 0 0")
 
-                standardNameLabel.grid(column=0, row=row, sticky=(E))
-                isNormBtn.grid(column=1, row=row)
-                isControlBtn.grid(column=2, row=row)
+                standard_name_label.grid(column=0, row=row, sticky=E)
+                is_norm_btn.grid(column=1, row=row)
+                is_control_btn.grid(column=2, row=row)
 
                 row += 1
 
@@ -125,55 +124,55 @@ class FilterStandardsPage(ttk.Frame):
         # invisibleNormLabel.grid(     column=1, row=20, sticky=(E))
         # invisibleControlLabel.grid(  column=2, row=20, sticky=(E))
 
-    def clearStandards(self):
+    def clear_standards(self):
         for widget in self.inner_canvas_frame.winfo_children():
             widget.destroy()
         self.standards.clear()
-        self.isNormStrVars.clear()
-        self.isControlStrVars.clear()
+        self.is_norm_str_vars.clear()
+        self.is_control_str_vars.clear()
 
-    def getNormalisingStandards(self):
+    def get_normalising_standards(self):
         standards = []
-        for strVar in self.isNormStrVars:
+        for strVar in self.is_norm_str_vars:
             if strVar.get() != "":
                 standards.append(strVar.get())
 
         return standards
 
-    def getControlStandards(self):
+    def get_control_standards(self):
         standards = []
-        for strVar in self.isControlStrVars:
+        for strVar in self.is_control_str_vars:
             if strVar.get() != "":
                 standards.append(strVar.get())
 
         return standards
 
-   # enables scrolling from anywhere on the page
-   # Note: yview_scroll's first parameter is platform dependant
-   # Note: darwin = macOS
-   # https://stackoverflow.com/questions/17355902/python-tkinter-binding-mousewheel-to-scrollbar
-   # UnicodeDecodeError on MacOS: https://stackoverflow.com/questions/16995969/inertial-scrolling-in-mac-os-x-with-tkinter-and-python
-    def onMouseWheel(self, event):
+    # enables scrolling from anywhere on the page
+    # Note: yview_scroll's first parameter is platform dependant
+    # Note: darwin = macOS
+    # https://stackoverflow.com/questions/17355902/python-tkinter-binding-mousewheel-to-scrollbar
+    # UnicodeDecodeError on MacOS: https://stackoverflow.com/questions/16995969/inertial-scrolling-in-mac-os-x-with-tkinter-and-python
+    def on_mouse_wheel(self, event):
         if sys.platform.startswith('darwin'):
-            self.canvas.yview_scroll(-1 * (event.delta), "units")
+            self.canvas.yview_scroll(-1 * event.delta, "units")
         elif sys.platform.startswith('win'):
             self.canvas.yview_scroll(-1 * (event.delta / 120), "units")
         elif sys.platform.startswith('linux'):
             self.canvas.yview_scroll(-1 * (event.delta / 120), "units")
 
-    def onFrameConfigure(self, event):
-        '''Reset the scroll region to encompass the inner frame'''
+    def on_frame_configure(self, event):
+        """Reset the scroll region to encompass the inner frame"""
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-    def initialiseUPb(self):
-        self.headerFrame.setTitle("3. Filter standards for UPb")
+    def initialise_u_pb(self):
+        self.header_frame.set_title("3. Filter standards for UPb")
 
-    def initialiseTE(self):
-        self.headerFrame.setTitle("3. Filter standards for TE")
+    def initialise_t_e(self):
+        self.header_frame.set_title("3. Filter standards for TE")
 
-    def onGo(self, *event):
-        control_standards = self.getControlStandards()
-        normalising_standards = self.getNormalisingStandards()
+    def on_go(self, *event):
+        control_standards = self.get_control_standards()
+        normalising_standards = self.get_normalising_standards()
         print(CHONDRITE_FILE)
         if self.controller.isUpb:
             output_filepath = self.controller.frames["UPbInputOutputPage"].output_filepath.get(
@@ -181,10 +180,10 @@ class FilterStandardsPage(ttk.Frame):
             files = self.controller.frames["UPbInputOutputPage"].valid_input_filepaths
             UPb.UPb(control_standards, normalising_standards,
                     files, output_filepath)
-            self.footerFrame.goToNextPage()
+            self.footerFrame.go_to_next_page()
         else:
             output_filepath = self.controller.frames["TEInputOutputPage"].output_filepath.get(
             )
             files = self.controller.frames["TEInputOutputPage"].valid_input_filepaths
             TE.te(files, output_filepath, CHONDRITE_FILE)
-            self.footerFrame.goToNextPage()
+            self.footerFrame.go_to_next_page()

@@ -2,8 +2,8 @@ import sys
 
 from gui.app import App
 
-import data_processing.UPb as upb
-import data_processing.TE as te
+import data_processing.UPb as uranium_lead
+import data_processing.TE as trace_elements
 
 def main():
     app = App()
@@ -12,9 +12,9 @@ def main():
 
     if len(sys.argv) > 1:
         if sys.argv[1] == "te":
-            te.te()
+            trace_elements.te()
         elif sys.argv[1] == "upb":
-            upb.UPb(['STDGJ','INT1'],['INT2','MT'])
+            uranium_lead.UPb(['STDGJ', 'INT1'], ['INT2', 'MT'])
     else:
         while True:
             try:
