@@ -3,6 +3,8 @@ File for functions common to TE and U-Pb processing
 """
 import copy
 import xlsxwriter
+
+    
 '''
 Tries to evaluate and divide a variable for each record in a table.
 Variable = can be a string int or float to be evaluated

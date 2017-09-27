@@ -1,5 +1,4 @@
-
-from common import *
+from .common import *
 csvTableNames = ['GLITTER!: Isotope ratios.',
                  'GLITTER!: Isotopic ratios: 1 sigma uncertainty.',
                  'GLITTER!: Age estimates (ma).',
@@ -13,8 +12,8 @@ shortNames = ['Istopic ratios',
 EndOfTableIndicator = ""
 denomTh = 649.9625
 denomU = 753.2491
-testInputLocation = 'C:/Users/markc_000/Google Drive/CITS3200/CITS3200/test_files/inputs/Dec04_RUN[1-4]_UPb.csv'
-testOutputLocation = 'C:/Users/markc_000/Google Drive/CITS3200/CITS3200/test_files/outputs/UPbOutput.xlsx'
+testInputLocation = 'C:/Users/mark/Google Drive/CITS3200/CITS3200/test_files/inputs/Dec04_RUN[1-4]_UPb.csv'
+testOutputLocation = 'C:/Users/mark/Google Drive/CITS3200/CITS3200/test_files/outputs/UPbOutput.xlsx'
 '''
 Reads a csv file then filters out the appropriate zircons and elements
 sheet = workbook.add_worksheet(f) if you wish to add this sheet to table
@@ -185,8 +184,8 @@ def UPb(control,normalised):
     print(IncludedFields)
     print("Remember you must name the input csv file with a .csv extention and the output excel spreadsheet with a .xlsx extension eg. runs.xlsx")
     print("This program was created and developed by Mark Collier in September 2017 [Contact:+61466523090]\n")
-    files = getFileList(input("Enter the location and number range of run files eg. run[2-4].csv : "))
-    output = input("Enter the location of the new excel file with a .xlsx extension : ")
+    files = getFileList(testInputLocation)#getFileList(input("Enter the location and number range of run files eg. run[2-4].csv : "))
+    output = testOutputLocation#input("Enter the location of the new excel file with a .xlsx extension : ")
     workbook = xlsxwriter.Workbook(output)
     tlist = []
     conc = []
@@ -226,6 +225,5 @@ def UPb(control,normalised):
     except:
         input("You must close "+output+" before continuing...")
         UPb(['STDGJ','INT1'],['INT2','MT'])
-UPb(['STDGJ','INT1'],['INT2','MT'])
 
 
