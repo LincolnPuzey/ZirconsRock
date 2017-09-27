@@ -3,21 +3,22 @@
 # http://infohost.nmt.edu/tcc/help/pubs/tkinter/web/index.html
 # https://stackoverflow.com/questions/16840660/scroll-a-group-of-widgets-in-tkinter
 
-#padding=(left top right bottom)
+# padding=(left top right bottom)
 
 from gui.resources import *
+
 
 class App(tk.Tk):
 
     def __init__(self, *args, **kwargs):
-        #initialising the base ttk class
+        # initialising the base ttk class
         tk.Tk.__init__(self, *args, **kwargs)
 
         styles.initialise_syles()
 
         self.title("CITS3200 Prototype")
 
-        #determines U-Pb or TE processing was selected
+        # determines U-Pb or TE processing was selected
         self.isUpb = True
 
         self.bigFont = tkfont.Font(family='Helvetica', size=28)
@@ -32,7 +33,6 @@ class App(tk.Tk):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
-
         # container.rowconfigure(0, weight=1)
         # container.rowconfigure(1, weight=1)
         # container.rowconfigure(2, weight=1)
@@ -42,18 +42,18 @@ class App(tk.Tk):
 
         self.frames = {}
 
-        #InputOutputPage for UPb
+        # InputOutputPage for UPb
         frame = InputOutputPage(parent=container, controller=self, title="UPb")
         self.frames["UPbInputOutputPage"] = frame
         frame.grid(row=0, column=0, sticky="nsew")
 
-        #InputOutputPage for TE
+        # InputOutputPage for TE
         frame = InputOutputPage(parent=container, controller=self, title="TE")
         self.frames["TEInputOutputPage"] = frame
         frame.grid(row=0, column=0, sticky="nsew")
 
         for F in (StartPage, FilterStandardsPage,
-                LoadingPage, FinishedPage):
+                  LoadingPage, FinishedPage):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -71,7 +71,7 @@ class App(tk.Tk):
         frame = self.frames[page_name]
         frame.tkraise()
 
-    #returns either 'U-Pb' or 'TE'
+    # returns either 'U-Pb' or 'TE'
     def getProcessName(self):
         if self.isUpb:
             return 'UPb'

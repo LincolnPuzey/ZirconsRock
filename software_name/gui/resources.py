@@ -1,4 +1,4 @@
-#padding=(left top right bottom)
+# padding=(left top right bottom)
 
 import os
 import sys
