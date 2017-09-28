@@ -1,8 +1,7 @@
 from .common import *
-
+from .TEcharts import *
 BeginningCell = "Element" #cell where program begins reading
 EndingCell = "" #cell where program ends reading
-testInputLocation = 'C:/Users/mark/Google Drive/CITS3200/CITS3200/test_files/inputs/Dec04_RUN[1-4]_TE.csv'
 ChondriteFile = ""
 SheetName="TrElem"
 def classify(cart,t,z="zircon eg. STDGJ-01"):
@@ -92,7 +91,7 @@ def data(t,zircon,element):
         Ce = t[r][c]
         La = t[r][c-1]
         Pr = t[r][c+1]
-        # ch = chond(element)
+        #ch = chond(element)
         return record(Ce)
     except Exception as e:
         print(e)
@@ -126,7 +125,6 @@ def te(files,output,ChondFile):
     #files = getFileList(filelist)
     workbook = xlsxwriter.Workbook(output)
     t = table(ChondriteFile)
-
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]),nospaces(t[i+3][2:]))
         full[0][1] = t[i][0]
@@ -135,10 +133,10 @@ def te(files,output,ChondFile):
             while i+k<len(t) and t[i+k][1]=="CARTS":
                 carts = nospaces(t[i+k][3:])
                 if len(carts)>0:
-                    addClassifier(full,workbook.add_worksheet(t[i+k][2]),carts)
+                    chart(addClassifier(full,workbook.add_worksheet(t[i+k][2]),carts),t[i+k][2],workbook)
                 k=k+1
-        except:
-            Finish = True
+        except Exception as e:
+            MayPrint = e
     try:
         workbook.close()
     except:

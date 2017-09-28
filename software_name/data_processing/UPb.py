@@ -214,12 +214,16 @@ def UPb(control,normalised, files, output):
             norm = workbook.add_worksheet("Normalized Report")
             addSheet(ctrl,alternate(combine(tlist,0,control),combine(tlist,1,control)))
             addSheet(norm,alternate(combine(tlist,0,normalised),combine(tlist,1,normalised)))
+            style(workbook,commonPb,ctrl,norm)
         else:
             r = sigma(copy.deepcopy(ratios),2)
             tablesToPutOnThisStandard = [r,concentrations,sigma(ages,2)]
             tablesToPutOnThisStandard.append(rho(copy.deepcopy(ratios)))
             titlesOfEachTable = ["Ratios","Concentrations","Ages","Normal Concordia data"]
-            SplitStandards(workbook.add_worksheet(s),tablesToPutOnThisStandard,titlesOfEachTable)
+            ss = workbook.add_worksheet(s)
+            SplitStandards(ss,tablesToPutOnThisStandard,titlesOfEachTable)
+            styleStandards(workbook,ss)
+            
     try:
         workbook.close()
     except:
