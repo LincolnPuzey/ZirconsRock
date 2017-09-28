@@ -1,4 +1,5 @@
 from .common import *
+from .StyleOfUPb import *
 csvTableNames = ['GLITTER!: Isotope ratios.',
                  'GLITTER!: Isotopic ratios: 1 sigma uncertainty.',
                  'GLITTER!: Age estimates (ma).',
