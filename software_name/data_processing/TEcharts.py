@@ -11,7 +11,8 @@ def chart(classifiers, sheet_name, workbook):
     workbook = The xlsxwriter standard of implementing the workbook
     """
     x, y, class_list = identify(classifiers)
-    scatterplot(x, y, class_list, "Scatterplot of " + sheet_name, workbook)
+    series_list = []
+    draw_scatterplot(series_list, class_list, "Scatterplot of " + sheet_name, workbook)
     convex_hull(x, y, class_list, sheet_name + " chart", workbook)
     # let me know if workbook isn't passed by reference cos then you'll have to:
     return workbook  # at the end of the function
@@ -22,23 +23,41 @@ def convex_hull(x, y, class_list, chart_name, workbook):
     Alex talking about Convex charts:
     how to do convex hull to get a region for a set of points:
     tldr version is
-    take the bottommost point, leftmost if there's a tie
-    sort all other points by angle with that point and x-axis (use cross product or something)
-    add each point, such that each point added means a line segment between the point and the previous point, if this results in the line segment causing the current shape to be non-convex, remove the previous point and try adding this point again
-    once through all points, add line segment between final point and your original point
+    take the bottommost point, leftmost if there's a tie.
+    sort all other points by angle with that point and x-axis (use cross product or something).
+    add each point, such that each point added means a line segment between the point and the previous point,
+    if this results in the line segment causing the current shape to be non-convex, remove the previous point and try adding this point again.
+    once through all points, add line segment between final point and your original point.
     that's a tldr of convex hull
     """
     print(chart_name)
 
 
-def scatterplot(x, y, class_list, chart_name, workbook):
+def draw_scatterplot(series_list, class_list, chart_name, workbook):
     """
-    Creates another spreadsheet in a workbook that plots the x and y coordinates with a colour of their classified type
+    Creates a chartsheet in a workbook that plots the x and y coordinates with a colour of their classified type
+    chart_name cannot contain any of the characters ' [ ] : * ? / \ ' and it must be less than 32 characters.
+    Since an excel chart cannot contain data, and instead displays data from elsewhere in the workbook,
+    series_list is a list of dictionary objects that describe the series to be added to the chart, as per the add_series() function,
+    described here: http://xlsxwriter.readthedocs.io/chart.html
     """
     print(chart_name)
-    print(x)
-    print(y)
+    print(series_list)
     print(class_list)
+
+    # create a chartsheet in the workbook for the plot
+    # a chartsheet is a worksheet that only contains a chart.
+    scatterplot_chartsheet = workbook.add_chartsheet(chart_name)
+
+    # the scatter plot
+    scatterplot = workbook.add_chart({'type': 'scatter'})
+
+    for series in series_list:
+        scatterplot.add_serires(series)
+
+    scatterplot_chartsheet.set_chart(scatterplot)
+
+    # pretty sure everything in python is by reference so don't need to return workbook
 
 
 def identify(classifiers):
