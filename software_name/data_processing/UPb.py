@@ -229,4 +229,4 @@ def UPb(control,normalised, files, output):
         workbook.close()
     except:
         input("You must close "+output+" before continuing...")
-        UPb(['STDGJ','INT1'],['INT2','MT'])
+        UPb(control, normalised, files, output)
