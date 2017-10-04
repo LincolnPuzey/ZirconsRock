@@ -106,7 +106,7 @@ def alternate(t,s):
         alt[0][j] = "1 sigma"
     return alt
 '''
-Add sequence numbers, Zircon numbers and Concentrations together in table t
+Add sequence numbers, Zircon numbers and Concentrations together in table t in groups
 '''
 def groups(t):
     if len(t[0])<4:
@@ -115,11 +115,33 @@ def groups(t):
     for r in range(1,len(t)):
         for c in range(len(t[0])):
             if c=="Th232":
-                t[r][c]=record(t[r][c])/denomTh
+                t[r][c]=record(t[r][c])
             if c=="U238":
-                t[r][c]=record(t[r][c])/denomU
+                t[r][c]=record(t[r][c])
         t[r].append(r)
     return t
+'''
+Mutates the concentration values
+'''
+def ThUppm(conc,normalised,ThPPM,UPPM):
+    i=0
+    for t in range(len(conc)):
+        i=i+1
+        r=begr(conc[t],csvTableNames[4])
+        values = conc[t][r+2:]
+        Th = record(avg(values,normalised,1),ThPPM)
+        U = record(avg(values,normalised,2),UPPM)
+        for i in range(r+2,len(conc[t])-1):
+            conc[t][i][1]=record(conc[t][i][1],Th)
+            conc[t][i][2]=record(conc[t][i][2],U)
+def avg(values,normalised,c):
+    sumNormalised = 0
+    count = 0
+    for z in range(len(values)):
+        if normalised in values[z][0]:
+            sumNormalised = sumNormalised + record(values[z][c])
+            count = count +1
+    return record(sumNormalised,count)
 '''
 Create the Normal Concordia data which calculates the rho values
 '''
@@ -132,6 +154,31 @@ def rho(ratios):
     for i in range(1,len(t)):
         t[i].append(record(t[i][-1],t[i][-2])/record(t[i][-3],t[i][-4]))
     return t
+'''
+Create the Inverse Concordia data which calculates the RSD values
+'''
+def inverse(concordia):
+    docols = [1,3]
+    for d in docols:
+        for r in range(1,len(concordia)):
+            concordia[r][d+1]=record(1,concordia[r][d+1])
+
+    for c in range(len(concordia[0])):
+        header = concordia[0][c].split("/")
+        if len(header)==2:
+            concordia[0][c] = header[1]+"/"+header[0]
+        elif header[0]=="1 sigma":
+            concordia[0][c] = "RSD"
+            for r in range(1,len(concordia)):
+                av = "/AVERAGE($AJ$3:$AJ$"+str(len(concordia)+1)+")"
+                if c==3:
+                    av=av.replace("J","L")
+                concordia[r][c] = "=100*"+str(concordia[r][c])+av
+        if c==len(concordia[0])-1:
+            for r in range(len(concordia)):
+                concordia[r][c] = ""
+    return concordia
+        
 '''
 Change the sigma values by a multiple of sig
 t = table with 1 sigma values
@@ -174,16 +221,16 @@ def getAllZircons(fileList):
 Main Function called to run the entire program
 '''
 
-def UPb(control,normalised, files, output):
+def UPb(control,unknown, files, output):
+    #These parameters need to be added
+    normalised = "STDGJ"
+    ThPPM = 20
+    UPPM = 290
     print("This particular python file will read the data recorded by the Laser device for U-Pb data.")
-    print("You have to specify the name of the csv file and input the range of numbers within that name:")
-    print("For example if you type run[1-3].csv then this program will read run1.csv,run2.csv and run3.csv")
-    print("Each of these csv files will then be placed into 1 excel spreadsheet with the name of your choice.")
-    print("The output excel file will remove sample '610-01' out of the spreadsheet")
+    print("The output excel file will remove sample '610' out of the spreadsheet")
     IncludedFields = ['Analysis_#','Pb206','Pb207','Pb208','Th232','U238']
     print("The Mean Raw CPS background table will include only these following fields:")
     print(IncludedFields)
-    print("Remember you must name the input csv file with a .csv extention and the output excel spreadsheet with a .xlsx extension eg. runs.xlsx")
     print("This program was created and developed by Mark Collier in September 2017 [Contact:+61466523090]\n")
     # files = getFileList(testInputLocation)#getFileList(input("Enter the location and number range of run files eg. run[2-4].csv : "))
     # output = testOutputLocation#input("Enter the location of the new excel file with a .xlsx extension : ")
@@ -211,16 +258,27 @@ def UPb(control,normalised, files, output):
             commonPb = workbook.add_worksheet("ToBeCommonLeadCorrected")
             addSheet(commonPb,combine(tlist,4,IncludedZircons),3,len(ratios[0])-1)
             addSheet(commonPb,ratios,3)
+            '''
             ctrl = workbook.add_worksheet("Control Report")
             norm = workbook.add_worksheet("Normalized Report")
             addSheet(ctrl,alternate(combine(tlist,0,control),combine(tlist,1,control)))
             addSheet(norm,alternate(combine(tlist,0,normalised),combine(tlist,1,normalised)))
-            style(workbook,commonPb,ctrl,norm)
+            '''
+            ThUppm(conc,normalised,ThPPM,UPPM)
+            report = workbook.add_worksheet("Report")
+            addSheet(report,alternate(combine(tlist,0,unknown),combine(tlist,1,unknown)))
+            style(workbook,commonPb,report)
         else:
             r = sigma(copy.deepcopy(ratios),2)
             tablesToPutOnThisStandard = [r,concentrations,sigma(ages,2)]
-            tablesToPutOnThisStandard.append(rho(copy.deepcopy(ratios)))
-            titlesOfEachTable = ["Ratios","Concentrations","Ages","Normal Concordia data"]
+            titlesOfEachTable = ["Ratios","Concentrations","Ages"]
+            if s in unknown:
+                concordia = rho(copy.deepcopy(ratios))
+                tablesToPutOnThisStandard.append(concordia)
+                titlesOfEachTable.append("Normal Concordia Plots")
+                if len(concordia)>3:
+                    tablesToPutOnThisStandard.append(inverse(copy.deepcopy(concordia)))
+                    titlesOfEachTable.append("Inverse Concordia Plots")    
             ss = workbook.add_worksheet(s)
             SplitStandards(ss,tablesToPutOnThisStandard,titlesOfEachTable)
             styleStandards(workbook,ss)
@@ -229,4 +287,4 @@ def UPb(control,normalised, files, output):
         workbook.close()
     except:
         input("You must close "+output+" before continuing...")
-        UPb(control, normalised, files, output)
+        UPb(control, unknown, files, output)

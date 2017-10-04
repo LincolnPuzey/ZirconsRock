@@ -2,7 +2,7 @@
 Change the Style of Control Report, Normalised Report and ToBeCommonLeadCorrected
 These spreadsheets are available on test_upb_output.xlsx
 '''
-def style(workbook,commonPb,control,normalised):
+def style(workbook,commonPb,report):
     #let me know if workbook isn't passed by reference cos then you'll have to:
     return workbook #at the end of the function
 '''
