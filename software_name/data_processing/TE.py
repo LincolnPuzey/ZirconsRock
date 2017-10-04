@@ -100,13 +100,74 @@ def data(t,zircon,element):
         print("For the",t[0][1],"spreadsheet:")
         print("Cannot find value for Element:",element,"for zircon",zircon,"?")
         return eval(input("Please enter the value here: "))
-
+'''
+Returns all Trace Elements given a specific file
+'''
 def getElements(file):
     t=table(file)
     r=begr(t,BeginningCell)
     e=begr(t[r:],EndingCell)
     return column(t[r+1:r+e],0)
+'''
+Creates the Summary spreadsheets
+'''
+def summary(full,Classifiers,workbook):
+    i=-1
+    zircons = column(Classifiers,1)
+    for s in Classifiers[0]:
+        i=i+1
+        if "CART" in s:
+            sheet=workbook.add_worksheet(s)
+            sheet.write(0,0,"Zircon Classification: "+s)
+            sheet.write(1,0,"Sample")
+            sheet.write(1,1,"Total Analysis")
+            stn = standard(zircons)
+            for r in range(len(stn)):
+                sheet.write(r+2,0,stn[r])
+                total = 0
+                for z in zircons:
+                    if stn[r] in z:
+                        total=total+1
+                sheet.write(r+2,1,total)
+            sheet.write(1,2,"Rock type")
+            sheet.write(1,3,"Percentage")
+            sheet.write(1,4,"Number of Analysis")
+            rocks = column(Classifiers,i)
+            rocktype = standard(rocks[2:],"Gives a distinct list of rock types")
+            for row in range(len(rocktype)):
+                sheet.write(row+2,2,rocktype[row])
+                n=0
+                for rock in range(len(rocks)):
+                    if rocks[rock]==rocktype[row]:
+                        n=n+1
+                sheet.write(row+2,4,n)
+            for p in range(len(rocktype)):
+                r = p+2
+                sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")
+    elements = full[0][3:]
+'''
+    avg = workbook.add_worksheet("Summary of "+full[0][1])
+    avg.write(1,0,"Sample")
+    c=1
+    for e in range(len(elements)):
+        r=1
+        avg.write(1,2*e+1,"Sum of"+e)
+        avg.write(1,2*e+2,"Count of"+e)
+        for rock in rocktype:
+            r=r+1
+            sume = 0
+            counte = 0
+            for z in rocks[2:]:
+                if z==rock:
+                    sume=data(full,z,elements[e])+sume
+                    counte = counte +1
 
+            avg.write(r,2*e,rock)
+            avg.write(r,2*e+1,sume)
+            avg.write(r,2*e+2,counte)
+'''            
+        
+                
 '''
 Main function that will call everything as needed
 '''      
@@ -129,22 +190,29 @@ def te(files,output,ChondFile):
     ChondriteFile=ChondFile
     workbook = xlsxwriter.Workbook(output)
     t = table(ChondriteFile)
+    NotDoneClassifiers = True
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
         full[0][1] = t[i][0]
-        k=4
+        k=3
         try:
-            while i+k<len(t) and t[i+k][1]=="CARTS":
+            while i+k+1<len(t) and t[i+k][1]=="CARTS":
                 carts = nospaces(t[i+k][3:])
                 if len(carts)>0:
-                    addClassifier(full,workbook.add_worksheet(t[i+k][2]),carts)
+                    worksheet = workbook.add_worksheet(t[i+k][2])
+                    Classifiers = addClassifier(full,worksheet,carts)
+                    if NotDoneClassifiers:
+                        summary(full,Classifiers,workbook)
+                    NotDoneClassifiers=False
+                    #workbook = chart(Classifiers,worksheet,t[i+k][2],workbook)
                 k=k+1
         except Exception as e:
-            print("Don't worry about index out of range error however this error has occurred:")
+            print("A minor error at "+t[i+k][2]+":")
             print(e)
     try:
         workbook.close()
-    except:
+    except Exception as e:
+        print(e)
         input("You must close "+output+" before continuing")
         workbook.close()
 '''
@@ -246,6 +314,7 @@ def addTESheet(files,sheet,includedElements,Chondrites,excludedZircons):
                     sheet.write(y+rstart,c+1,data)
             x=x+1
     return full
+
 def teSheetNamesIndicies(Chondtable):
     sn=[]
     indicies = []

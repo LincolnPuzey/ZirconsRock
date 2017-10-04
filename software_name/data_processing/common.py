@@ -163,17 +163,17 @@ def rnums(n):
 '''
 Converts a zircon or a list of zircons into a standard or a standard list
 '''
-def standard(zirconName):
+def standard(zirconName,Splitter='-'):
     if type(zirconName)==type(["","STDGJ"]):
         stans = []
         for z in zirconName:
-            stan = z.split('-')[0]
+            stan = z.split(Splitter)[0]
             if stan not in stans:
                 stans.append(stan)
         return stans
     else:
         z = str(zirconName)
-        return z.split('-')[0]
+        return z.split(Splitter)[0]
 '''
 Prints and returns n
 '''

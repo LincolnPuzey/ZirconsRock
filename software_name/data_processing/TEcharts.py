@@ -4,6 +4,7 @@ from .common import column
 
 
 def chart(classifiers, sheet_name, workbook):
+    return workbook
     """
     The main funtion for chart Processing
     Classifiers = 2D array of the contents of the spreadsheet
@@ -12,10 +13,10 @@ def chart(classifiers, sheet_name, workbook):
     """
     x, y, class_list = identify(classifiers)
     series_list = []
-    draw_scatterplot(series_list, class_list, "Scatterplot of " + sheet_name, workbook)
-    convex_hull(x, y, class_list, sheet_name + " chart", workbook)
+    return draw_scatterplot(series_list, class_list, "Scatterplot of " + sheet_name, workbook)
+    #convex_hull(x, y, class_list, sheet_name + " chart", workbook)
     # let me know if workbook isn't passed by reference cos then you'll have to:
-    return workbook  # at the end of the function
+    #return workbook  # at the end of the function
 
 
 def convex_hull(x, y, class_list, chart_name, workbook):
@@ -53,9 +54,10 @@ def draw_scatterplot(series_list, class_list, chart_name, workbook):
     scatterplot = workbook.add_chart({'type': 'scatter'})
 
     for series in series_list:
-        scatterplot.add_serires(series)
+        scatterplot.add_series(series)
 
     scatterplot_chartsheet.set_chart(scatterplot)
+    return workbook
 
     # pretty sure everything in python is by reference so don't need to return workbook
 
