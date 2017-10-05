@@ -2,7 +2,24 @@
 File for functions common to TE and U-Pb processing
 """
 import copy
-import xlsxwriter
+try:
+    import xlsxwriter
+except:
+    install_requirements()
+
+def install_requirements():
+    print("Installing requirements...")
+    try:
+        import pip
+        pip.main(['install', '-r', 'requirements.txt'])
+
+        print("Success")
+        input("Press Enter to exit...")
+        import xlsxwriter
+    except Exception as e:
+        print("Exception:")
+        print(str(e))
+        input("Press Enter to exit...")
 
     
 '''
@@ -64,6 +81,19 @@ def read(FileName='C:/untitled.txt'):
     except:
         contents="This file does not exist"
     return str(contents)
+def write(Text='',File='untitled.txt'):
+    with open(File,"w") as outfile:
+        print(Text,file=outfile)
+    outfile.close()
+def writeln(LineNumber=0,Text='',File='untitled.txt'):
+    lin=round(abs(LineNumber))
+    f=readln(File)
+    if lin>=len(f):
+        f+=['']*(lin-len(f))
+        f.append(Text)
+    else:
+        f[lin]=Text       
+    write("\n".join(f),File)
 '''
 For testing whether a particular expression that includes functions return an expected value
 eg. we could test the function with following parameters

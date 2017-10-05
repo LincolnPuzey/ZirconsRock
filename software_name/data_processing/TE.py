@@ -2,7 +2,6 @@ from .common import *
 from .TEcharts import *
 BeginningCell = "Element" #cell where program begins reading
 EndingCell = "" #cell where program ends reading
-ChondriteFile = ""
 SheetName="TrElem"
 allChondriteElements = ['La139','Ce140','Pr141','Nd146','Sm147','Eu151','Gd157','Th232','Dy163','Y89','Ho165','Er166','U238','Yb173','Lu175','Hf178','Nb93','Ta181','Ti49','P31','Tb159','Tm169']
 ChondriteValues = [0.237,0.613,0.0928,0.457,0.148,0.0563,0.199,0.0294,0.246,1.57,0.0546,0.16,0.0074,0.161,0.0246,0.103,0.24,0.0136,440,1080,0.0361,0.0247]
@@ -80,20 +79,23 @@ zircon eg = 'STDGJ-01'
 element eg = 'Ce'
 '''
 def data(t,zircon,element):
+    e=[False,element]
     if "/" in element:
         e=element.split("/")
-        return record(data(t,zircon,e[0]),data(t,zircon,e[1]))
+        if e[0]!=e[1]:
+            return record(data(t,zircon,e[0]),data(t,zircon,e[1]))
     r=0
     c=0
     try:
         while t[r][1]!=zircon:
             r=r+1
-        while element not in t[0][c]:
+        while e[1]!=t[0][c]:
             c=c+1
         Ce = t[r][c]
-        La = t[r][c-1]
-        Pr = t[r][c+1]
-        #ch = chond(element)
+        La = record(t[r][c-1])
+        Pr = record(t[r][c+1])
+        if e[0]:
+            return record(Ce,(La+Pr)/2)
         return record(Ce)
     except Exception as e:
         print(e)
@@ -166,37 +168,50 @@ def summary(full,Classifiers,workbook):
             avg.write(r,2*e+1,sume)
             avg.write(r,2*e+2,counte)
 '''            
-        
+def getChondrite(file,unknown,detected):
+    if type(unknown)!=type(["list"]):
+        return table(file)
+    chond = readln(file)
+    if chond[2].split(',')[1]=="Excluded Zircons or Standards":
+        known = []
+        for d in detected:
+            if d not in unknown:
+                known.append(d)
+        un = str(known).replace("[","").replace("]","").replace("\'","")
+        text = ',Excluded Zircons or Standards,' + un
+        writeln(2,text,file)
+    return table(file)
+    
                 
 '''
 Main function that will call everything as needed
 '''      
 def te(files,output,ChondFile):
+#Parameters to add{
+    control = ['STDGJ','MT','91500']
+    unknown = ['INT1','INT2']
+#}
     print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
     print("This program was created and developed by Mark Collier September 2017 [Contact:+61466523090]")
     print("You have to specify the name of the csv file and input the range of numbers within that name:")
-    print("For example if you type run[1-3].csv then this program will read run1.csv,run2.csv and run3.csv")
-    print("Data from every csv file will be added on top into your output spreadsheet.")
-    print("This program uses Chondrite values.csv file:")
+    print("This program uses chondrite_values.csv file:")
     print("     Column A lists the names of the sheets you will use in the Output xl file")
     print("     Every other column beside it will have 4 rows")
     print("     Row 1: You may add or remove as many elements you like")
     print("     Row 2: Enter the Chondrite values for each element")
     print("     Row 3: Include a list of zircons or standards that you wish to exclude")
-    print("     Row 4: Include a list of elements that you wish to exclude")
-    print("Remember you must name the input csv file with a .csv extention and the output excel spreadsheet with a .xlsx extension eg. runs.xlsx")
-    print("Please save and close all xlsx files and csv files before continuing!\n")
-    ChondriteFile=ChondFile
+    print("     Row >3: indicats the CART classification that you wish to be done for this given data")
+    print("         Column B here Always states CARTS followed by the name of the new Spreadsheet")
     workbook = xlsxwriter.Workbook(output)
-    t = table(ChondriteFile)
+    t = getChondrite(ChondFile,unknown,standard(getAllZircons(files)))
     NotDoneClassifiers = True
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
         full[0][1] = t[i][0]
         k=3
         try:
-            while i+k+1<len(t) and t[i+k][1]=="CARTS":
+            while i+k+2<len(t) and t[i+k][1]=="CARTS":
                 carts = nospaces(t[i+k][3:])
                 if len(carts)>0:
                     worksheet = workbook.add_worksheet(t[i+k][2])
@@ -207,8 +222,9 @@ def te(files,output,ChondFile):
                     #workbook = chart(Classifiers,worksheet,t[i+k][2],workbook)
                 k=k+1
         except Exception as e:
-            print("A minor error at "+t[i+k][2]+":")
-            print(e)
+            if False:
+                print("Ignore list index out of range error. This error was:")
+                print(e)
     try:
         workbook.close()
     except Exception as e:

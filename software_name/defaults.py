@@ -30,5 +30,5 @@ TE_OUTPUT_FILEPATH = OUTPUT_DIR + '/test_te_output.xlsx'
 UPB_OUTPUT_FILEPATH = OUTPUT_DIR + '/test_upb_output.xlsx'
 
 # Temporary: List of normalising and control standards for testing
-NORMALISING_STANDARDS = ['STDGJ', '91500']
-CONTROL_STANDARDS = ['MT', 'INT1']
+NORMALISING_STANDARDS = ['INT2', 'INT1']
+CONTROL_STANDARDS =['STDGJ', '91500','MT'] 

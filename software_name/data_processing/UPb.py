@@ -222,11 +222,13 @@ Main Function called to run the entire program
 '''
 
 def UPb(control,unknown, files, output):
-    #These parameters need to be added
+#Parameters to add{
     normalised = "STDGJ"
     ThPPM = 20
     UPPM = 290
+#}
     print("This particular python file will read the data recorded by the Laser device for U-Pb data.")
+    print("Please ensure you are using Python version 3.6.2 on your computer")
     print("The output excel file will remove sample '610' out of the spreadsheet")
     IncludedFields = ['Analysis_#','Pb206','Pb207','Pb208','Th232','U238']
     print("The Mean Raw CPS background table will include only these following fields:")
