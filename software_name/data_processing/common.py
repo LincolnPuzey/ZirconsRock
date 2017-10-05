@@ -2,11 +2,6 @@
 File for functions common to TE and U-Pb processing
 """
 import copy
-try:
-    import xlsxwriter
-except:
-    install_requirements()
-
 def install_requirements():
     print("Installing requirements...")
     try:
@@ -20,8 +15,12 @@ def install_requirements():
         print("Exception:")
         print(str(e))
         input("Press Enter to exit...")
+try:
+    import xlsxwriter
+except:
+    install_requirements()
 
-    
+
 '''
 Tries to evaluate and divide a variable for each record in a table.
 Variable = can be a string int or float to be evaluated
