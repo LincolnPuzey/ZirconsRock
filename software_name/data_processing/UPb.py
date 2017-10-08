@@ -56,8 +56,6 @@ def filterfields(t,tablename,IncludedFields):
     for rec in t[cps+1]:
         r=cps+1
         if rec in IncludedFields:
-            if tablename == -1:
-                print(rec,"is in",IncludedFields)
             try:
                 while t[r][current]!='':
                     t[r][future]=t[r][current]

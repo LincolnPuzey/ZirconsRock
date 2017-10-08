@@ -145,29 +145,52 @@ def summary(full,Classifiers,workbook):
                 sheet.write(row+2,4,n)
             for p in range(len(rocktype)):
                 r = p+2
-                sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")
+                sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")   
     elements = full[0][3:]
-'''
+    z = standard(column(full,1)[1:])
     avg = workbook.add_worksheet("Summary of "+full[0][1])
     avg.write(1,0,"Sample")
-    c=1
+
+    
+    classified=copy.deepcopy(rocktype)
     for e in range(len(elements)):
         r=1
-        avg.write(1,2*e+1,"Sum of"+e)
-        avg.write(1,2*e+2,"Count of"+e)
-        for rock in rocktype:
-            r=r+1
-            sume = 0
-            counte = 0
-            for z in rocks[2:]:
-                if z==rock:
-                    sume=data(full,z,elements[e])+sume
-                    counte = counte +1
-
-            avg.write(r,2*e,rock)
-            avg.write(r,2*e+1,sume)
-            avg.write(r,2*e+2,counte)
-'''            
+        n=5
+        el = elements[e]
+        avg.write(r,n*e+1,"sum "+el)
+        avg.write(r,n*e+2,"count "+el)
+        avg.write(r,n*e+3,"mean "+el)
+        avg.write(r,n*e+4,"stdev "+el)
+        avg.write(r,n*e+5,"median "+el)
+        for r in range(2,len(z)+2):
+            vals = values(full,e+2,z[r-2])
+            avg.write(r,0,z[r-2])
+            total = sum(vals)
+            count = len(vals)
+            i = count/2
+            if type(i)==type(3):
+                median = (vals[i]+vals[i+1])/2
+            if type(i)==type(3.4):
+                median = vals[round(i)-1]
+            mean = total/count
+            stdev = 0
+            for v in vals:
+                stdev=stdev+(mean-v)/count
+            avg.write(r,n*e+1,total)
+            avg.write(r,n*e+2,count)
+            avg.write(r,n*e+3,mean)
+            avg.write(r,n*e+4,stdev)
+            avg.write(r,n*e+5,median)
+            
+def values(t,c,c0):
+    v = []
+    for r in t:
+        if r[0] == c0:
+            v.append(r[c])
+    return v
+        
+    
+            
 def getChondrite(file,unknown,detected):
     if type(unknown)!=type(["list"]):
         return table(file)
@@ -210,8 +233,8 @@ def te(files,output,ChondFile):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
         full[0][1] = t[i][0]
         k=3
-        try:
-            while i+k+2<len(t) and t[i+k][1]=="CARTS":
+        if True:
+            while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
                 carts = nospaces(t[i+k][3:])
                 if len(carts)>0:
                     worksheet = workbook.add_worksheet(t[i+k][2])
@@ -221,10 +244,12 @@ def te(files,output,ChondFile):
                     NotDoneClassifiers=False
                     #workbook = chart(Classifiers,worksheet,t[i+k][2],workbook)
                 k=k+1
+        '''
         except Exception as e:
-            if False:
+            if True:
                 print("Ignore list index out of range error. This error was:")
                 print(e)
+    '''
     try:
         workbook.close()
     except Exception as e:
