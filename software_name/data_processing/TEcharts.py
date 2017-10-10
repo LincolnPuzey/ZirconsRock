@@ -4,19 +4,16 @@ from .common import column
 
 
 def chart(classifiers, sheet_name, workbook):
-    return "Keep this here if your functions don't work"
     """
     The main funtion for chart Processing
     Classifiers = 2D array of the contents of the spreadsheet
     sheetName = the string of name of those contents in the 2D array
     workbook = The xlsxwriter standard of implementing the workbook
     """
-    x, y, class_list = identify(classifiers)
-    series_list = []
-    return draw_scatterplot(series_list, class_list, "Scatterplot of " + sheet_name, workbook)
-    #convex_hull(x, y, class_list, sheet_name + " chart", workbook)
-    # let me know if workbook isn't passed by reference cos then you'll have to:
-    #return workbook  # at the end of the function
+
+    x_column, y_column, class_column = identify(classifiers)
+    draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
+    # convex_hull(x, y, class_list, sheet_name + " chart", workbook)
 
 
 def convex_hull(x, y, class_list, chart_name, workbook):
@@ -34,7 +31,7 @@ def convex_hull(x, y, class_list, chart_name, workbook):
     print(chart_name)
 
 
-def draw_scatterplot(series_list, class_list, chart_name, workbook):
+def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook):
     """
     Creates a chartsheet in a workbook that plots the x and y coordinates with a colour of their classified type
     chart_name cannot contain any of the characters ' [ ] : * ? / \ ' and it must be less than 32 characters.
@@ -42,32 +39,63 @@ def draw_scatterplot(series_list, class_list, chart_name, workbook):
     series_list is a list of dictionary objects that describe the series to be added to the chart, as per the add_series() function,
     described here: http://xlsxwriter.readthedocs.io/chart.html
     """
-    print(chart_name)
-    print(series_list)
-    print(class_list)
+
+    # build the list of series to add to chart, each series specifies a range of data
+    series_list = []
+    current_series = classifiers[1][class_column]
+    current_series_start, current_series_end = 1, 1
+
+    for i in range(1, len(classifiers)):
+
+        if current_series == classifiers[i][class_column]:
+            # still in same series - update end index
+            current_series_end = i
+        else:
+            # encountered new series - add previous one to list
+            series_list.append({
+                'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
+                'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
+                'name': current_series
+            })
+            # new series
+            current_series_start = i
+            current_series_end = i
+            current_series = classifiers[i][class_column]
+    # add last series:
+    series_list.append({
+        'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
+        'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
+        'name': current_series
+    })
 
     # create a chartsheet in the workbook for the plot
     # a chartsheet is a worksheet that only contains a chart.
-    scatterplot_chartsheet = workbook.add_chartsheet(chart_name)
+    scatterplot_chartsheet = workbook.add_chartsheet("Scatterplot of " + sheet_name)
 
     # the scatter plot
     scatterplot = workbook.add_chart({'type': 'scatter'})
 
     for series in series_list:
         scatterplot.add_series(series)
+        scatterplot.set_x_axis({
+            'name': [sheet_name, 0, x_column],
+            'log_base': 10
+        })
+        scatterplot.set_y_axis({
+            'name': [sheet_name, 0, y_column],
+            'log_base': 10
+        })
 
     scatterplot_chartsheet.set_chart(scatterplot)
-    return workbook
 
     # pretty sure everything in python is by reference so don't need to return workbook
 
 
 def identify(classifiers):
     """
-    Function identify
-    Ensures that the correct x values,y values and Classified rock types are returned dependent on the data received.
-    Curently identify prints out this information in order of Scatterplot Name,xvalues,yvalues,classList and ConvexHull ChartName:
+    Identifies which columns from parameter classifiers are to be used as the x, y and series in the scatterplot
 
+    The following are example columns from classifiers
     Scatterplot of Class
     ['CART1', 'Carbonite', 'Carbonite', 'Syenite', 'Basalt', 'Carbonite', 'Granitoid (>65% SiO2)', 'Ne-syenite&Syenite Pegmatites', 'Granitoid (>65% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Carbonite', 'Carbonite', 'Basalt', 'Carbonite', 'Carbonite', 'Basalt', 'Syenite', 'Carbonite', 'Dolerite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Dolerite', 'Ne-syenite&Syenite Pegmatites', 'Dolerite', 'Dolerite', 'Dolerite', 'Dolerite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Carbonite', 'Carbonite', 'Carbonite', 'Carbonite', 'Basalt', 'Syenite', 'Granitoid (>65% SiO2)', 'Carbonite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Carbonite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Dolerite', 'Dolerite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Ne-syenite&Syenite Pegmatites', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Carbonite', 'Carbonite', 'Carbonite', 'Carbonite', 'Basalt', 'Syenite', 'Dolerite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Dolerite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Dolerite', 'Granitoid (>65% SiO2)', 'Carbonite', 'Carbonite', 'Basalt', 'Carbonite', 'Dolerite', 'Carbonite', 'Carbonite']
     ['CART2', 'Carbonite (79%)', 'Carbonite (79%)', 'Syenite (93%)', 'Basalt (94%)', 'Carbonite (79%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Dolerite (71%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Syenite (93%)', 'Carbonite (79%)', 'Basalt (94%)', 'Syenite (93%)', 'Carbonite (79%)', 'Basalt (94%)', 'Syenite (93%)', 'Carbonite (79%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Dolerite (71%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Carbonite (79%)', 'Syenite (93%)', 'Carbonite (79%)', 'Syenite (93%)', 'Basalt (94%)', 'Syenite (93%)', 'Larvikite (72%)', 'Syenite (93%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Carbonite (79%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Carbonite (79%)', 'Carbonite (79%)', 'Carbonite (79%)', 'Carbonite (79%)', 'Basalt (94%)', 'Syenite (93%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Larvikite (72%)', 'Syenite (93%)', 'Syenite (93%)', 'Basalt (94%)', 'Syenite (93%)', 'Larvikite (72%)', 'Carbonite (79%)', 'Carbonite (79%)']
@@ -129,4 +157,13 @@ def identify(classifiers):
     ['CART1', 'Carbonite', 'Carbonite', 'Syenite', 'Basalt', 'Carbonite', 'Granitoid (>65% SiO2)', 'Ne-syenite&Syenite Pegmatites', 'Granitoid (>65% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Granitoid (70-75% SiO2)', 'Carbonite', 'Carbonite', 'Basalt', 'Carbonite', 'Carbonite', 'Basalt', 'Syenite', 'Carbonite', 'Dolerite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Dolerite', 'Ne-syenite&Syenite Pegmatites', 'Dolerite', 'Dolerite', 'Dolerite', 'Dolerite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Carbonite', 'Carbonite', 'Carbonite', 'Carbonite', 'Basalt', 'Syenite', 'Granitoid (>65% SiO2)', 'Carbonite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Carbonite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Dolerite', 'Dolerite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Ne-syenite&Syenite Pegmatites', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Carbonite', 'Carbonite', 'Carbonite', 'Carbonite', 'Basalt', 'Syenite', 'Dolerite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Dolerite', 'Dolerite', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Granitoid (>65% SiO2)', 'Dolerite', 'Granitoid (>65% SiO2)', 'Carbonite', 'Carbonite', 'Basalt', 'Carbonite', 'Dolerite', 'Carbonite', 'Carbonite']
     CeCe-EuEu data chart
     """
-    return column(classifiers, -2), column(classifiers, -1), column(classifiers, -3)
+
+    # work out which columns of classifiers hold the data and class names
+    width = len(classifiers[0])
+    x_column = width-2
+    y_column = width-1
+    class_column = width-3
+    # TODO deal with edge cases?
+
+    return x_column, y_column, class_column
+
