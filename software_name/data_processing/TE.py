@@ -1,5 +1,6 @@
 from .common import *
 from .TEcharts import *
+from .StyleOfTE import *
 BeginningCell = "Element" #cell where program begins reading
 EndingCell = "" #cell where program ends reading
 SheetName="TrElem"
@@ -148,11 +149,9 @@ def summary(full,Classifiers,workbook):
                 sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")   
     elements = full[0][3:]
     z = standard(column(full,1)[1:])
+    zirconClassification(sheet,workbook)
     avg = workbook.add_worksheet("Summary of "+full[0][1])
     avg.write(1,0,"Sample")
-
-    
-    classified=copy.deepcopy(rocktype)
     for e in range(len(elements)):
         r=1
         n=5
@@ -181,7 +180,7 @@ def summary(full,Classifiers,workbook):
             avg.write(r,n*e+3,mean)
             avg.write(r,n*e+4,stdev)
             avg.write(r,n*e+5,median)
-            
+    styleSummary(avg,workbook)
 def values(t,c,c0):
     v = []
     for r in t:
@@ -239,6 +238,7 @@ def te(files,output,ChondFile):
                 if len(carts)>0:
                     worksheet = workbook.add_worksheet(t[i+k][2])
                     Classifiers = addClassifier(full,worksheet,carts)
+                    chart(Classifiers,t[i+k][2],workbook)
                     if NotDoneClassifiers:
                         summary(full,Classifiers,workbook)
                     NotDoneClassifiers=False

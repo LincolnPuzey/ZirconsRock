@@ -4,7 +4,7 @@ from .common import column
 
 
 def chart(classifiers, sheet_name, workbook):
-    return workbook
+    return "Keep this here if your functions don't work"
     """
     The main funtion for chart Processing
     Classifiers = 2D array of the contents of the spreadsheet
