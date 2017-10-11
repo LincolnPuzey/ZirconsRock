@@ -30,6 +30,16 @@ CLASS_COLORS = {
     "Dolerite":                      '#800080',  # purple
     "Basalt":                        '#800000',  # maroon
 }
+# Used for generating charts and convex hull images
+CHART_WIDTH = 1100
+CHART_HEIGHT = 660
+# expressed as percentages of CHART_WIDTH and CHART_HEIGHT
+PLOT_X_OFFSET = 0.1
+PLOT_Y_OFFSET = 0.07
+PLOT_WIDTH = 0.65
+PLOT_HEIGHT = 0.8
+# where to store convex hull image file
+CONVEX_HULL_IMAGE_FILE = "convexhull.png"
 
 # File path for chondrite_values.csv
 CHONDRITE_FILE = INPUT_DIR + '/chondrite_values.csv'

@@ -1,94 +1,20 @@
-from defaults import CLASS_COLORS
+from defaults import CLASS_COLORS, CHART_HEIGHT, CHART_WIDTH, CONVEX_HULL_IMAGE_FILE, PLOT_HEIGHT, PLOT_WIDTH, \
+    PLOT_X_OFFSET, PLOT_Y_OFFSET
+from PIL import Image
 
 
 def chart(classifiers, sheet_name, workbook):
     """
     The main funtion for chart Processing
-    Classifiers = 2D array of the contents of the spreadsheet
-    sheetName = the string of name of those contents in the 2D array
+    classifiers = 2D array of the contents of the worksheet containing the data to the plotted on the chart
+    is indexed as classifiers[row][column], where row and row are zero-indexed
+    sheet_name = the string of name of the worksheet containing the data
     workbook = The xlsxwriter standard of implementing the workbook
     """
 
     x_column, y_column, class_column = identify(classifiers)
     if x_column is not None and y_column is not None:
         draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
-        # convex_hull(x, y, class_list, sheet_name + " chart", workbook)
-
-
-def convex_hull(x, y, class_list, chart_name, workbook):
-    """
-    Alex talking about Convex charts:
-    how to do convex hull to get a region for a set of points:
-    tldr version is
-    take the bottommost point, leftmost if there's a tie.
-    sort all other points by angle with that point and x-axis (use cross product or something).
-    add each point, such that each point added means a line segment between the point and the previous point,
-    if this results in the line segment causing the current shape to be non-convex, remove the previous point and try adding this point again.
-    once through all points, add line segment between final point and your original point.
-    that's a tldr of convex hull
-    """
-    print(chart_name)
-
-
-def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook):
-    """
-    Creates a chartsheet in a workbook that plots the x and y coordinates with a colour of their classified type
-    chart_name cannot contain any of the characters ' [ ] : * ? / \ ' and it must be less than 32 characters.
-    Since an excel chart cannot contain data, and instead displays data from elsewhere in the workbook,
-    series_list is a list of dictionary objects that describe the series to be added to the chart, as per the add_series() function,
-    described here: http://xlsxwriter.readthedocs.io/chart.html
-    """
-
-    # build the list of series to add to chart, each series specifies a range of data
-    series_list = []
-    current_series = classifiers[1][class_column]
-    current_series_start, current_series_end = 1, 1
-
-    for i in range(1, len(classifiers)):
-
-        if current_series == classifiers[i][class_column]:
-            # still in same series - update end index
-            current_series_end = i
-        else:
-            # encountered new series - add previous one to list
-            series_list.append({
-                'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
-                'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
-                'name': current_series,
-                'fill': {'color': CLASS_COLORS.get(current_series, '#000000')}
-            })
-            # new series
-            current_series_start = i
-            current_series_end = i
-            current_series = classifiers[i][class_column]
-    # add last series:
-    series_list.append({
-        'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
-        'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
-        'name': current_series
-    })
-
-    # create a chartsheet in the workbook for the plot
-    # a chartsheet is a worksheet that only contains a chart.
-    scatterplot_chartsheet = workbook.add_chartsheet("Scatterplot of " + sheet_name)
-
-    # the scatter plot
-    scatterplot = workbook.add_chart({'type': 'scatter'})
-
-    for series in series_list:
-        scatterplot.add_series(series)
-        scatterplot.set_x_axis({
-            'name': [sheet_name, 0, x_column],
-            'log_base': 10
-        })
-        scatterplot.set_y_axis({
-            'name': [sheet_name, 0, y_column],
-            'log_base': 10
-        })
-
-    scatterplot_chartsheet.set_chart(scatterplot)
-
-    # pretty sure everything in python is by reference so don't need to return workbook
 
 
 def identify(classifiers):
@@ -169,3 +95,118 @@ def identify(classifiers):
         return x_column, y_column, class_column
     else:
         return None, None, None
+
+
+def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook):
+    """
+    Creates a chartsheet in a workbook that plots the data with a colour of their classified type
+    sheet_name cannot contain any of the characters ' [ ] : * ? / \ ' and it must be less than 20 characters.
+    x_column, y_column and class_column are indexes of columns in classifiers to use as x-values, y-values and
+    series names, respectively
+    """
+
+    # build the list of series to add to chart, each series specifies a range of data
+    series_list = []
+    current_series = classifiers[1][class_column]
+    current_series_start, current_series_end = 1, 1
+
+    x_axis_min = 1
+    x_axis_max = 10
+    y_axis_min = 1
+    y_axis_max = 10
+
+    for i in range(1, len(classifiers)):
+
+        # keep track of x/y min/max
+        x_axis_min = x_axis_min/10 if classifiers[i][x_column] < x_axis_min else x_axis_min
+        x_axis_max = x_axis_max*10 if classifiers[i][x_column] > x_axis_max else x_axis_max
+        y_axis_min = y_axis_min/10 if classifiers[i][y_column] < y_axis_min else y_axis_min
+        y_axis_max = y_axis_max*10 if classifiers[i][y_column] > y_axis_max else y_axis_max
+
+        if current_series == classifiers[i][class_column]:
+            # still in same series - update end index
+            current_series_end = i
+        else:
+            # encountered new series - add previous one to list
+            series_list.append({
+                'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
+                'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
+                'name': current_series,
+                'fill': {'color': CLASS_COLORS.get(current_series, '#000000')}
+            })
+            # new series
+            current_series_start = i
+            current_series_end = i
+            current_series = classifiers[i][class_column]
+
+    # add last series:
+    series_list.append({
+        'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
+        'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
+        'name': current_series
+    })
+
+    # create a chartsheet in the workbook for the plot
+    # a chartsheet is a worksheet that only contains a chart.
+    scatterplot_worksheet = workbook.add_worksheet("{} Plot".format(sheet_name))
+
+    # the scatter plot
+    scatterplot = workbook.add_chart({'type': 'scatter'})
+    # default size is 480 x 288 pixels
+    # we want 2x default size
+    scatterplot.set_size({'width': CHART_WIDTH, 'height': CHART_HEIGHT})
+    scatterplot.set_chartarea({'fill': {'none': True}, 'border': {'none': True}})
+    scatterplot.set_plotarea({
+        'fill': {'none': True},
+        'layout': {
+            'x': PLOT_X_OFFSET,
+            'y': PLOT_Y_OFFSET,
+            'width': PLOT_WIDTH,
+            'height': PLOT_HEIGHT
+        }
+    })
+    scatterplot.set_x_axis({
+        'name': [sheet_name, 0, x_column],
+        'max': x_axis_max,
+        'min': x_axis_min,
+        'log_base': 10
+    })
+    scatterplot.set_y_axis({
+        'name': [sheet_name, 0, y_column],
+        'max': y_axis_max,
+        'min': y_axis_min,
+        'log_base': 10
+    })
+
+    for series in series_list:
+        scatterplot.add_series(series)
+
+    scatterplot_worksheet.insert_chart('A1', scatterplot)
+
+    # generate and add convex hull image
+    generate_convex_hull(x_column, y_column, class_column, classifiers, x_axis_max, x_axis_min, y_axis_max, y_axis_min)
+    scatterplot_worksheet.insert_image('A1', CONVEX_HULL_IMAGE_FILE, {
+        'x_offset': int(PLOT_X_OFFSET*CHART_WIDTH),
+        'y_offset': int(PLOT_Y_OFFSET*CHART_HEIGHT)
+    })
+
+
+def generate_convex_hull(x_column, y_column, class_column, classifiers, x_axis_max, x_axis_min, y_axis_max, y_axis_min):
+    """
+    Generates a image to use as background in the chart containing the convex hulls
+    Saves image at location specified in defaults.CONVEX_HULL_IMAGE_FILE
+
+    Alex talking about Convex charts:
+    how to do convex hull to get a region for a set of points:
+    tldr version is
+    take the bottommost point, leftmost if there's a tie.
+    sort all other points by angle with that point and x-axis (use cross product or something).
+    add each point, such that each point added means a line segment between the point and the previous point,
+    if this results in the line segment causing the current shape to be non-convex,
+    remove the previous point and try adding this point again.
+    once through all points, add line segment between final point and your original point.
+    that's a tldr of convex hull
+    """
+
+    image = Image.new('RGBA', (int(CHART_WIDTH*PLOT_WIDTH), int(CHART_HEIGHT*PLOT_HEIGHT)), '#FF000080')
+    image.save(CONVEX_HULL_IMAGE_FILE)
