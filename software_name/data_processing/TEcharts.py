@@ -155,9 +155,8 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
     # default size is 480 x 288 pixels
     # we want 2x default size
     scatterplot.set_size({'width': CHART_WIDTH, 'height': CHART_HEIGHT})
-    scatterplot.set_chartarea({'fill': {'none': True}, 'border': {'none': True}})
+    scatterplot.set_chartarea({'border': {'none': True}})
     scatterplot.set_plotarea({
-        'fill': {'none': True},
         'layout': {
             'x': PLOT_X_OFFSET,
             'y': PLOT_Y_OFFSET,
