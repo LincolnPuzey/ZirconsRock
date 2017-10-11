@@ -270,21 +270,24 @@ def addClassifier(full, sheet, carts):
     sheet = the actual sheet we use in the spreadsheet
     carts = the list of examples to classify
     """
-    sheet.write('B1','Analysis')
-    sheet.write('A1','Sample')
-    classifier = [["Sample","Analysis"]]
+
+    # build 'classifier'
+    classifier = [["Sample", "Analysis"]]
     for c in range(len(carts)):
-        sheet.write(0,c+2,carts[c])
         classifier[0].append(carts[c])
-    for r in range(1,len(full)):
-        z=full[r][1]
-        classifier.append([full[r][0],z])
-        sheet.write(r,0,full[r][0])
-        sheet.write(r,1,z)
+    for r in range(1, len(full)):
+        z = full[r][1]
+        classifier.append([full[r][0], z])
         for c in range(len(carts)):
-            content = classify(carts[c],full,z)
-            sheet.write(r,c+2,content)
+            content = classify(carts[c], full, z)
             classifier[r].append(content)
+
+    # sort 'classifier' except for first row
+    classifier = [classifier[0]] + sorted(classifier[1:], key=lambda row: row[-3])
+
+    # write to excel
+    addSheet(sheet, classifier)
+
     return classifier
 
 
