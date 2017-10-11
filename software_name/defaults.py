@@ -8,6 +8,15 @@ CUR_DIR = os.path.dirname(os.path.realpath(__file__))
 INPUT_DIR = CUR_DIR + '/../test_files/inputs'
 OUTPUT_DIR = CUR_DIR + '/../test_files/outputs'
 
+# Variables used in TE.py:
+BeginningCell = "Element"  # cell where program begins reading
+EndingCell = ""  # cell where program ends reading
+SheetName = "TrElem"
+allChondriteElements = ['La139', 'Ce140', 'Pr141', 'Nd146', 'Sm147', 'Eu151', 'Gd157', 'Th232', 'Dy163', 'Y89', 'Ho165',
+                        'Er166', 'U238', 'Yb173', 'Lu175', 'Hf178', 'Nb93', 'Ta181', 'Ti49', 'P31', 'Tb159', 'Tm169']
+ChondriteValues = [0.237, 0.613, 0.0928, 0.457, 0.148, 0.0563, 0.199, 0.0294, 0.246, 1.57, 0.0546, 0.16, 0.0074, 0.161,
+                   0.0246, 0.103, 0.24, 0.0136, 440, 1080, 0.0361, 0.0247]
+
 # File path for chondrite_values.csv
 CHONDRITE_FILE = INPUT_DIR + '/chondrite_values.csv'
 

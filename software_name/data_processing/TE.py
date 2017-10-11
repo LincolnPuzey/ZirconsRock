@@ -1,12 +1,10 @@
 from .common import *
 from .TEcharts import *
 from .StyleOfTE import *
-BeginningCell = "Element" #cell where program begins reading
-EndingCell = "" #cell where program ends reading
-SheetName="TrElem"
-allChondriteElements = ['La139','Ce140','Pr141','Nd146','Sm147','Eu151','Gd157','Th232','Dy163','Y89','Ho165','Er166','U238','Yb173','Lu175','Hf178','Nb93','Ta181','Ti49','P31','Tb159','Tm169']
-ChondriteValues = [0.237,0.613,0.0928,0.457,0.148,0.0563,0.199,0.0294,0.246,1.57,0.0546,0.16,0.0074,0.161,0.0246,0.103,0.24,0.0136,440,1080,0.0361,0.0247]
-def classify(cart,t,z="zircon eg. STDGJ-01"):
+from defaults import BeginningCell, EndingCell, SheetName, allChondriteElements, ChondriteValues
+
+
+def classify(cart, t, z="zircon eg. STDGJ-01"):
     if cart == "CART1":
         if data(t,z,"Lu")<20.7:
             if data(t,z,"Hf")<6200:
@@ -74,12 +72,14 @@ def classify(cart,t,z="zircon eg. STDGJ-01"):
         return "At the moment the python file only specifies CART 1 and CART 2"
     else:
         return ""
-'''
-Provided the 2D array t with zircons against elements what number would I get from zircon on element?
-zircon eg = 'STDGJ-01'
-element eg = 'Ce'
-'''
-def data(t,zircon,element):
+
+
+def data(t, zircon, element):
+    """
+    Provided the 2D array t with zircons against elements what number would I get from zircon on element?
+    zircon eg = 'STDGJ-01'
+    element eg = 'Ce'
+    """
     e=[False,element]
     if "/" in element:
         e=element.split("/")
@@ -103,18 +103,22 @@ def data(t,zircon,element):
         print("For the",t[0][1],"spreadsheet:")
         print("Cannot find value for Element:",element,"for zircon",zircon,"?")
         return eval(input("Please enter the value here: "))
-'''
-Returns all Trace Elements given a specific file
-'''
+
+
 def getElements(file):
+    """
+    Returns all Trace Elements given a specific file
+    """
     t=table(file)
     r=begr(t,BeginningCell)
     e=begr(t[r:],EndingCell)
     return column(t[r+1:r+e],0)
-'''
-Creates the Summary spreadsheets
-'''
-def summary(full,Classifiers,workbook):
+
+
+def summary(full, Classifiers, workbook):
+    """
+    Creates the Summary spreadsheets
+    """
     i=-1
     zircons = column(Classifiers,1)
     for s in Classifiers[0]:
@@ -181,16 +185,17 @@ def summary(full,Classifiers,workbook):
             avg.write(r,n*e+4,stdev)
             avg.write(r,n*e+5,median)
     styleSummary(avg,workbook)
-def values(t,c,c0):
+
+
+def values(t, c, c0):
     v = []
     for r in t:
         if r[0] == c0:
             v.append(r[c])
     return v
-        
-    
-            
-def getChondrite(file,unknown,detected):
+
+
+def getChondrite(file, unknown, detected):
     if type(unknown)!=type(["list"]):
         return table(file)
     chond = readln(file)
@@ -203,16 +208,16 @@ def getChondrite(file,unknown,detected):
         text = ',Excluded Zircons or Standards,' + un
         writeln(2,text,file)
     return table(file)
-    
-                
-'''
-Main function that will call everything as needed
-'''      
-def te(files,output,ChondFile):
-#Parameters to add{
+
+
+def te(files, output, ChondFile):
+    """
+    Main function that will call everything as needed
+    """
+    # Parameters to add
     control = ['STDGJ','MT','91500']
     unknown = ['INT1','INT2']
-#}
+
     print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
     print("This program was created and developed by Mark Collier September 2017 [Contact:+61466523090]")
@@ -256,13 +261,15 @@ def te(files,output,ChondFile):
         print(e)
         input("You must close "+output+" before continuing")
         workbook.close()
-'''
-Adds a sheet based upon the outline of a Classification sheet
-full = 2D array of the table
-sheet = the actual sheet we use in the spreadsheet
-carts = the list of examples to classify
-'''
-def addClassifier(full,sheet,carts):
+
+
+def addClassifier(full, sheet, carts):
+    """
+    Adds a sheet based upon the outline of a Classification sheet
+    full = 2D array of the table
+    sheet = the actual sheet we use in the spreadsheet
+    carts = the list of examples to classify
+    """
     sheet.write('B1','Analysis')
     sheet.write('A1','Sample')
     classifier = [["Sample","Analysis"]]
@@ -279,10 +286,12 @@ def addClassifier(full,sheet,carts):
             sheet.write(r,c+2,content)
             classifier[r].append(content)
     return classifier
-'''
-Testing some our functions
-'''
+
+
 def test():
+    """
+    Testing some our functions
+    """
     assertEquals(['Hf177', 'Hf178'],listfilter(["Hf177","Hf178","Pb204"],"Hf"),"Function listfilter")
     assertEquals(['INT1-01', 'INT1-02'],listfilter(["INT1-01","INT2-01","INT1-02"],"INT1"))
     assertEquals(['INT1-01', 'INT2-01', 'INT1-02'],listfilter(["INT1-01","INT2-01","INT1-02"],"INT"))
@@ -293,10 +302,12 @@ def test():
     assertEquals(4,record(4))
     assertEquals("",record(4,""))
     assertEquals(0.613,chond("Ce"),"Function chond")
-'''
-Returns all of the zircons listed in a Trace Element File List
-'''
+
+
 def getAllZircons(files):
+    """
+    Returns all of the zircons listed in a Trace Element File List
+    """
     zlist = []
     for f in files:
         t = table(f)
@@ -305,11 +316,13 @@ def getAllZircons(files):
             if row != BeginningCell:
                 zlist.append(row)
     return zlist
-'''
-Add a spreadsheet of zircons against elements with it's included Chondrite values and Elements to be included in the list
-Choose particular isotopes and zircons to be excluded from this spreadsheet
-'''
-def addTESheet(files,sheet,includedElements,Chondrites,excludedZircons):
+
+
+def addTESheet(files, sheet, includedElements, Chondrites, excludedZircons):
+    """
+    Add a spreadsheet of zircons against elements with it's included Chondrite values and Elements to be included in the list
+    Choose particular isotopes and zircons to be excluded from this spreadsheet
+    """
     sheet.write('B1','Analysis')
     sheet.write('A1','Sample')
     full=[[""]*(3+len(includedElements))]
@@ -356,6 +369,7 @@ def addTESheet(files,sheet,includedElements,Chondrites,excludedZircons):
             x=x+1
     return full
 
+
 def teSheetNamesIndicies(Chondtable):
     sn=[]
     indicies = []
@@ -365,10 +379,11 @@ def teSheetNamesIndicies(Chondtable):
             indicies.append(i)
     return indicies
 
-'''
-Returns the Chondrite value of a specific element
-'''
+
 def chond(element):
+    """
+    Returns the Chondrite value of a specific element
+    """
     i=0
     for e in allChondriteElements:
         if element in e:
