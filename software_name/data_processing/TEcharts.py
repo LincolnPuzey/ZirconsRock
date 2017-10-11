@@ -1,6 +1,4 @@
-import xlsxwriter
-
-from .common import column
+from defaults import CLASS_COLORS
 
 
 def chart(classifiers, sheet_name, workbook):
@@ -55,7 +53,8 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
             series_list.append({
                 'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
                 'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
-                'name': current_series
+                'name': current_series,
+                'fill': {'color': CLASS_COLORS.get(current_series, '#000000')}
             })
             # new series
             current_series_start = i
