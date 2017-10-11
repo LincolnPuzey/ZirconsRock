@@ -1,15 +1,18 @@
-'''
-Change the Style of Control Report, Normalised Report and ToBeCommonLeadCorrected
-These spreadsheets are available on test_upb_output.xlsx
-'''
-def style(workbook,commonPb,report):
-    #let me know if workbook isn't passed by reference cos then you'll have to:
-    return workbook #at the end of the function
-'''
-This function will take in a single standard worksheet eg. STDGJ, 91500, MT, INT1 or INT2 etc.
-You need to format the style of this sheet into the way that was provided by Irina
-ie. See RequiredUPb.xlsx
-'''
-def styleStandards(workbook,worksheet):
-    #let me know if workbook isn't passed by reference cos then you'll have to:
-    return workbook #at the end of the function
+def styleUPb(FileLocation,StandardList):
+    formatReport('Report')
+    formatCommonPb('ToBeCommonLeadCorrected')
+    styleStandards(StandardList)
+def formatReport(sheetName):
+    return "The formatted version of Sheet: Report"
+def formatCommonPb(sheetName):
+    return "The formatted version of Sheet: ToBeCommonLeadCorrected"
+
+def styleStandards(StandardList):
+    '''
+        Style each of the Spreadsheets with different Standards
+        An example of the StandardList = STDGJ, 91500, MT, INT1, INT2
+        This example is shown on test_upb_output.xlsx
+        You need to format the style of this sheet into the way that was provided by Irina on RequiredUPb.xlsx
+    '''
+    return 'Styled sheet whether it has concordia, inverse concordia sheets on it or not'
+

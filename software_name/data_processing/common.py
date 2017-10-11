@@ -2,24 +2,7 @@
 File for functions common to TE and U-Pb processing
 """
 import copy
-def install_requirements():
-    print("Installing requirements...")
-    try:
-        import pip
-        pip.main(['install', '-r', 'requirements.txt'])
-
-        print("Success")
-        input("Press Enter to exit...")
-        import xlsxwriter
-    except Exception as e:
-        print("Exception:")
-        print(str(e))
-        input("Press Enter to exit...")
-try:
-    import xlsxwriter
-except:
-    install_requirements()
-
+import xlsxwriter
 
 '''
 Tries to evaluate and divide a variable for each record in a table.
@@ -91,7 +74,9 @@ def writeln(LineNumber=0,Text='',File='untitled.txt'):
         f+=['']*(lin-len(f))
         f.append(Text)
     else:
-        f[lin]=Text       
+        f[lin]=Text
+    if f[-1] == "" and f[-2] == "":
+        f=f[:-2]
     write("\n".join(f),File)
 '''
 For testing whether a particular expression that includes functions return an expected value
@@ -99,7 +84,6 @@ eg. we could test the function with following parameters
 expected = 3
 actual = record(6,2)
 message = 'Function record'
-
 '''
 def assertEquals(expected,actual,message=""):
     if expected!=actual:
