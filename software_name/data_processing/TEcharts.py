@@ -10,8 +10,9 @@ def chart(classifiers, sheet_name, workbook):
     """
 
     x_column, y_column, class_column = identify(classifiers)
-    draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
-    # convex_hull(x, y, class_list, sheet_name + " chart", workbook)
+    if x_column is not None and y_column is not None:
+        draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
+        # convex_hull(x, y, class_list, sheet_name + " chart", workbook)
 
 
 def convex_hull(x, y, class_list, chart_name, workbook):
@@ -162,7 +163,9 @@ def identify(classifiers):
     x_column = width-2
     y_column = width-1
     class_column = width-3
-    # TODO deal with edge cases?
 
-    return x_column, y_column, class_column
-
+    # check columns contain numbers
+    if isinstance(classifiers[1][x_column], float) and isinstance(classifiers[1][y_column], float):
+        return x_column, y_column, class_column
+    else:
+        return None, None, None
