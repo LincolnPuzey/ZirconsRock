@@ -153,7 +153,6 @@ def summary(full, Classifiers, workbook):
                 sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")   
     elements = full[0][3:]
     z = standard(column(full,1)[1:])
-    zirconClassification(sheet,workbook)
     avg = workbook.add_worksheet("Summary of "+full[0][1])
     avg.write(1,0,"Sample")
     for e in range(len(elements)):
@@ -184,7 +183,6 @@ def summary(full, Classifiers, workbook):
             avg.write(r,n*e+3,mean)
             avg.write(r,n*e+4,stdev)
             avg.write(r,n*e+5,median)
-    styleSummary(avg,workbook)
 
 
 def values(t, c, c0):
@@ -261,6 +259,7 @@ def te(files, output, ChondFile):
         print(e)
         input("You must close "+output+" before continuing")
         workbook.close()
+    styleTE(output)
 
 
 def addClassifier(full, sheet, carts):

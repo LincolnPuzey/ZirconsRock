@@ -267,7 +267,6 @@ def UPb(control,unknown, files, output):
             ThUppm(conc,normalised,ThPPM,UPPM)
             report = workbook.add_worksheet("Report")
             addSheet(report,alternate(combine(tlist,0,unknown),combine(tlist,1,unknown)))
-            style(workbook,commonPb,report)
         else:
             r = sigma(copy.deepcopy(ratios),2)
             tablesToPutOnThisStandard = [r,concentrations,sigma(ages,2)]
@@ -281,10 +280,10 @@ def UPb(control,unknown, files, output):
                     titlesOfEachTable.append("Inverse Concordia Plots")    
             ss = workbook.add_worksheet(s)
             SplitStandards(ss,tablesToPutOnThisStandard,titlesOfEachTable)
-            styleStandards(workbook,ss)
             
     try:
         workbook.close()
     except:
         input("You must close "+output+" before continuing...")
         UPb(control, unknown, files, output)
+    styleUPb(output,standards)
