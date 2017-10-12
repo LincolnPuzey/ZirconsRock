@@ -6,7 +6,15 @@ from PIL import Image, ImageDraw, ImageColor
 from defaults import CLASS_COLORS, CLASS_MARKERS, CONVEX_HULL_IMAGE_FILE, CONVEX_HULL_IMAGE_DIR, \
     CHART_HEIGHT, CHART_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, PLOT_X_OFFSET, PLOT_Y_OFFSET
 
-
+def line_chart(sheet_name,workbook):
+    '''
+    Does a line graph of the sheets TrElem and REE as specified in RequiredTE.xls
+    '''
+def bar_chart(sheet_name,workbook):
+    '''
+    Presents a bar graph of each Classified rock type using Zircon Classification.
+    See sheet RT INT in RequiredTE.xls file
+    '''
 def chart(classifiers, sheet_name, workbook):
     """
     The main funtion for chart Processing
