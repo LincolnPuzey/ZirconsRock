@@ -1,0 +1,2 @@
+This directory is used to store convex hull image files that are inserted into the excel file.
+Github should ignore these generated image files.

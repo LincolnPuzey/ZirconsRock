@@ -11,8 +11,8 @@ desktop.ini
 
 *.pyc
 
-convexhull.png
-**/convexhull.png
+*convexhull.png
+**/*convexhull.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

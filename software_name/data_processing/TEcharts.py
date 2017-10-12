@@ -1,6 +1,10 @@
-from defaults import CLASS_COLORS, CHART_HEIGHT, CHART_WIDTH, CONVEX_HULL_IMAGE_FILE, PLOT_HEIGHT, PLOT_WIDTH, \
-    PLOT_X_OFFSET, PLOT_Y_OFFSET
-from PIL import Image
+from math import log10
+from os import path
+
+from PIL import Image, ImageDraw, ImageColor
+
+from defaults import CLASS_COLORS, CLASS_MARKERS, CONVEX_HULL_IMAGE_FILE, CONVEX_HULL_IMAGE_DIR, \
+    CHART_HEIGHT, CHART_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, PLOT_X_OFFSET, PLOT_Y_OFFSET
 
 
 def chart(classifiers, sheet_name, workbook):
@@ -99,16 +103,21 @@ def identify(classifiers):
 
 def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook):
     """
-    Creates a chartsheet in a workbook that plots the data with a colour of their classified type
+    Creates a worksheet in a workbook that plots the data with a colour of their classified type.
+    Calculates the points that make a convex hull around each series, then generates an image to
+    overlay over the chart to illustrate the convex hulls.
     sheet_name cannot contain any of the characters ' [ ] : * ? / \ ' and it must be less than 20 characters.
     x_column, y_column and class_column are indexes of columns in classifiers to use as x-values, y-values and
-    series names, respectively
+    series names, respectively.
     """
 
     # build the list of series to add to chart, each series specifies a range of data
     series_list = []
-    current_series = classifiers[1][class_column]
+    current_series_name = classifiers[1][class_column]
     current_series_start, current_series_end = 1, 1
+    series_data = {
+        current_series_name: []
+    }
 
     x_axis_min = 1
     x_axis_max = 10
@@ -123,28 +132,53 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
         y_axis_min = y_axis_min/10 if classifiers[i][y_column] < y_axis_min else y_axis_min
         y_axis_max = y_axis_max*10 if classifiers[i][y_column] > y_axis_max else y_axis_max
 
-        if current_series == classifiers[i][class_column]:
+        if current_series_name == classifiers[i][class_column]:
             # still in same series - update end index
             current_series_end = i
+            # add values
+
         else:
             # encountered new series - add previous one to list
             series_list.append({
                 'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
                 'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
-                'name': current_series,
-                'fill': {'color': CLASS_COLORS.get(current_series, '#000000')}
+                'name': current_series_name,
+                'marker': CLASS_MARKERS.get(
+                    current_series_name,
+                    {
+                        # default marker
+                        'type': 'square',
+                        'size': 7,
+                        'border': {'color': '#808080'},
+                        'fill': {'color': '#808080'}
+                    }
+                )
             })
             # new series
             current_series_start = i
             current_series_end = i
-            current_series = classifiers[i][class_column]
+            current_series_name = classifiers[i][class_column]
+            series_data[current_series_name] = []
+
+        series_data[current_series_name].append((classifiers[i][x_column], classifiers[i][y_column]))
 
     # add last series:
     series_list.append({
         'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
         'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
-        'name': current_series
+        'name': current_series_name,
+        'marker': CLASS_MARKERS.get(
+            current_series_name,
+            {
+                # default marker
+                'type': 'square',
+                'size': 7,
+                'border': {'color': '#808080'},
+                'fill': {'color': '#808080'}
+            }
+        )
     })
+    #
 
     # create a chartsheet in the workbook for the plot
     # a chartsheet is a worksheet that only contains a chart.
@@ -152,6 +186,7 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
 
     # the scatter plot
     scatterplot = workbook.add_chart({'type': 'scatter'})
+    scatterplot.set_title({'name': "{} vs {} in Zircon".format(classifiers[0][y_column], classifiers[0][x_column])})
     # default size is 480 x 288 pixels
     # we want 2x default size
     scatterplot.set_size({'width': CHART_WIDTH, 'height': CHART_HEIGHT})
@@ -168,13 +203,19 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
         'name': [sheet_name, 0, x_column],
         'max': x_axis_max,
         'min': x_axis_min,
-        'log_base': 10
+        'log_base': 10,
+        'major_gridlines': {'visible': True},
+        'major_tick_mark': 'outside',
+        'minor_tick_mark': 'inside'
     })
     scatterplot.set_y_axis({
         'name': [sheet_name, 0, y_column],
         'max': y_axis_max,
         'min': y_axis_min,
-        'log_base': 10
+        'log_base': 10,
+        'major_gridlines': {'visible': True},
+        'major_tick_mark': 'outside',
+        'minor_tick_mark': 'inside'
     })
 
     for series in series_list:
@@ -183,14 +224,18 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
     scatterplot_worksheet.insert_chart('A1', scatterplot)
 
     # generate and add convex hull image
-    generate_convex_hull(x_column, y_column, class_column, classifiers, x_axis_max, x_axis_min, y_axis_max, y_axis_min)
-    scatterplot_worksheet.insert_image('A1', CONVEX_HULL_IMAGE_FILE, {
-        'x_offset': int(PLOT_X_OFFSET*CHART_WIDTH),
-        'y_offset': int(PLOT_Y_OFFSET*CHART_HEIGHT)
-    })
+    image = generate_convex_hull_image(sheet_name, series_data, x_axis_max, x_axis_min, y_axis_max, y_axis_min)
+    scatterplot_worksheet.insert_image(
+        'A1',
+        image,
+        {
+            'x_offset': int(PLOT_X_OFFSET*CHART_WIDTH),
+            'y_offset': int(PLOT_Y_OFFSET*CHART_HEIGHT)
+        }
+    )
 
 
-def generate_convex_hull(x_column, y_column, class_column, classifiers, x_axis_max, x_axis_min, y_axis_max, y_axis_min):
+def generate_convex_hull_image(sheet_name, series_data, x_axis_max, x_axis_min, y_axis_max, y_axis_min):
     """
     Generates a image to use as background in the chart containing the convex hulls
     Saves image at location specified in defaults.CONVEX_HULL_IMAGE_FILE
@@ -207,5 +252,90 @@ def generate_convex_hull(x_column, y_column, class_column, classifiers, x_axis_m
     that's a tldr of convex hull
     """
 
-    image = Image.new('RGBA', (int(CHART_WIDTH*PLOT_WIDTH), int(CHART_HEIGHT*PLOT_HEIGHT)), '#FF000080')
-    image.save(CONVEX_HULL_IMAGE_FILE)
+    image = Image.new('RGBA', (int(CHART_WIDTH * PLOT_WIDTH), int(CHART_HEIGHT * PLOT_HEIGHT)), '#FFFFFF00')
+    draw = ImageDraw.Draw(image)
+
+    for class_name, points in series_data.items():
+        edge_points = convex_hull(transform_points(points, x_axis_max, x_axis_min, y_axis_max, y_axis_min))
+        if edge_points is not None:
+
+            color = ImageColor.getrgb(CLASS_COLORS.get(class_name, '#00000000'))+(255,)
+
+            draw.line(edge_points, fill=color, width=2)
+
+    image_file_path = path.join(CONVEX_HULL_IMAGE_DIR, CONVEX_HULL_IMAGE_FILE.format(sheet_name))
+    image.save(image_file_path)
+    return image_file_path
+
+
+def convex_hull(points):
+    """
+    Based on Code from:
+    https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain#Python
+    Used here under terms of the Creative Commons Attribution-ShareAlike License:
+    https://creativecommons.org/licenses/by-sa/3.0/
+
+    Computes the convex hull of a set of 2D points.
+
+    Input: an iterable sequence of (x, y) pairs representing the points.
+    Output: a list of vertices of the convex hull in counter-clockwise order,
+      starting from the vertex with the lexicographically smallest coordinates.
+    Implements Andrew's monotone chain algorithm. O(n log n) complexity.
+    """
+
+    # Sort the points lexicographically (tuples are compared lexicographically).
+    # Remove duplicates with set().
+    points = sorted(set(points))
+
+    # Boring case: 0-2 unique points
+    if len(points) < 3:
+        return None
+
+    # 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
+    # Returns a positive value, if OAB makes a counter-clockwise turn,
+    # negative for clockwise turn, and zero if the points are collinear.
+    def cross(o, a, b):
+        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+    # Build lower hull
+    lower = []
+    for p in points:
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], p) <= 0:
+            lower.pop()
+        lower.append(p)
+
+    # Build upper hull
+    upper = []
+    for p in reversed(points):
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], p) <= 0:
+            upper.pop()
+        upper.append(p)
+
+    # Concatenation of the lower and upper hulls gives the convex hull.
+    # Last point of lower is omitted because it is repeated at the beginning of upper list.
+    return lower[:-1] + upper
+
+
+def transform_points(points, x_axis_max, x_axis_min, y_axis_max, y_axis_min):
+    """
+    takes a list of points in form [(x,y), (x,y), ...]
+    and transforms the from raw x and y data values to x and y coordinate values suitable for drawing on the image
+    """
+    x_axis_max_log = log10(x_axis_max)
+    x_axis_min_log = log10(x_axis_min)
+    y_axis_max_log = log10(y_axis_max)
+    y_axis_min_log = log10(y_axis_min)
+    x_axis_range = x_axis_max_log-x_axis_min_log
+    y_axis_range = y_axis_max_log-y_axis_min_log
+
+    points_transformed = []
+
+    for point in points:
+        points_transformed.append(
+            (
+                int((log10(point[0]) - x_axis_min_log) / x_axis_range * PLOT_WIDTH * CHART_WIDTH),
+                int((y_axis_max_log - log10(point[1])) / y_axis_range * PLOT_HEIGHT * CHART_HEIGHT)
+            )
+        )
+
+    return points_transformed

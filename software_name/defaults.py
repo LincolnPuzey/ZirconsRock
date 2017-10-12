@@ -17,18 +17,42 @@ allChondriteElements = ['La139', 'Ce140', 'Pr141', 'Nd146', 'Sm147', 'Eu151', 'G
 ChondriteValues = [0.237, 0.613, 0.0928, 0.457, 0.148, 0.0563, 0.199, 0.0294, 0.246, 1.57, 0.0546, 0.16, 0.0074, 0.161,
                    0.0246, 0.103, 0.24, 0.0136, 440, 1080, 0.0361, 0.0247]
 
-# colors used for scatterplots and convex hulls for each class of CART1
+# colors and markers used for scatterplots and convex hulls for each class of CART1
+CLASSES = [
+    "Carbonite",
+    "Granitoid(>5% SiO2)",
+    "Granitoid (70-75% SiO2)",
+    "Granitoid (>65% SiO2)",
+    "Syenite",
+    "Kimberlite",
+    "Ne-syenite&Syenite Pegmatites",
+    "Syenite/Monzonite",
+    "Dolerite",
+    "Basalt"
+]
 CLASS_COLORS = {
-    "Carbonite":                     '#FF0000',  # red
-    "Granitoid(>5% SiO2)":           '#0000FF',  # blue
-    "Granitoid (70-75% SiO2)":       '#008080',  # teal
-    "Granitoid (>65% SiO2)":         '#00FFFF',  # aqua
-    "Syenite":                       '#FFFF00',  # yellow
-    "Kimberlite":                    '#00FF00',  # lime
-    "Ne-syenite&Syenite Pegmatites": '#008000',  # green
-    "Syenite/Monzonite":             '#FF00FF',  # fuchsia
-    "Dolerite":                      '#800080',  # purple
-    "Basalt":                        '#800000',  # maroon
+    CLASSES[0]: '#CC3300',  # dark red
+    CLASSES[1]: '#669900',  # dark green
+    CLASSES[2]: '#00CC66',  # aqua green
+    CLASSES[3]: '#00B3B3',  # dark aqua
+    CLASSES[4]: '#E6E600',  # dark yellow
+    CLASSES[5]: '#0066CC',  # blue
+    CLASSES[6]: '#6600FF',  # blue-purple
+    CLASSES[7]: '#B800E6',  # purple
+    CLASSES[8]: '#B30059',  # dark pink
+    CLASSES[9]: '#661A00',  # brown
+}
+CLASS_MARKERS = {
+    CLASSES[0]: {'type': 'square',    'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[0], '#000000')}, 'fill': {'color': CLASS_COLORS.get(CLASSES[0], '#000000')}},
+    CLASSES[1]: {'type': 'diamond',   'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[1], '#000000')}, 'fill': {'color': CLASS_COLORS.get(CLASSES[1], '#000000')}},
+    CLASSES[2]: {'type': 'diamond',   'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[2], '#000000')}, 'fill': {'color': CLASS_COLORS.get(CLASSES[2], '#000000')}},
+    CLASSES[3]: {'type': 'diamond',   'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[3], '#000000')}, 'fill': {'color': CLASS_COLORS.get(CLASSES[3], '#000000')}},
+    CLASSES[4]: {'type': 'x',         'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[4], '#000000')}, },
+    CLASSES[5]: {'type': 'circle',    'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[5], '#000000')}, 'fill': {'color': CLASS_COLORS.get(CLASSES[5], '#000000')}},
+    CLASSES[6]: {'type': 'triangle',  'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[6], '#000000')}, 'fill': {'color': CLASS_COLORS.get(CLASSES[6], '#000000')}},
+    CLASSES[7]: {'type': 'plus',      'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[7], '#000000')}, },
+    CLASSES[8]: {'type': 'star',      'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[8], '#000000')}, },
+    CLASSES[9]: {'type': 'long_dash', 'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[9], '#000000')}, 'fill': {'color': CLASS_COLORS.get(CLASSES[9], '#000000')}},
 }
 # Used for generating charts and convex hull images
 CHART_WIDTH = 1100
@@ -39,7 +63,8 @@ PLOT_Y_OFFSET = 0.07
 PLOT_WIDTH = 0.65
 PLOT_HEIGHT = 0.8
 # where to store convex hull image file
-CONVEX_HULL_IMAGE_FILE = "convexhull.png"
+CONVEX_HULL_IMAGE_DIR = "convex_hull"
+CONVEX_HULL_IMAGE_FILE = "{}_convexhull.png"
 
 # File path for chondrite_values.csv
 CHONDRITE_FILE = INPUT_DIR + '/chondrite_values.csv'
