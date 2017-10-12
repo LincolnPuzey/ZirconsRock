@@ -8,6 +8,8 @@ virtual_python/**
 **/.DS_Store
 desktop.ini
 **/desktop.ini
+Thumbs.db
+**/Thumbs.db
 
 *.pyc
 
