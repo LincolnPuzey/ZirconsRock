@@ -222,8 +222,8 @@ Main Function called to run the entire program
 def UPb(control,unknown, files, output):
 #Parameters to add{
     normalised = "STDGJ"
-    ThPPM = 20
-    UPPM = 290
+    ThPPM = 18
+    UPPM = 288
 #}
     print("This particular python file will read the data recorded by the Laser device for U-Pb data.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
@@ -266,7 +266,7 @@ def UPb(control,unknown, files, output):
             '''
             ThUppm(conc,normalised,ThPPM,UPPM)
             report = workbook.add_worksheet("Report")
-            addSheet(report,alternate(combine(tlist,0,unknown),combine(tlist,1,unknown)))
+            addSheet(report,sigma(alternate(combine(tlist,0,unknown),combine(tlist,1,unknown)),2))
         else:
             r = sigma(copy.deepcopy(ratios),2)
             tablesToPutOnThisStandard = [r,concentrations,sigma(ages,2)]

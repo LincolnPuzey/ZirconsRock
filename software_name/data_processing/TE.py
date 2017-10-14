@@ -151,7 +151,7 @@ def summary(full, Classifiers, workbook):
             for p in range(len(rocktype)):
                 r = p+2
                 sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")
-            bar_chart(s,workbook)
+            bar_chart(rocktype,s,workbook)
     elements = full[0][3:]
     z = standard(column(full,1)[1:])
     avg = workbook.add_worksheet("Summary of "+full[0][1])
@@ -236,18 +236,18 @@ def te(files, output, ChondFile):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
         full[0][1] = t[i][0]
         if t[i][0] in "TrElem" or t[i][0] in "REE":
-            line_chart(t[i][0],workbook)
+            line_chart(full,t[i][0],workbook)
         k=3
-	while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
-	    carts = nospaces(t[i+k][3:])
-	    if len(carts)>0:
-		worksheet = workbook.add_worksheet(t[i+k][2])
-		Classifiers = addClassifier(full,worksheet,carts)
-		chart(Classifiers,t[i+k][2],workbook)
-		if NotDoneClassifiers:
-		    summary(full,Classifiers,workbook)
-		NotDoneClassifiers=False
-	    k=k+1
+        while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
+            carts = nospaces(t[i+k][3:])
+            if len(carts)>0:
+                worksheet = workbook.add_worksheet(t[i+k][2])
+                Classifiers = addClassifier(full,worksheet,carts)
+                chart(Classifiers,t[i+k][2],workbook)
+                if NotDoneClassifiers:
+                    summary(full,Classifiers,workbook)
+                NotDoneClassifiers=False
+            k=k+1
 	
     try:
         workbook.close()
