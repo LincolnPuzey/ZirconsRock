@@ -3,7 +3,8 @@ from os import path
 
 from PIL import Image, ImageDraw, ImageColor
 
-from defaults import CLASS_COLORS, CLASS_MARKERS, CONVEX_HULL_IMAGE_FILE, CONVEX_HULL_IMAGE_DIR, \
+from defaults import LINE_COLORS, LINE_MARKERS, \
+    CLASS_COLORS, CLASS_MARKERS, CONVEX_HULL_IMAGE_FILE, CONVEX_HULL_IMAGE_DIR, \
     CHART_HEIGHT, CHART_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, PLOT_X_OFFSET, PLOT_Y_OFFSET
 
 
@@ -23,11 +24,23 @@ def line_chart(sheet_data, sheet_name, workbook):
 
         zircon_chart.set_title({'name': 'Trace Element Patterns of Zircons'})
         for i in range(1, len(sheet_data)):
+            color = LINE_COLORS[i % len(LINE_COLORS)]
             zircon_chart.add_series({
                 'categories': [sheet_name, 0, 2, 0, len(sheet_data[0])-2],
                 'values': [sheet_name, i, 2, i, len(sheet_data[0])-2],
-                'name': sheet_data[i][1]
+                'name': sheet_data[i][1],
+                'line': {'width': 1.0, 'color': color},
+                'marker': {
+                    'type': LINE_MARKERS[i % len(LINE_MARKERS)],
+                    'size': 4,
+                    'border': {'color': color},
+                    'fill': {'none': True}
+                }
             })
+        zircon_chart.set_x_axis({
+            'name': '<--- Increasing Ionic Radius <---',
+            'label_position': 'low'
+        })
         zircon_chart.set_y_axis({
             'name': 'Zircon/Chrondrite',
             'log_base': 10
