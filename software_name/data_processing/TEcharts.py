@@ -6,15 +6,60 @@ from PIL import Image, ImageDraw, ImageColor
 from defaults import CLASS_COLORS, CLASS_MARKERS, CONVEX_HULL_IMAGE_FILE, CONVEX_HULL_IMAGE_DIR, \
     CHART_HEIGHT, CHART_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, PLOT_X_OFFSET, PLOT_Y_OFFSET
 
-def line_chart(sheet2Darray,sheet_name,workbook):
-    '''
-    Does a line graph of the sheets TrElem and REE as specified in RequiredTE.xls
-    '''
-def bar_chart(rocktypelist,sheet_name,workbook):
-    '''
+
+def line_chart(sheet_data, sheet_name, workbook):
+    """
+    Does a line graph of the sheets TrElem and REE
+    Each line (series) is a different sample
+    Each point on the line is the concentration of a particular element in the sample
+
+    sheet_name is the name of the worksheet containing the data to plotted on the chart
+    sheet_data is a 2-dimensional list containing all the data on the worksheet sheet_name
+    workbook the xlsxwriter representation of the excel workbook
+    """
+    if len(sheet_data) > 1:
+        chartsheet = workbook.add_chartsheet("{} Chart".format(sheet_name))
+        zircon_chart = workbook.add_chart({'type': 'line'})
+
+        zircon_chart.set_title({'name': 'Trace Element Patterns of Zircons'})
+        for i in range(1, len(sheet_data)):
+            zircon_chart.add_series({
+                'categories': [sheet_name, 0, 2, 0, len(sheet_data[0])-2],
+                'values': [sheet_name, i, 2, i, len(sheet_data[0])-2],
+                'name': sheet_data[i][1]
+            })
+        zircon_chart.set_y_axis({
+            'name': 'Zircon/Chrondrite',
+            'log_base': 10
+        })
+
+        chartsheet.set_chart(zircon_chart)
+
+
+def bar_chart(rock_type_list, sheet_name, workbook):
+    """
     Presents a bar graph of each Classified rock type using Zircon Classification.
     See sheet RT INT in RequiredTE.xls file
-    '''
+
+    sheet_name is the name of the worksheet containing the data to plotted on the chart
+    rock_type_list is the list of rock types to be displayed on the bar chart - one bar per rock type
+    workbook the xlsxwriter representation of the excel workbook
+    """
+    if len(rock_type_list) > 0:
+        chartsheet = workbook.add_chartsheet("{} Chart".format(sheet_name))
+        rock_chart = workbook.add_chart({'type': 'column'})
+
+        rock_chart.set_title({'name': 'Modelled Rock Types of Zircons'})
+        rock_chart.add_series({
+            'categories': [sheet_name, 2, 2, 1+len(rock_type_list), 2],
+            'values': [sheet_name, 2, 4, 1+len(rock_type_list), 4]
+        })
+        rock_chart.set_legend({'none': True})
+        rock_chart.set_y_axis({'name': 'Number of Grains'})
+
+        chartsheet.set_chart(rock_chart)
+
+
 def chart(classifiers, sheet_name, workbook):
     """
     The main funtion for chart Processing
