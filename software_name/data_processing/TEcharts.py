@@ -18,10 +18,13 @@ def line_chart(sheet_data, sheet_name, workbook):
     sheet_data is a 2-dimensional list containing all the data on the worksheet sheet_name
     workbook the xlsxwriter representation of the excel workbook
     """
+    # if we have data to graph
     if len(sheet_data) > 1:
+        # add chartsheet and chart
         chartsheet = workbook.add_chartsheet("{} Chart".format(sheet_name))
         zircon_chart = workbook.add_chart({'type': 'line'})
 
+        # add data and formatting to chart
         zircon_chart.set_title({'name': 'Trace Element Patterns of Zircons'})
         for i in range(1, len(sheet_data)):
             color = LINE_COLORS[i % len(LINE_COLORS)]
@@ -46,6 +49,7 @@ def line_chart(sheet_data, sheet_name, workbook):
             'log_base': 10
         })
 
+        # set chart to chartsheet
         chartsheet.set_chart(zircon_chart)
 
 
@@ -58,10 +62,13 @@ def bar_chart(rock_type_list, sheet_name, workbook):
     rock_type_list is the list of rock types to be displayed on the bar chart - one bar per rock type
     workbook the xlsxwriter representation of the excel workbook
     """
+    # if we have data to graph
     if len(rock_type_list) > 0:
+        # add chartsheet and chart
         chartsheet = workbook.add_chartsheet("{} Chart".format(sheet_name))
         rock_chart = workbook.add_chart({'type': 'column'})
 
+        # add data and formatting to chart
         rock_chart.set_title({'name': 'Modelled Rock Types of Zircons'})
         rock_chart.add_series({
             'categories': [sheet_name, 2, 2, 1+len(rock_type_list), 2],
@@ -70,6 +77,7 @@ def bar_chart(rock_type_list, sheet_name, workbook):
         rock_chart.set_legend({'none': True})
         rock_chart.set_y_axis({'name': 'Number of Grains'})
 
+        # set chart to chartsheet
         chartsheet.set_chart(rock_chart)
 
 
@@ -81,8 +89,9 @@ def chart(classifiers, sheet_name, workbook):
     sheet_name = the string of name of the worksheet containing the data
     workbook = The xlsxwriter standard of implementing the workbook
     """
-
+    # Find which columns in classifiers hold data
     x_column, y_column, class_column = identify(classifiers)
+    # If we found appropriate data
     if x_column is not None and y_column is not None:
         draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
 
