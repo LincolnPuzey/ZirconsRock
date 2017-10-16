@@ -220,11 +220,6 @@ Main Function called to run the entire program
 '''
 
 def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
-#Parameters to add{
-    # normalised = "STDGJ"
-    # ThPPM = 18
-    # UPPM = 288
-#}
     print("This particular python file will read the data recorded by the Laser device for U-Pb data.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
     print("The output excel file will remove sample '610' out of the spreadsheet")
@@ -237,10 +232,15 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
     workbook = xlsxwriter.Workbook(output)
     tlist = []
     conc = []
+    badzircons = getAllZircons(files)
+    for x in [control,unknown,[normalised]]:
+        for y in x:
+            if y in badzircons:
+                badzircons.remove(y)
     for f in files:
         #If you need the run files in the Output then remove "" below
-        tlist.append(addUPbSheet("workbook.add_worksheet(f)",f,IncludedFields))
-        conc.append(addUPbSheet("workbook.add_worksheet(f)",f,['Analysis_#','Th232','U238']))
+        tlist.append(addUPbSheet("workbook.add_worksheet(f)",f,IncludedFields,badzircons))
+        conc.append(addUPbSheet("workbook.add_worksheet(f)",f,['Analysis_#','Th232','U238'],badzircons))
     allZircons=column(combine(tlist,0,'*'),0)
     standards = standard(allZircons)
     for s in standards:

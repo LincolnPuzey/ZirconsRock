@@ -193,18 +193,23 @@ def values(t, c, c0):
     return v
 
 
-def getChondrite(file, unknown, detected):
+def getChondrite(file, unknown, stand, detected):
     if type(unknown)!=type(["list"]):
         return table(file)
-    chond = readln(file)
-    if chond[2].split(',')[1]=="Excluded Zircons or Standards":
-        known = []
-        for d in detected:
-            if d not in unknown:
-                known.append(d)
-        un = str(known).replace("[","").replace("]","").replace("\'","")
-        text = ',Excluded Zircons or Standards,' + un
-        writeln(2,text,file)
+    chond = table(file)
+    for i in range(len(chond)):
+        if i==2:
+            control = unknown
+        else:
+            control = stand
+        if chond[i][1]=="Excluded Zircons or Standards":
+            known = []
+            for d in detected:
+                if d not in control:
+                    known.append(d)
+            un = str(known).replace("[","").replace("]","").replace("\'","")
+            text = ',Excluded Zircons or Standards,' + un
+            writeln(2,text,file)
     return table(file)
 
 
@@ -212,10 +217,6 @@ def te(files, output, ChondFile, control, unknown):
     """
     Main function that will call everything as needed
     """
-# Parameters to add{
-    # control = ['STDGJ','MT','91500']
-    # unknown = ['INT1','INT2']
-#}
     print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
     print("This program was created and developed by Mark Collier September 2017 [Contact:+61466523090]")
@@ -229,7 +230,7 @@ def te(files, output, ChondFile, control, unknown):
     print("     Row >3: indicats the CART classification that you wish to be done for this given data")
     print("         Column B here Always states CARTS followed by the name of the new Spreadsheet")
     workbook = xlsxwriter.Workbook(output)
-    t = getChondrite(ChondFile,unknown,standard(getAllZircons(files)))
+    t = getChondrite(ChondFile,unknown,control,standard(getAllZircons(files)))
     NotDoneClassifiers = True
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
