@@ -235,6 +235,7 @@ def te(files, output, ChondFile):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
         full[0][1] = t[i][0]
         k=3
+<<<<<<< HEAD
         if True:
             while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
                 carts = nospaces(t[i+k][3:])
@@ -253,6 +254,19 @@ def te(files, output, ChondFile):
                 print("Ignore list index out of range error. This error was:")
                 print(e)
     '''
+=======
+        while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
+            carts = nospaces(t[i+k][3:])
+            if len(carts)>0:
+                worksheet = workbook.add_worksheet(t[i+k][2])
+                Classifiers = addClassifier(full,worksheet,carts)
+                chart(Classifiers,t[i+k][2],workbook)
+                if NotDoneClassifiers:
+                    summary(full,Classifiers,workbook)
+                NotDoneClassifiers=False
+            k=k+1
+
+>>>>>>> 923b94c75065f0ac5ffcaab6d983f1fea42b48a1
     try:
         workbook.close()
     except Exception as e:

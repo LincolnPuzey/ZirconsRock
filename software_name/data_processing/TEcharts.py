@@ -3,18 +3,84 @@ from os import path
 
 from PIL import Image, ImageDraw, ImageColor
 
-from defaults import CLASS_COLORS, CLASS_MARKERS, CONVEX_HULL_IMAGE_FILE, CONVEX_HULL_IMAGE_DIR, \
+from defaults import LINE_COLORS, LINE_MARKERS, \
+    CLASS_COLORS, CLASS_MARKERS, CONVEX_HULL_IMAGE_FILE, CONVEX_HULL_IMAGE_DIR, \
     CHART_HEIGHT, CHART_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, PLOT_X_OFFSET, PLOT_Y_OFFSET
 
-def line_chart(sheet2Darray,sheet_name,workbook):
-    '''
-    Does a line graph of the sheets TrElem and REE as specified in RequiredTE.xls
-    '''
-def bar_chart(rocktypelist,sheet_name,workbook):
-    '''
+
+def line_chart(sheet_data, sheet_name, workbook):
+    """
+    Does a line graph of the sheets TrElem and REE
+    Each line (series) is a different sample
+    Each point on the line is the concentration of a particular element in the sample
+
+    sheet_name is the name of the worksheet containing the data to plotted on the chart
+    sheet_data is a 2-dimensional list containing all the data on the worksheet sheet_name
+    workbook the xlsxwriter representation of the excel workbook
+    """
+    # if we have data to graph
+    if len(sheet_data) > 1:
+        # add chartsheet and chart
+        chartsheet = workbook.add_chartsheet("{} Chart".format(sheet_name))
+        zircon_chart = workbook.add_chart({'type': 'line'})
+
+        # add data and formatting to chart
+        zircon_chart.set_title({'name': 'Trace Element Patterns of Zircons'})
+        for i in range(1, len(sheet_data)):
+            color = LINE_COLORS[i % len(LINE_COLORS)]
+            zircon_chart.add_series({
+                'categories': [sheet_name, 0, 2, 0, len(sheet_data[0])-2],
+                'values': [sheet_name, i, 2, i, len(sheet_data[0])-2],
+                'name': sheet_data[i][1],
+                'line': {'width': 1.0, 'color': color},
+                'marker': {
+                    'type': LINE_MARKERS[i % len(LINE_MARKERS)],
+                    'size': 4,
+                    'border': {'color': color},
+                    'fill': {'none': True}
+                }
+            })
+        zircon_chart.set_x_axis({
+            'name': '<--- Increasing Ionic Radius <---',
+            'label_position': 'low'
+        })
+        zircon_chart.set_y_axis({
+            'name': 'Zircon/Chrondrite',
+            'log_base': 10
+        })
+
+        # set chart to chartsheet
+        chartsheet.set_chart(zircon_chart)
+
+
+def bar_chart(rock_type_list, sheet_name, workbook):
+    """
     Presents a bar graph of each Classified rock type using Zircon Classification.
     See sheet RT INT in RequiredTE.xls file
-    '''
+
+    sheet_name is the name of the worksheet containing the data to plotted on the chart
+    rock_type_list is the list of rock types to be displayed on the bar chart - one bar per rock type
+    workbook the xlsxwriter representation of the excel workbook
+    """
+    # if we have data to graph
+    if len(rock_type_list) > 0:
+        # add chartsheet and chart
+        chartsheet = workbook.add_chartsheet("{} Chart".format(sheet_name))
+        rock_chart = workbook.add_chart({'type': 'column'})
+
+        # add data and formatting to chart
+        rock_chart.set_title({'name': 'Modelled Rock Types of Zircons'})
+        rock_chart.add_series({
+            'categories': [sheet_name, 2, 2, 1+len(rock_type_list), 2],
+            'values': [sheet_name, 2, 4, 1+len(rock_type_list), 4]
+        })
+        rock_chart.set_legend({'none': True})
+        rock_chart.set_y_axis({'name': 'Number of Grains'})
+
+        # set chart to chartsheet
+        chartsheet.set_chart(rock_chart)
+
+
 def chart(classifiers, sheet_name, workbook):
     """
     The main funtion for chart Processing
@@ -23,12 +89,20 @@ def chart(classifiers, sheet_name, workbook):
     sheet_name = the string of name of the worksheet containing the data
     workbook = The xlsxwriter standard of implementing the workbook
     """
+<<<<<<< HEAD
     try:
         x_column, y_column, class_column = identify(classifiers)
         if x_column is not None and y_column is not None:
             draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
     except:
         skip = True
+=======
+    # Find which columns in classifiers hold data
+    x_column, y_column, class_column = identify(classifiers)
+    # If we found appropriate data
+    if x_column is not None and y_column is not None:
+        draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
+>>>>>>> 923b94c75065f0ac5ffcaab6d983f1fea42b48a1
 
 
 def identify(classifiers):
