@@ -150,7 +150,7 @@ def summary(full, Classifiers, workbook):
                 sheet.write(row+2,4,n)
             for p in range(len(rocktype)):
                 r = p+2
-                sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")   
+                sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")
     elements = full[0][3:]
     z = standard(column(full,1)[1:])
     avg = workbook.add_worksheet("Summary of "+full[0][1])
@@ -208,14 +208,14 @@ def getChondrite(file, unknown, detected):
     return table(file)
 
 
-def te(files, output, ChondFile):
+def te(files, output, ChondFile, control, unknown):
     """
     Main function that will call everything as needed
     """
-    # Parameters to add
-    control = ['STDGJ','MT','91500']
-    unknown = ['INT1','INT2']
-
+# Parameters to add{
+    # control = ['STDGJ','MT','91500']
+    # unknown = ['INT1','INT2']
+#}
     print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
     print("This program was created and developed by Mark Collier September 2017 [Contact:+61466523090]")
@@ -235,26 +235,6 @@ def te(files, output, ChondFile):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
         full[0][1] = t[i][0]
         k=3
-<<<<<<< HEAD
-        if True:
-            while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
-                carts = nospaces(t[i+k][3:])
-                if len(carts)>0:
-                    worksheet = workbook.add_worksheet(t[i+k][2])
-                    Classifiers = addClassifier(full,worksheet,carts)
-                    chart(Classifiers,t[i+k][2],workbook)
-                    if NotDoneClassifiers:
-                        summary(full,Classifiers,workbook)
-                    NotDoneClassifiers=False
-                    #workbook = chart(Classifiers,worksheet,t[i+k][2],workbook)
-                k=k+1
-        '''
-        except Exception as e:
-            if True:
-                print("Ignore list index out of range error. This error was:")
-                print(e)
-    '''
-=======
         while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
             carts = nospaces(t[i+k][3:])
             if len(carts)>0:
@@ -266,7 +246,6 @@ def te(files, output, ChondFile):
                 NotDoneClassifiers=False
             k=k+1
 
->>>>>>> 923b94c75065f0ac5ffcaab6d983f1fea42b48a1
     try:
         workbook.close()
     except Exception as e:

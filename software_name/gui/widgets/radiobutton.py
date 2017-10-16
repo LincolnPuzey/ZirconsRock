@@ -1,21 +1,17 @@
 from gui.resources import *
 
 
-class CustomCheckbutton(ttk.Checkbutton):
+class CustomRadiobutton(ttk.Checkbutton):
     """
     Extends ttk.Checkbutton so arrow keys can be used to traverse
-    between checkbuttons and radiobuttons.
-
-    Also makes the checbutton's 'onvalue' attribute accessible after __init__
+    between radiobuttons and checkbuttons
     """
 
     def __init__(self, *args, **kwargs):
 
-        self.onvalue = kwargs.get('onvalue')
-        self.variable = kwargs.get('variable')
         self.num_columns = kwargs.pop('num_columns')
 
-        ttk.Checkbutton.__init__(self, *args, **kwargs)
+        ttk.Radiobutton.__init__(self, *args, **kwargs)
 
         self.bind("<Up>", self.traverse)
         self.bind("<Down>", self.traverse)
@@ -24,31 +20,19 @@ class CustomCheckbutton(ttk.Checkbutton):
 
         self.bind("<Return>", self.toggle)
 
+
     def toggle(self, event):
-        """Toggles the checkbutton's state"""
-
+        """Toggles the radiobutton's state"""
         event.widget.invoke()
-
-
-    def select(self):
-        """Selects the checkbutton"""
-
-        self.variable.set(self.onvalue)
-
-
-    def deselect(self):
-        """Deselects the checkbutton"""
-
-        self.variable.set("")
 
 
     # https://stackoverflow.com/questions/6687108/how-to-set-the-tab-order-in-a-tkinter-application
     def traverse(self, event):
         """
-        Traverses checkbuttons in the direction of the pressed arrow key.
+        Traverses radiobuttons in the direction of the pressed arrow key.
 
-        num_columns determines how many checkbuttons must be traversed left/right
-        to find the above/below checkbutton
+        num_columns determines how many radiobuttons must be traversed left/right
+        to find the above/below radiobutton
         """
 
         widget = event.widget

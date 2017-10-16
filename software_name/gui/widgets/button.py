@@ -2,6 +2,10 @@ from gui.resources import *
 
 
 class Button(ttk.Button):
+    """
+    Extends ttk.Button so arrow keys can be used to traverse
+    between buttons
+    """
 
     def __init__(self, *args, **kwargs):
         ttk.Button.__init__(self, *args, **kwargs)
@@ -9,10 +13,18 @@ class Button(ttk.Button):
         self.bind("<Left>", self.traverse)
         self.bind("<Right>", self.traverse)
 
+
     def on_press(self, *event):
+        """Enables an event (e.g. key press) to invoke the button"""
+
         self.invoke()
 
+
     def traverse(self, event):
+        """
+        Traverses buttons in the direction of the pressed arrow key.
+        """
+
         widget = event.widget
         if event.keysym == "Left":
             # find the previous widget

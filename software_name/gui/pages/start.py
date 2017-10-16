@@ -1,107 +1,113 @@
 from gui.resources import *
-
 import defaults as defaults
-# from data_processing.UPb import *
 import data_processing.UPb as UPb
 import data_processing.TE as TE
 import data_processing.common as common
 
 
 class StartPage(ttk.Frame):
+    """
+    Page for selecting between UPb or TE processing.
+
+    This is the first page the user sees.
+    """
 
     def __init__(self, parent, controller):
+        """
+        Initialises buttons and grids them to the page.
+        Enables window scaling through columnconfigure and rowconfigure.
+        """
+
         # initialising the base Frame class
         ttk.Frame.__init__(self, parent, style='bg.TFrame')
         self.parent = parent
         self.controller = controller
 
         # distinguishes between the frame's header and the frame's content
-        headerFrame = Header(self, controller, "1. Select a process", "")
-        contentFrame = Content(self, controller)
-        footerFrame = Footer(self, controller, False, "",
-                             "", "StartPage", "FilterStandardsPage")
+        header_frame = Header(self, controller, "1. Select a process", "")
+        content_frame = Content(self, controller)
 
         # can use GIF, PPM/PGP - http://effbot.org/tkinterbook/photoimage.html
-        uraniumImg = PhotoImage(file='./gui/images/placeholder.gif')
-        traceImg = PhotoImage(file='./gui/images/placeholder.gif')
+        uranium_img = PhotoImage(file='./gui/images/placeholder.gif')
+        trace_img = PhotoImage(file='./gui/images/placeholder.gif')
+
+        button_frame = ttk.Frame(content_frame, padding="0 20 0 20");
 
         # define buttons
-        uraniumButton = Button(contentFrame, text="\nUruanium Lead", image=uraniumImg, compound="top",
+        uranium_button = Button(button_frame, text="\nUruanium Lead", image=uranium_img, compound="top",
                                style="image.TButton", command=self.onPressUpb, padding="5 20 5 20")
-        traceButton = Button(contentFrame, text="\nTrace Element", image=traceImg, compound="top",
+        trace_button = Button(button_frame, text="\nTrace Element", image=trace_img, compound="top",
                              style="image.TButton", command=self.onPressTE, padding="5 20 5 20")
 
         # temporary test buttons
-        test_upb_button = Button(
-            contentFrame, text="Test UPb", command=self.test_upb)
-        test_te_button = Button(
-            contentFrame, text="Test TE", command=self.test_te)
+        # test_upb_button = Button(content_frame, text="Test UPb", command=self.test_upb)
+        # test_te_button = Button(content_frame, text="Test TE", command=self.test_te)
 
         # need to maintain references to images like this
         # http://effbot.org/pyfaq/why-do-my-tkinter-images-not-appear.htm
-        uraniumButton.image = uraniumImg
-        traceButton.image = traceImg
+        uranium_button.image = uranium_img
+        trace_button.image = trace_img
 
-        orLabel = ttk.Label(contentFrame, text="or",
-                            font=controller.smallFont, padding="5 0 5 0")
+        or_label = ttk.Label(button_frame, text="or", padding="5 0 5 0")
 
-        # draw widgets
-        uraniumButton.grid(column=0, row=0)
-        orLabel.grid(column=1, row=0)
-        traceButton.grid(column=2, row=0)
+        # content_frame children
+        button_frame.grid(column=0, row=0)
 
-        test_upb_button.grid(column=0, row=1)
-        test_te_button.grid(column=2, row=1)
+        uranium_button.grid(column=0, row=0)
+        or_label.grid(column=1, row=0)
+        trace_button.grid(column=2, row=0)
+
+        # test_upb_button.grid(column=0, row=1)
+        # test_te_button.grid(column=2, row=1)
 
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
         self.columnconfigure(2, weight=1)
 
-        self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=1)
-        self.rowconfigure(2, weight=1)
+        self.rowconfigure(1, weight=2)
+        self.rowconfigure(2, weight=2)
 
-        contentFrame.columnconfigure(0, weight=1)
-        contentFrame.columnconfigure(1, weight=1)
-        contentFrame.columnconfigure(2, weight=1)
-        contentFrame.rowconfigure(0, weight=1)
+        content_frame.columnconfigure(0, weight=1)
+        content_frame.rowconfigure(0, weight=1)
+
 
     def onPressUpb(self):
-        self.controller.isUpb = True
+        """Initialises UPbInputOutputPage and sets the controller to UPb processing"""
 
+        self.controller.isUpb = True
         self.controller.frames["UPbInputOutputPage"].initialise()
-        self.controller.frames["FilterStandardsPage"].initialise_u_pb()
         self.controller.show_frame("UPbInputOutputPage")
 
     def onPressTE(self):
-        self.controller.isUpb = False
+        """Initialises TEInputOutputPage and sets the controller to TE processing"""
 
+        self.controller.isUpb = False
         self.controller.frames["TEInputOutputPage"].initialise()
-        self.controller.frames["FilterStandardsPage"].initialise_t_e()
         self.controller.show_frame("TEInputOutputPage")
 
-    def test_upb(self):
-        UPb.UPb(defaults.CONTROL_STANDARDS, defaults.NORMALISING_STANDARDS,
-                defaults.UPB_INPUT_FILEPATHS, defaults.UPB_OUTPUT_FILEPATH)
-        self.controller.isUpb = True
-        self.controller.frames["UPbInputOutputPage"].output_filepath.set(
-            defaults.UPB_OUTPUT_FILEPATH)
-        self.controller.frames["UPbInputOutputPage"].output_dir.set(
-            defaults.OUTPUT_DIR)
-        self.controller.frames["UPbInputOutputPage"].output_filename.set(
-            defaults.UPB_OUTPUT_FILEPATH)
 
-        self.controller.frames["FilterStandardsPage"].footerFrame.go_to_next_page()
-
-    def test_te(self):
-        TE.te(defaults.TE_INPUT_FILEPATHS,
-              defaults.TE_OUTPUT_FILEPATH, defaults.CHONDRITE_FILE)
-        self.controller.isUpb = False
-        self.controller.frames["TEInputOutputPage"].output_filepath.set(
-            defaults.TE_OUTPUT_FILEPATH)
-        self.controller.frames["TEInputOutputPage"].output_dir.set(
-            defaults.OUTPUT_DIR)
-        self.controller.frames["TEInputOutputPage"].output_filename.set(
-            defaults.TE_OUTPUT_FILEPATH)
-
-        self.controller.frames["FilterStandardsPage"].footerFrame.go_to_next_page()
+    # def test_upb(self):
+    #     UPb.UPb(defaults.TEMP_UPB_INPUT_FILEPATHS, defaults.TEMP_UPB_OUTPUT_FILEPATH,
+    #     "STDGJ", defaults.TEMP_CONTROL_STANDARDS, defaults.TEMP_NORMALISING_STANDARDS, 290, 20)
+    #     self.controller.isUpb = True
+    #     self.controller.frames["UPbInputOutputPage"].output_filepath.set(
+    #         defaults.TEMP_UPB_OUTPUT_FILEPATH)
+    #     self.controller.frames["UPbInputOutputPage"].output_dir.set(
+    #         defaults.OUTPUT_DIR)
+    #     self.controller.frames["UPbInputOutputPage"].output_filename.set(
+    #         defaults.TEMP_UPB_OUTPUT_FILEPATH)
+    #
+    #     self.controller.frames["UPbFilterStandardsPage"].footer_frame.go_to_next_page()
+    #
+    # def test_te(self):
+    #     TE.te(defaults.TEMP_TE_INPUT_FILEPATHS,
+    #           defaults.TEMP_TE_OUTPUT_FILEPATH, defaults.CHONDRITE_FILE, ['STDGJ','MT','91500'], ['INT1','INT2'])
+    #     self.controller.isUpb = False
+    #     self.controller.frames["TEInputOutputPage"].output_filepath.set(
+    #         defaults.TEMP_TE_OUTPUT_FILEPATH)
+    #     self.controller.frames["TEInputOutputPage"].output_dir.set(
+    #         defaults.OUTPUT_DIR)
+    #     self.controller.frames["TEInputOutputPage"].output_filename.set(
+    #         defaults.TEMP_TE_OUTPUT_FILEPATH)
+    #
+    #     self.controller.frames["TEFilterStandardsPage"].footer_frame.go_to_next_page()

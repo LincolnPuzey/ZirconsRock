@@ -94,24 +94,47 @@ CONVEX_HULL_IMAGE_FILE = "{}_convexhull.png"
 # File path for chondrite_values.csv
 CHONDRITE_FILE = INPUT_DIR + '/chondrite_values.csv'
 
-# Temporary: List of TE input filepaths for testing
-TE_INPUT_FILEPATHS = [INPUT_DIR + '/Dec04_RUN1_TE.csv',
-                      INPUT_DIR + '/Dec04_RUN2_TE.csv',
-                      INPUT_DIR + '/Dec04_RUN3_TE.csv',
-                      INPUT_DIR + '/Dec04_RUN4_TE.csv']
+# Filepaths for pickled objects
+GUI_TEMPS_DIR = './gui/temps'
+UPB_INPUT_FILEPATHS = GUI_TEMPS_DIR + '/upb_input_filepaths.pkl'
+UPB_OUTPUT_FILEPATH = GUI_TEMPS_DIR + '/upb_output_filepath.pkl'
+UPB_OUTPUT_FILENAME = GUI_TEMPS_DIR + '/upb_output_filename.pkl'
+UPB_OUTPUT_DIR = GUI_TEMPS_DIR + '/upb_output_dir.pkl'
+TE_INPUT_FILEPATHS = GUI_TEMPS_DIR + '/te_input_filepaths.pkl'
+TE_OUTPUT_FILEPATH = GUI_TEMPS_DIR + '/te_output_filepath.pkl'
+TE_OUTPUT_FILENAME = GUI_TEMPS_DIR + '/te_output_filename.pkl'
+TE_OUTPUT_DIR = GUI_TEMPS_DIR + '/te_output_dir.pkl'
 
-# Temporary: List of UPb input filepaths for testing
-UPB_INPUT_FILEPATHS = [INPUT_DIR + '/Dec04_RUN1_UPb.csv',
-                       INPUT_DIR + '/Dec04_RUN2_UPb.csv',
-                       INPUT_DIR + '/Dec04_RUN3_UPb.csv',
-                       INPUT_DIR + '/Dec04_RUN4_UPb.csv']
+UPB_NORMALISING = GUI_TEMPS_DIR + '/upb_normalising.pkl'
+UPB_CONTROLS = GUI_TEMPS_DIR + '/upb_controls.pkl'
+UPB_UNKNOWNS = GUI_TEMPS_DIR + '/upb_unknown.pkl'
 
-# Temporary: TE output filepath for testing
-TE_OUTPUT_FILEPATH = OUTPUT_DIR + '/test_te_output.xlsx'
+TE_CONTROLS = GUI_TEMPS_DIR + '/te_controls.pkl'
+TE_UNKNOWNS = GUI_TEMPS_DIR + '/te_unknown.pkl'
 
-# Temporary: UPb output filepath for testing
-UPB_OUTPUT_FILEPATH = OUTPUT_DIR + '/test_upb_output.xlsx'
+MIN_WINDOW_WIDTH = 400
+MIN_WINDOW_HEIGHT = 400
+INITIAL_WINDOW_WIDTH = 450
+INITIAL_WINDOW_HEIGHT = 500
 
-# Temporary: List of normalising and control standards for testing
-NORMALISING_STANDARDS = ['INT2', 'INT1']
-CONTROL_STANDARDS = ['STDGJ', '91500', 'MT']
+# # Temporary: List of TE input filepaths for testing
+# TEMP_TE_INPUT_FILEPATHS = [INPUT_DIR + '/Dec04_RUN1_TE.csv',
+#                       INPUT_DIR + '/Dec04_RUN2_TE.csv',
+#                       INPUT_DIR + '/Dec04_RUN3_TE.csv',
+#                       INPUT_DIR + '/Dec04_RUN4_TE.csv']
+#
+# # Temporary: List of UPb input filepaths for testing
+# TEMP_UPB_INPUT_FILEPATHS = [INPUT_DIR + '/Dec04_RUN1_UPb.csv',
+#                        INPUT_DIR + '/Dec04_RUN2_UPb.csv',
+#                        INPUT_DIR + '/Dec04_RUN3_UPb.csv',
+#                        INPUT_DIR + '/Dec04_RUN4_UPb.csv']
+#
+# # Temporary: TE output filepath for testing
+# TEMP_TE_OUTPUT_FILEPATH = OUTPUT_DIR + '/test_te_output.xlsx'
+#
+# # Temporary: UPb output filepath for testing
+# TEMP_UPB_OUTPUT_FILEPATH = OUTPUT_DIR + '/test_upb_output.xlsx'
+#
+# # Temporary: List of normalising and control standards for testing
+# TEMP_NORMALISING_STANDARDS = ['INT2', 'INT1']
+# TEMP_CONTROL_STANDARDS =['STDGJ', '91500','MT']

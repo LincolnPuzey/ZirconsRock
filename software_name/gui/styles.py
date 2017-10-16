@@ -9,12 +9,11 @@ BG_COLOUR = '#f5f5f5'
 
 ERROR_COLOUR_LIGHT = '#ffafaf'
 ERROR_COLOUR_MED = '#ff8989'
-ERROR_COLOUR_DARK = '#e22424'  # '#a32323'
+ERROR_COLOUR_DARK = '#e22424'
 
 SUCCESS_COLOUR_LIGHT = '#a8ffbc'
 SUCCESS_COLOUR_MED = '#6bff8d'
 SUCCESS_COLOUR_DARK = '#3b894d'
-
 
 def initialise_syles():
 
@@ -28,8 +27,7 @@ def initialise_syles():
     s.configure('bg.TFrame')
 
     # polaroid button
-    s.configure('image.TButton', font=MEDIUM_FONT,
-                relief=tk.RAISED, borderwidth=1)
+    s.configure('image.TButton', font=MEDIUM_FONT, relief=tk.RAISED, borderwidth=1)
 
     # normal button
     s.configure('TButton', relief=tk.RAISED, borderwidth=1)
@@ -39,6 +37,12 @@ def initialise_syles():
 
     # subtitle label
     s.configure('subtitle.TLabel', font=MEDIUM_FONT)
+
+    # heading label
+    s.configure('heading.TLabel', font=SMALL_FONT)
+
+    # tiny label
+    s.configure('tiny.TLabel', font=TINY_FONT)
 
     # filepath label
     s.configure('filepath.TLabel', background='#ffffff')
@@ -51,12 +55,6 @@ def initialise_syles():
 
     # listboxes
     s.configure('TListbox', relief=tk.SOLID)
-    #
+
     # entries
     s.configure('TEntry', relief=tk.SOLID, borderwidth=1)
-
-    # scrollbar
-    s.configure('TScrollbar', troughcolor="BG_COLOUR")
-
-    # # checkboxes
-    # s.configure('TCheckbutton', )

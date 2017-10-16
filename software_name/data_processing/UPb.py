@@ -176,7 +176,7 @@ def inverse(concordia):
             for r in range(len(concordia)):
                 concordia[r][c] = ""
     return concordia
-        
+
 '''
 Change the sigma values by a multiple of sig
 t = table with 1 sigma values
@@ -219,11 +219,11 @@ def getAllZircons(fileList):
 Main Function called to run the entire program
 '''
 
-def UPb(control,unknown, files, output):
+def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
 #Parameters to add{
-    normalised = "STDGJ"
-    ThPPM = 18
-    UPPM = 288
+    # normalised = "STDGJ"
+    # ThPPM = 18
+    # UPPM = 288
 #}
     print("This particular python file will read the data recorded by the Laser device for U-Pb data.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
@@ -279,10 +279,10 @@ def UPb(control,unknown, files, output):
                 titlesOfEachTable.append("Normal Concordia Plots")
                 if len(concordia)>3:
                     tablesToPutOnThisStandard.append(inverse(copy.deepcopy(concordia)))
-                    titlesOfEachTable.append("Inverse Concordia Plots")    
+                    titlesOfEachTable.append("Inverse Concordia Plots")
             ss = workbook.add_worksheet(s)
             SplitStandards(ss,tablesToPutOnThisStandard,titlesOfEachTable)
-            
+
     try:
         workbook.close()
     except:

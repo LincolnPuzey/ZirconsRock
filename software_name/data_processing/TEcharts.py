@@ -89,20 +89,12 @@ def chart(classifiers, sheet_name, workbook):
     sheet_name = the string of name of the worksheet containing the data
     workbook = The xlsxwriter standard of implementing the workbook
     """
-<<<<<<< HEAD
-    try:
-        x_column, y_column, class_column = identify(classifiers)
-        if x_column is not None and y_column is not None:
-            draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
-    except:
-        skip = True
-=======
+
     # Find which columns in classifiers hold data
     x_column, y_column, class_column = identify(classifiers)
     # If we found appropriate data
     if x_column is not None and y_column is not None:
         draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
->>>>>>> 923b94c75065f0ac5ffcaab6d983f1fea42b48a1
 
 
 def identify(classifiers):

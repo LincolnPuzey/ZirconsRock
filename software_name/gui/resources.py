@@ -1,5 +1,3 @@
-# padding=(left top right bottom)
-
 import os
 import sys
 import subprocess
@@ -40,12 +38,13 @@ import gui.styles as styles
 
 from gui.widgets.button import Button
 from gui.widgets.checkbutton import CustomCheckbutton
+from gui.widgets.radiobutton import CustomRadiobutton
 from gui.widgets.header import Header
 from gui.widgets.content import Content
 from gui.widgets.footer import Footer
+from gui.widgets.autohide_scrollbar import AutoScrollbar
 
 from gui.pages.start import StartPage
 from gui.pages.filter_standards import FilterStandardsPage
 from gui.pages.input_output import InputOutputPage
-from gui.pages.loading import LoadingPage
 from gui.pages.finished import FinishedPage
