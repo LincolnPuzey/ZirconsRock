@@ -256,8 +256,10 @@ def UPb(control,unknown, files, output):
             addSheet(workbook.add_worksheet("Ratios raw"),ratios)
             addSheet(workbook.add_worksheet("Ages raw"),ages)
             commonPb = workbook.add_worksheet("ToBeCommonLeadCorrected")
-            addSheet(commonPb,combine(tlist,4,IncludedZircons),3,len(ratios[0])-1)
-            addSheet(commonPb,ratios,3)
+            addSheet(commonPb,combine(tlist,4,IncludedZircons)[:1],3,len(ratios[0])-1)
+            addSheet(commonPb,ratios[:1],3)
+            addSheet(commonPb,combine(tlist,4,IncludedZircons)[1:],6,len(ratios[0])-1)
+            addSheet(commonPb,ratios[1:],6)
             '''
             ctrl = workbook.add_worksheet("Control Report")
             norm = workbook.add_worksheet("Normalized Report")

@@ -1,6 +1,6 @@
 Unknown,P31,Ca43,Ti49,Y89,Zr92,Nb93,La139,Ce140,Pr141,Nd146,Sm147,Eu151,Gd157,Tb159,Dy163,Ho165,Er166,Tm169,Yb173,Lu175,Hf178,Ta181,Th232,U238
 ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-,Excluded Zircons or Standards,STDGJ, 91500, 610, MT
+,Excluded Zircons or Standards,STDGJ, MT, 91500, 610, MIR1, MIX1
 ,CARTS,Class,CART1,CART2,,,,,,,,,,,,,,,,,,,,
 ,CARTS,Y-U data,CART1,Y,U,,,,,,,,,,,,,,,,,,,
 ,CARTS,Y-Th data,CART1,Y,Th,,,,,,,,,,,,,,,,,,,
@@ -22,15 +22,6 @@ TrElem,La139,Ce140,Pr141,Nd146,Sm147,Eu151,Gd157,Th232,Dy163,Y89,Ho165,Er166,U23
 REE,La139,Ce140,Pr141,Nd146,Sm147,Eu151,Gd157,Tb159,Dy163,Ho165,Er166,Tm169,Yb173,Lu175,,,,,,,,,,
 ,0.237,0.613,0.0928,0.457,0.148,0.0563,0.199,0.0361,0.246,0.0546,0.16,0.0247,0.161,0.0246,,,,,,,,,,
 ,Excluded Zircons or Standards,,,,,,,,,,,,,,,,,,,,,,,
-
-
-
-
-
-
-
-
-
 
 
 

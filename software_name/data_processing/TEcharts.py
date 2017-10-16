@@ -23,10 +23,12 @@ def chart(classifiers, sheet_name, workbook):
     sheet_name = the string of name of the worksheet containing the data
     workbook = The xlsxwriter standard of implementing the workbook
     """
-
-    x_column, y_column, class_column = identify(classifiers)
-    if x_column is not None and y_column is not None:
-        draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
+    try:
+        x_column, y_column, class_column = identify(classifiers)
+        if x_column is not None and y_column is not None:
+            draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
+    except:
+        skip = True
 
 
 def identify(classifiers):
@@ -101,7 +103,6 @@ def identify(classifiers):
     x_column = width-2
     y_column = width-1
     class_column = width-3
-
     # check columns contain numbers
     if isinstance(classifiers[1][x_column], float) and isinstance(classifiers[1][y_column], float):
         return x_column, y_column, class_column

@@ -150,8 +150,7 @@ def summary(full, Classifiers, workbook):
                 sheet.write(row+2,4,n)
             for p in range(len(rocktype)):
                 r = p+2
-                sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")
-            bar_chart(rocktype,s,workbook)
+                sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")   
     elements = full[0][3:]
     z = standard(column(full,1)[1:])
     avg = workbook.add_worksheet("Summary of "+full[0][1])
@@ -171,14 +170,14 @@ def summary(full, Classifiers, workbook):
             total = sum(vals)
             count = len(vals)
             i = count/2
-            if type(i)==type(3):
-                median = (vals[i]+vals[i+1])/2
-            if type(i)==type(3.4):
+            if count%2==0:
+                median = (vals[round(i)]+vals[round(i+1)])/2
+            else:
                 median = vals[round(i)-1]
             mean = total/count
             stdev = 0
             for v in vals:
-                stdev=stdev+(mean-v)/count
+                stdev=stdev+pow(mean-v,2)/(count-1)
             avg.write(r,n*e+1,total)
             avg.write(r,n*e+2,count)
             avg.write(r,n*e+3,mean)
@@ -213,10 +212,10 @@ def te(files, output, ChondFile):
     """
     Main function that will call everything as needed
     """
-# Parameters to add{
+    # Parameters to add
     control = ['STDGJ','MT','91500']
     unknown = ['INT1','INT2']
-#}
+
     print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
     print("This program was created and developed by Mark Collier September 2017 [Contact:+61466523090]")
@@ -235,20 +234,25 @@ def te(files, output, ChondFile):
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
         full[0][1] = t[i][0]
-        if t[i][0] in "TrElem" or t[i][0] in "REE":
-            line_chart(full,t[i][0],workbook)
         k=3
-        while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
-            carts = nospaces(t[i+k][3:])
-            if len(carts)>0:
-                worksheet = workbook.add_worksheet(t[i+k][2])
-                Classifiers = addClassifier(full,worksheet,carts)
-                chart(Classifiers,t[i+k][2],workbook)
-                if NotDoneClassifiers:
-                    summary(full,Classifiers,workbook)
-                NotDoneClassifiers=False
-            k=k+1
-	
+        if True:
+            while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
+                carts = nospaces(t[i+k][3:])
+                if len(carts)>0:
+                    worksheet = workbook.add_worksheet(t[i+k][2])
+                    Classifiers = addClassifier(full,worksheet,carts)
+                    chart(Classifiers,t[i+k][2],workbook)
+                    if NotDoneClassifiers:
+                        summary(full,Classifiers,workbook)
+                    NotDoneClassifiers=False
+                    #workbook = chart(Classifiers,worksheet,t[i+k][2],workbook)
+                k=k+1
+        '''
+        except Exception as e:
+            if True:
+                print("Ignore list index out of range error. This error was:")
+                print(e)
+    '''
     try:
         workbook.close()
     except Exception as e:
