@@ -150,45 +150,49 @@ def summary(full, Classifiers, workbook):
             for p in range(len(rocktype)):
                 r = p+2
                 sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")
-    elements = full[0][3:]
-    z = standard(column(full,1)[1:])
+    elements = full[0][2:]
+    z = standard(column(full, 1)[1:])
     avg = workbook.add_worksheet("Statistics of "+full[0][1])
-    avg.write(1,0,"Sample")
-    for e in range(len(elements)):
-        r=1
-        n=5
-        el = elements[e]
-        avg.write(r,n*e+1,"sum "+el)
-        avg.write(r,n*e+2,"count "+el)
-        avg.write(r,n*e+3,"mean "+el)
-        avg.write(r,n*e+4,"stdev "+el)
-        avg.write(r,n*e+5,"median "+el)
-        for r in range(2, len(z)+2):
-            vals = values(full, e+2, z[r-2])
+    avg.write(0, 0, "Sample")
+    avg.write(0, 1, "Number of Analyses")
+    avg.write(0, 2, "Stat. Parameter")
+
+    for i in range(len(elements)):
+        avg.write(0, i+3, elements[i])
+
+    rows_per_sample = 4
+    for i in range(len(z)):
+        avg.write(1 + (i * rows_per_sample), 0, z[i])
+        avg.write(1 + (i * rows_per_sample), 1, len(values(full, 0, z[i])))
+        avg.write(1 + (i * rows_per_sample) + 0, 2, "Mean")
+        avg.write(1 + (i * rows_per_sample) + 1, 2, "St. Dev. - Population")
+        avg.write(1 + (i * rows_per_sample) + 2, 2, "Median")
+
+        for j in range(len(elements)):
+
+            vals = sorted(values(full, j + 2, z[i]))
             if len(vals) > 0:
-                avg.write(r, 0, z[r-2])
 
                 total = sum(vals)
                 count = len(vals)
-                mean = total/count
+                mean = total / count
 
-                i = count/2
-                if i % 1 == 0.0:
-                    median = (vals[round(i)-1]+vals[round(i)])/2
+                middle = count / 2
+                if middle % 1 == 0.0:
+                    median = (vals[round(middle) - 1] + vals[round(middle)]) / 2
                 else:
-                    median = vals[round(i-0.5)]
+                    median = vals[round(middle - 0.5)]
 
                 variance = 0
                 for v in vals:
-                    variance = variance + pow(v-mean, 2)
-                variance = variance/count
+                    variance = variance + pow(v - mean, 2)
+                variance = variance / count
                 stddev = pow(variance, 0.5)
 
-                avg.write(r,n*e+1,total)
-                avg.write(r,n*e+2,count)
-                avg.write(r,n*e+3,mean)
-                avg.write(r,n*e+4,stddev)
-                avg.write(r,n*e+5,median)
+                avg.write(1 + (i * rows_per_sample) + 0, j + 3, mean)
+                avg.write(1 + (i * rows_per_sample) + 1, j + 3, stddev)
+                avg.write(1 + (i * rows_per_sample) + 2, j + 3, median)
+
 
 def values(t, c, c0):
     v = []
