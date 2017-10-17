@@ -4,7 +4,7 @@ from os import path
 from PIL import Image, ImageDraw, ImageColor
 
 from defaults import LINE_COLORS, \
-    CLASS_COLORS, CLASS_MARKERS, CONVEX_HULL_IMAGE_FILE, CONVEX_HULL_IMAGE_DIR, \
+    CLASS_COLORS, CLASS_MARKERS, TE_PLOTS, TE_PLOT_AXES, TE_PLOT_IMAGE_DIR,TE_PLOT_FIELDS, TE_PLOT_FIELD_FILE, TE_PLOT_LEGEND_FILE, \
     CHART_HEIGHT, CHART_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, PLOT_X_OFFSET, PLOT_Y_OFFSET
 
 
@@ -168,8 +168,8 @@ def identify(classifiers):
 
     # work out which columns of classifiers hold the data and class names
     width = len(classifiers[0])
-    x_column = width-2
-    y_column = width-1
+    x_column = width-1
+    y_column = width-2
     class_column = width-3
     # check columns contain numbers
     if isinstance(classifiers[1][x_column], float) and isinstance(classifiers[1][y_column], float):
@@ -188,6 +188,11 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
     series names, respectively.
     """
 
+    plot_name = sheet_name[:-5]  # should match with an element of defaults.TE_PLOTS
+
+    if plot_name not in TE_PLOTS:
+        return  # don't draw plot if cant find a matching entry
+
     # build the list of series to add to chart, each series specifies a range of data
     series_list = []
     current_series_name = classifiers[1][class_column]
@@ -196,18 +201,18 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
         current_series_name: []
     }
 
-    x_axis_min = 1
-    x_axis_max = 10
-    y_axis_min = 1
-    y_axis_max = 10
+    #x_axis_min = 1
+    #x_axis_max = 10
+    #y_axis_min = 1
+    #y_axis_max = 10
 
     for i in range(1, len(classifiers)):
 
         # keep track of x/y min/max
-        x_axis_min = x_axis_min/10 if classifiers[i][x_column] < x_axis_min else x_axis_min
-        x_axis_max = x_axis_max*10 if classifiers[i][x_column] > x_axis_max else x_axis_max
-        y_axis_min = y_axis_min/10 if classifiers[i][y_column] < y_axis_min else y_axis_min
-        y_axis_max = y_axis_max*10 if classifiers[i][y_column] > y_axis_max else y_axis_max
+        #x_axis_min = x_axis_min/10 if classifiers[i][x_column] < x_axis_min else x_axis_min
+        #x_axis_max = x_axis_max*10 if classifiers[i][x_column] > x_axis_max else x_axis_max
+        #y_axis_min = y_axis_min/10 if classifiers[i][y_column] < y_axis_min else y_axis_min
+        #y_axis_max = y_axis_max*10 if classifiers[i][y_column] > y_axis_max else y_axis_max
 
         if current_series_name == classifiers[i][class_column]:
             # still in same series - update end index
@@ -276,23 +281,27 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
             'height': PLOT_HEIGHT
         }
     })
+    y_axis_options = {
+        'name': [sheet_name, 0, y_column],
+        'max': TE_PLOT_AXES[plot_name][3],
+        'min': TE_PLOT_AXES[plot_name][2],
+        'major_gridlines': {'visible': True},
+        'major_tick_mark': 'outside',
+        'minor_tick_mark': 'inside',
+        'label_position': 'low'
+    }
+    if plot_name != "Hf-Y":
+        y_axis_options['log_base'] = 10
+    scatterplot.set_y_axis(y_axis_options)
     scatterplot.set_x_axis({
         'name': [sheet_name, 0, x_column],
-        'max': x_axis_max,
-        'min': x_axis_min,
+        'max': TE_PLOT_AXES[plot_name][1],
+        'min': TE_PLOT_AXES[plot_name][0],
         'log_base': 10,
         'major_gridlines': {'visible': True},
         'major_tick_mark': 'outside',
-        'minor_tick_mark': 'inside'
-    })
-    scatterplot.set_y_axis({
-        'name': [sheet_name, 0, y_column],
-        'max': y_axis_max,
-        'min': y_axis_min,
-        'log_base': 10,
-        'major_gridlines': {'visible': True},
-        'major_tick_mark': 'outside',
-        'minor_tick_mark': 'inside'
+        'minor_tick_mark': 'inside',
+        'label_position': 'low'
     })
 
     for series in series_list:
@@ -300,119 +309,14 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
 
     scatterplot_worksheet.insert_chart('A1', scatterplot)
 
-    # generate and add convex hull image
-    image = generate_convex_hull_image(sheet_name, series_data, x_axis_max, x_axis_min, y_axis_max, y_axis_min)
-    scatterplot_worksheet.insert_image(
-        'A1',
-        image,
-        {
-            'x_offset': int(PLOT_X_OFFSET*CHART_WIDTH),
-            'y_offset': int(PLOT_Y_OFFSET*CHART_HEIGHT)
-        }
-    )
-
-
-def generate_convex_hull_image(sheet_name, series_data, x_axis_max, x_axis_min, y_axis_max, y_axis_min):
-    """
-    Generates a image to use as background in the chart containing the convex hulls
-    Saves image at location specified in defaults.CONVEX_HULL_IMAGE_FILE
-
-    Alex talking about Convex charts:
-    how to do convex hull to get a region for a set of points:
-    tldr version is
-    take the bottommost point, leftmost if there's a tie.
-    sort all other points by angle with that point and x-axis (use cross product or something).
-    add each point, such that each point added means a line segment between the point and the previous point,
-    if this results in the line segment causing the current shape to be non-convex,
-    remove the previous point and try adding this point again.
-    once through all points, add line segment between final point and your original point.
-    that's a tldr of convex hull
-    """
-
-    image = Image.new('RGBA', (int(CHART_WIDTH * PLOT_WIDTH), int(CHART_HEIGHT * PLOT_HEIGHT)), '#FFFFFF00')
-    draw = ImageDraw.Draw(image)
-
-    for class_name, points in series_data.items():
-        edge_points = convex_hull(transform_points(points, x_axis_max, x_axis_min, y_axis_max, y_axis_min))
-        if edge_points is not None:
-
-            color = ImageColor.getrgb(CLASS_COLORS.get(class_name, '#00000000'))+(255,)
-
-            draw.line(edge_points, fill=color, width=2)
-
-    image_file_path = path.join(CONVEX_HULL_IMAGE_DIR, CONVEX_HULL_IMAGE_FILE.format(sheet_name))
-    image.save(image_file_path)
-    return image_file_path
-
-
-def convex_hull(points):
-    """
-    Based on Code from:
-    https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain#Python
-    Used here under terms of the Creative Commons Attribution-ShareAlike License:
-    https://creativecommons.org/licenses/by-sa/3.0/
-
-    Computes the convex hull of a set of 2D points.
-
-    Input: an iterable sequence of (x, y) pairs representing the points.
-    Output: a list of vertices of the convex hull in counter-clockwise order,
-      starting from the vertex with the lexicographically smallest coordinates.
-    Implements Andrew's monotone chain algorithm. O(n log n) complexity.
-    """
-
-    # Sort the points lexicographically (tuples are compared lexicographically).
-    # Remove duplicates with set().
-    points = sorted(set(points))
-
-    # Boring case: 0-2 unique points
-    if len(points) < 3:
-        return None
-
-    # 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
-    # Returns a positive value, if OAB makes a counter-clockwise turn,
-    # negative for clockwise turn, and zero if the points are collinear.
-    def cross(o, a, b):
-        return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
-
-    # Build lower hull
-    lower = []
-    for p in points:
-        while len(lower) >= 2 and cross(lower[-2], lower[-1], p) <= 0:
-            lower.pop()
-        lower.append(p)
-
-    # Build upper hull
-    upper = []
-    for p in reversed(points):
-        while len(upper) >= 2 and cross(upper[-2], upper[-1], p) <= 0:
-            upper.pop()
-        upper.append(p)
-
-    # Concatenation of the lower and upper hulls gives the convex hull.
-    # Last point of lower is omitted because it is repeated at the beginning of upper list.
-    return lower[:-1] + upper
-
-
-def transform_points(points, x_axis_max, x_axis_min, y_axis_max, y_axis_min):
-    """
-    takes a list of points in form [(x,y), (x,y), ...]
-    and transforms the from raw x and y data values to x and y coordinate values suitable for drawing on the image
-    """
-    x_axis_max_log = log10(x_axis_max)
-    x_axis_min_log = log10(x_axis_min)
-    y_axis_max_log = log10(y_axis_max)
-    y_axis_min_log = log10(y_axis_min)
-    x_axis_range = x_axis_max_log-x_axis_min_log
-    y_axis_range = y_axis_max_log-y_axis_min_log
-
-    points_transformed = []
-
-    for point in points:
-        points_transformed.append(
-            (
-                int((log10(point[0]) - x_axis_min_log) / x_axis_range * PLOT_WIDTH * CHART_WIDTH),
-                int((y_axis_max_log - log10(point[1])) / y_axis_range * PLOT_HEIGHT * CHART_HEIGHT)
-            )
+    if TE_PLOT_FIELDS[plot_name]:
+        scatterplot_worksheet.insert_image(
+            'A1',
+            path.join(TE_PLOT_IMAGE_DIR, TE_PLOT_FIELD_FILE.format(plot_name)),
+            {
+                'x_offset': int(PLOT_X_OFFSET*CHART_WIDTH),
+                'y_offset': int(PLOT_Y_OFFSET*CHART_HEIGHT),
+                'x_scale': 0.7,
+                'y_scale': 0.7
+            }
         )
-
-    return points_transformed

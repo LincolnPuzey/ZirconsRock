@@ -35,7 +35,7 @@ LINE_COLORS = [
     '#FF6600',  # orange
     '#FF1A1A',  # red
 ]
-# colors and markers used for scatterplots and convex hulls for each class of CART1
+# colors and markers used for scatterplots for each class of CART1
 CLASSES = [
     "Carbonite",
     "Granitoid(>5% SiO2)",
@@ -72,17 +72,58 @@ CLASS_MARKERS = {
     CLASSES[8]: {'type': 'star',      'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[8], '#000000')}, },
     CLASSES[9]: {'type': 'long_dash', 'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[9], '#000000')}, 'fill': {'color': CLASS_COLORS.get(CLASSES[9], '#000000')}},
 }
+TE_PLOTS = [
+    "Y-U",
+    "Y-Th",
+    "Y-YbSm",
+    "Y-NbTa",
+    "Y-ThU",
+    "Y-CeCe",
+    "Y-EuEu",
+    "Hf-Y",
+    "Nb-Ta",
+    "U-Th",
+    "CeCe-EuEu",
+]
+TE_PLOT_FIELDS = {
+    TE_PLOTS[0]: True,
+    TE_PLOTS[1]: False,
+    TE_PLOTS[2]: True,
+    TE_PLOTS[3]: True,
+    TE_PLOTS[4]: False,
+    TE_PLOTS[5]: True,
+    TE_PLOTS[6]: False,
+    TE_PLOTS[7]: True,
+    TE_PLOTS[8]: True,
+    TE_PLOTS[9]: False,
+    TE_PLOTS[10]: True,
+}
+TE_PLOT_AXES = {
+    # "plot_name": (x_min, x_max, y_min, y_max)
+    TE_PLOTS[0]:  (0.01,  10000,  1,    100000),
+    TE_PLOTS[1]:  (0.1,   100000, 1,    100000),
+    TE_PLOTS[2]:  (0.1,   1000,   1,    100000),
+    TE_PLOTS[3]:  (0.1,   100,    1,    100000),
+    TE_PLOTS[4]:  (0.01,  10000,  1,    100000),
+    TE_PLOTS[5]:  (0.1,   1000,   1,    100000),
+    TE_PLOTS[6]:  (0.001, 100,    1,    100000),
+    TE_PLOTS[7]:  (1,     100000, 0,    2.5),
+    TE_PLOTS[8]:  (0.01,  10000,  0.1,  10000),
+    TE_PLOTS[9]:  (0.1,   100000, 0.01, 100000),
+    TE_PLOTS[10]: (0.001, 10,     0.1,  1000),
+}
 # Used for generating charts and convex hull images
 CHART_WIDTH = 1100
-CHART_HEIGHT = 660
+CHART_HEIGHT = 1000
 # expressed as percentages of CHART_WIDTH and CHART_HEIGHT
 PLOT_X_OFFSET = 0.1
 PLOT_Y_OFFSET = 0.07
-PLOT_WIDTH = 0.65
-PLOT_HEIGHT = 0.8
-# where to store convex hull image file
-CONVEX_HULL_IMAGE_DIR = "convex_hull"
-CONVEX_HULL_IMAGE_FILE = "{}_convexhull.png"
+PLOT_WIDTH = 0.58
+PLOT_HEIGHT = 0.55
+# where to store TE plot fields image files
+TE_PLOT_IMAGE_DIR = "te_plot_fields"
+TE_PLOT_FIELD_FILE = "{}.PNG"
+TE_PLOT_LEGEND_FILE = "{}_legend.PNG"
 
 # File path for chondrite_values.csv
 CHONDRITE_FILE = CUR_DIR + '/chondrite_values.csv'
