@@ -119,6 +119,8 @@ Tries to return a number but if it can't just return the string
 '''
 def evalif(n):
     try:
+        if '-' in n:
+            return n
         return eval(n)
     except:
         return n

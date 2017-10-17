@@ -3,7 +3,6 @@ from .TEcharts import *
 from .StyleOfTE import *
 from defaults import BeginningCell, EndingCell, SheetName, allChondriteElements, ChondriteValues
 
-
 def classify(cart, t, z="zircon eg. STDGJ-01"):
     if cart == "CART1":
         if data(t,z,"Lu")<20.7:
@@ -153,7 +152,7 @@ def summary(full, Classifiers, workbook):
                 sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")
     elements = full[0][3:]
     z = standard(column(full,1)[1:])
-    avg = workbook.add_worksheet("Summary of "+full[0][1])
+    avg = workbook.add_worksheet("Statistics of "+full[0][1])
     avg.write(1,0,"Sample")
     for e in range(len(elements)):
         r=1
@@ -166,30 +165,34 @@ def summary(full, Classifiers, workbook):
         avg.write(r,n*e+5,"median "+el)
         for r in range(2,len(z)+2):
             vals = values(full,e+2,z[r-2])
+            print(vals)
             avg.write(r,0,z[r-2])
             total = sum(vals)
             count = len(vals)
             i = count/2
             if count%2==0:
-                median = (vals[round(i)]+vals[round(i+1)])/2
+                try:
+                    median = (vals[round(i)-1]+vals[round(i)])/2
+                except:
+                    print(i,len(vals))
+                    print(vals)
             else:
                 median = vals[round(i)-1]
-            mean = total/count
+            mean = record(total,count)
             stdev = 0
             for v in vals:
-                stdev=stdev+pow(mean-v,2)/(count-1)
+                stdev=stdev+record(pow(mean-v,2),(count-1))
             avg.write(r,n*e+1,total)
             avg.write(r,n*e+2,count)
             avg.write(r,n*e+3,mean)
             avg.write(r,n*e+4,stdev)
             avg.write(r,n*e+5,median)
 
-
 def values(t, c, c0):
     v = []
     for r in t:
         if r[0] == c0:
-            v.append(r[c])
+            v.append(record(r[c]))
     return v
 
 
@@ -197,11 +200,10 @@ def getChondrite(file, unknown, stand, detected):
     if type(unknown)!=type(["list"]):
         return table(file)
     chond = table(file)
-    for i in range(len(chond)):
-        if i==2:
-            control = unknown
-        else:
-            control = stand
+    i=2
+    control = copy.deepcopy(unknown)
+    control.extend(copy.deepcopy(stand))
+    while i<len(chond) and len(chond[i])>=2:
         if chond[i][1]=="Excluded Zircons or Standards":
             known = []
             for d in detected:
@@ -209,11 +211,13 @@ def getChondrite(file, unknown, stand, detected):
                     known.append(d)
             un = str(known).replace("[","").replace("]","").replace("\'","")
             text = ',Excluded Zircons or Standards,' + un
-            writeln(2,text,file)
+            writeln(i,text,file)
+            control = unknown
+        i=i+1
     return table(file)
 
 
-def te(files, output, ChondFile, control, unknown):
+def te(files, output, ChondFile, control,unknown):
     """
     Main function that will call everything as needed
     """
@@ -240,6 +244,7 @@ def te(files, output, ChondFile, control, unknown):
             carts = nospaces(t[i+k][3:])
             if len(carts)>0:
                 worksheet = workbook.add_worksheet(t[i+k][2])
+                addSheet(workbook.add_worksheet("Full of "+t[i+k][2]),full)
                 Classifiers = addClassifier(full,worksheet,carts)
                 chart(Classifiers,t[i+k][2],workbook)
                 if NotDoneClassifiers:
@@ -252,6 +257,7 @@ def te(files, output, ChondFile, control, unknown):
     except Exception as e:
         print(e)
         input("You must close "+output+" before continuing")
+        te(files, output, ChondFile, unknown, control)
         workbook.close()
     styleTE(output)
 
@@ -332,14 +338,6 @@ def addTESheet(files, sheet, includedElements, Chondrites, excludedZircons):
         rstart = r
         t = table(f)
         bi=begr(t,BeginningCell)
-        xe=1
-        e=[]
-        try:
-            while t[bi+xe][0]!=EndingCell:
-                e.append(t[bi+xe][0])
-                xe=xe+1
-        except:
-            EndWhileOnError = True
         i=0 #Column Index starting after 'Element'
         si = [] #Sample Indicies matching from the input
         for row in t[bi]:
@@ -385,3 +383,8 @@ def chond(element):
         if element in e:
             return ChondriteValues[i]
         i=i+1
+def withoutGUI():
+    run = 'C:/Users/markc_000/Google Drive/CITS3200/CITS3200/test_files/inputs/Dec04_RUN[1-4]_TE.csv'
+    output = 'C:/Users/markc_000/Google Drive/CITS3200/CITS3200/test_files/outputs/test_te_output.xlsx'
+    chondfile = 'C:/Users/markc_000/Google Drive/CITS3200/CITS3200/software_name/chondrite_values.csv'
+    te(getFileList(run),output,chondfile,['STDGJ','MT'],['INT1','INT2'])

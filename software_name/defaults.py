@@ -92,7 +92,7 @@ CONVEX_HULL_IMAGE_DIR = "convex_hull"
 CONVEX_HULL_IMAGE_FILE = "{}_convexhull.png"
 
 # File path for chondrite_values.csv
-CHONDRITE_FILE = INPUT_DIR + '/chondrite_values.csv'
+CHONDRITE_FILE = CUR_DIR + '/chondrite_values.csv'
 
 # Filepaths for pickled objects
 GUI_TEMPS_DIR = './gui/temps'
