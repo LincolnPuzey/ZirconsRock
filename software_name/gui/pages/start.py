@@ -84,30 +84,3 @@ class StartPage(ttk.Frame):
         self.controller.isUpb = False
         self.controller.frames["TEInputOutputPage"].initialise()
         self.controller.show_frame("TEInputOutputPage")
-
-
-    # def test_upb(self):
-    #     UPb.UPb(defaults.TEMP_UPB_INPUT_FILEPATHS, defaults.TEMP_UPB_OUTPUT_FILEPATH,
-    #     "STDGJ", defaults.TEMP_CONTROL_STANDARDS, defaults.TEMP_NORMALISING_STANDARDS, 290, 20)
-    #     self.controller.isUpb = True
-    #     self.controller.frames["UPbInputOutputPage"].output_filepath.set(
-    #         defaults.TEMP_UPB_OUTPUT_FILEPATH)
-    #     self.controller.frames["UPbInputOutputPage"].output_dir.set(
-    #         defaults.OUTPUT_DIR)
-    #     self.controller.frames["UPbInputOutputPage"].output_filename.set(
-    #         defaults.TEMP_UPB_OUTPUT_FILEPATH)
-    #
-    #     self.controller.frames["UPbFilterStandardsPage"].footer_frame.go_to_next_page()
-    #
-    # def test_te(self):
-    #     TE.te(defaults.TEMP_TE_INPUT_FILEPATHS,
-    #           defaults.TEMP_TE_OUTPUT_FILEPATH, defaults.CHONDRITE_FILE, ['STDGJ','MT','91500'], ['INT1','INT2'])
-    #     self.controller.isUpb = False
-    #     self.controller.frames["TEInputOutputPage"].output_filepath.set(
-    #         defaults.TEMP_TE_OUTPUT_FILEPATH)
-    #     self.controller.frames["TEInputOutputPage"].output_dir.set(
-    #         defaults.OUTPUT_DIR)
-    #     self.controller.frames["TEInputOutputPage"].output_filename.set(
-    #         defaults.TEMP_TE_OUTPUT_FILEPATH)
-    #
-    #     self.controller.frames["TEFilterStandardsPage"].footer_frame.go_to_next_page()

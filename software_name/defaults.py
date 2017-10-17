@@ -4,6 +4,8 @@ import os
 # Use ALL_CAPS_AND_UNDERSCORES for variable names
 # Then import them into whatever part of the program they are needed in.
 
+PROGRAM_NAME = "Zircons Rock"
+
 CUR_DIR = os.path.dirname(os.path.realpath(__file__))
 INPUT_DIR = CUR_DIR + '/../test_files/inputs'
 OUTPUT_DIR = CUR_DIR + '/../test_files/outputs'
@@ -104,7 +106,7 @@ TE_CONTROLS = GUI_TEMPS_DIR + '/te_controls.pkl'
 TE_UNKNOWNS = GUI_TEMPS_DIR + '/te_unknown.pkl'
 
 MIN_WINDOW_WIDTH = 400
-MIN_WINDOW_HEIGHT = 400
+MIN_WINDOW_HEIGHT = 410
 INITIAL_WINDOW_WIDTH = 450
 INITIAL_WINDOW_HEIGHT = 500
 

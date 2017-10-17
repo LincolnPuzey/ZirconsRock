@@ -1,4 +1,5 @@
 from gui.resources import *
+from defaults import GUI_TEMPS_DIR
 from defaults import UPB_INPUT_FILEPATHS
 from defaults import UPB_OUTPUT_FILEPATH
 from defaults import UPB_OUTPUT_FILENAME
@@ -55,6 +56,8 @@ class InputOutputPage(ttk.Frame):
         else:
             self.footer_frame = Footer(
                 self, controller, True, "Back", "Continue", "StartPage", "TEFilterStandardsPage")
+
+        self.footer_frame.set_next_btn_command(self.on_next_button)
 
         input_title_label = ttk.Label(content_frame, text="Input CSV files", style='subtitle.TLabel', padding='0 0 0 5')
 
@@ -118,6 +121,7 @@ class InputOutputPage(ttk.Frame):
         Opens the operating system's file manager so a user can add
         input CSV files.
         """
+
         filepaths = filedialog.askopenfilenames()  # paths is a tuple of filenames
 
         for path in filepaths:
@@ -137,6 +141,7 @@ class InputOutputPage(ttk.Frame):
         """
         Removes the selected input CSV files.
         """
+
         selection = self.input_list.curselection()
 
         for index in selection:
@@ -157,6 +162,7 @@ class InputOutputPage(ttk.Frame):
         If the FilterStandardsPage cannot find standards within a CSV file,
         that CSV file is marked red and considered 'unrecognised' or 'invalid'.
         """
+
         if self.controller.isUpb:
             filter_standards_page = self.controller.frames["UPbFilterStandardsPage"]
         else:
@@ -175,13 +181,19 @@ class InputOutputPage(ttk.Frame):
                     filter_standards_page.populate_te_standards(path)
                 # sucessfully retrieved standards from file -> green
                 self.input_list.itemconfig(index, {
-                                          'background': styles.SUCCESS_COLOUR_LIGHT, 'selectbackground': styles.SUCCESS_COLOUR_MED})
+                                          'background': styles.SUCCESS_COLOUR_LIGHT,
+                                          'foreground': styles.BLACK,
+                                          'selectbackground': styles.SUCCESS_COLOUR_MED,
+                                          'selectforeground': styles.BLACK})
                 self.num_valid_files += 1
                 self.valid_input_filepaths.append(path)
             except Exception as e:
                 #  unsuccessfully retrieved standards from file -> red
                 self.input_list.itemconfig(index, {
-                                          'background': styles.ERROR_COLOUR_LIGHT, 'selectbackground': styles.ERROR_COLOUR_MED})
+                                          'background': styles.ERROR_COLOUR_LIGHT,
+                                          'foreground': styles.BLACK,
+                                          'selectbackground': styles.ERROR_COLOUR_MED,
+                                          'selectforeground': styles.BLACK})
                 self.error_label.grid(column=0, row=2, sticky=(W, N, S))
                 # print("Unrecognised: ", path)
                 # print("\t", e)
@@ -194,6 +206,7 @@ class InputOutputPage(ttk.Frame):
         Opens the operating system's file manager so the user can specify
         the name and location of the output Excel workbook.
         """
+
         old_name = self.output_filename.get()
         old_dir = self.output_dir.get()
         olf_path = self.output_filepath.get()
@@ -207,7 +220,7 @@ class InputOutputPage(ttk.Frame):
 
         # get the file name from the file path
         if sys.platform.startswith("win"):
-            new_name = str.split(new_path, "\\")[-1]
+            new_name = str.split(new_path, "/")[-1]
             new_dir = new_path[:-len(new_name)]
         else:
             new_name = str.split(new_path, "/")[-1]
@@ -222,6 +235,7 @@ class InputOutputPage(ttk.Frame):
 
     def initialise(self):
         """Initialises the InputOutputPage"""
+
         self.disable_next_button()
 
         finished_page = self.controller.frames["FinishedPage"]
@@ -237,6 +251,7 @@ class InputOutputPage(ttk.Frame):
         Enables the next button if there is at least one valid input CSV file and
         a filepath for the Excel workbook has been supplied.
         """
+
         if(self.num_valid_files > 0 and self.output_filename.get() != ""):
             self.enable_next_button()
         else:
@@ -245,16 +260,30 @@ class InputOutputPage(ttk.Frame):
 
     def disable_next_button(self):
         """Disables the next button."""
+
         self.footer_frame.next_button.config(state=tk.DISABLED)
+
 
     def enable_next_button(self):
         """Enables the next button."""
+
         self.footer_frame.next_button.config(state=tk.NORMAL)
+
+
+    def on_next_button(self):
+        """Passes the name and location of the Excel workbook to the FinishedPage"""
+
+        finished_page = self.controller.frames["FinishedPage"]
+        finished_page.update(self.output_filename.get(), self.output_dir.get())
+        self.footer_frame.go_to_next_page()
 
 
     # unpickles the input and ouput filepaths
     def load_filepaths(self):
         """Loads previously saved input/output filepaths from pickled objects."""
+
+        if not os.path.isdir(GUI_TEMPS_DIR):
+            os.makedirs(GUI_TEMPS_DIR)
 
         try:
             successful_load = True

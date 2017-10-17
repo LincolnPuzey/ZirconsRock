@@ -7,12 +7,21 @@ import data_processing.TE as TE
 import data_processing.common as common
 
 # Serialised pickle files
+from defaults import GUI_TEMPS_DIR
 from defaults import UPB_NORMALISING
 from defaults import UPB_CONTROLS
 from defaults import UPB_UNKNOWNS
 from defaults import TE_CONTROLS
 from defaults import TE_UNKNOWNS
 
+from defaults import UPB_INPUT_FILEPATHS
+from defaults import UPB_OUTPUT_FILEPATH
+from defaults import UPB_OUTPUT_FILENAME
+from defaults import UPB_OUTPUT_DIR
+from defaults import TE_INPUT_FILEPATHS
+from defaults import TE_OUTPUT_FILEPATH
+from defaults import TE_OUTPUT_FILENAME
+from defaults import TE_OUTPUT_DIR
 
 class FilterStandardsPage(ttk.Frame):
     """
@@ -359,6 +368,9 @@ class FilterStandardsPage(ttk.Frame):
         were previously specified as Normalising, Control and Unknown.
         """
 
+        if not os.path.isdir(GUI_TEMPS_DIR):
+            os.makedirs(GUI_TEMPS_DIR)
+
         successful_load = True
 
         if self.title == "UPb":
@@ -479,6 +491,8 @@ class FilterStandardsPage(ttk.Frame):
 
         self.save_std_prefs()
 
+
+
         if self.controller.isUpb:
             output_filepath = self.controller.frames["UPbInputOutputPage"].output_filepath.get()
             files = self.controller.frames["UPbInputOutputPage"].valid_input_filepaths
@@ -487,5 +501,12 @@ class FilterStandardsPage(ttk.Frame):
         else:
             output_filepath = self.controller.frames["TEInputOutputPage"].output_filepath.get()
             files = self.controller.frames["TEInputOutputPage"].valid_input_filepaths
+
+            # print("files: " + str(files))
+            # print("output_filepath: " + output_filepath)
+            # print("CHONDRITE_FILE: " + CHONDRITE_FILE)
+            # print("Control standards: " + str(control_standards))
+            # print("Unknown standards: " + str(unknown_standards))
+
             TE.te(files, output_filepath, CHONDRITE_FILE, control_standards, unknown_standards)
             self.footer_frame.go_to_next_page()

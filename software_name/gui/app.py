@@ -5,10 +5,21 @@
 
 # padding=(left top right bottom)
 
+import shutil
+
 from gui.resources import *
+
+from defaults import PROGRAM_NAME
 
 from defaults import MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT
 from defaults import INITIAL_WINDOW_WIDTH, INITIAL_WINDOW_HEIGHT
+
+from defaults import GUI_TEMPS_DIR
+from defaults import UPB_NORMALISING
+from defaults import UPB_CONTROLS
+from defaults import UPB_UNKNOWNS
+from defaults import TE_CONTROLS
+from defaults import TE_UNKNOWNS
 
 class App(tk.Tk):
     """
@@ -25,15 +36,14 @@ class App(tk.Tk):
 
         styles.initialise_syles()
 
-        self.title("CITS3200 Prototype")
+        self.title(PROGRAM_NAME)
 
         # set initial window size
         self.geometry(str(INITIAL_WINDOW_WIDTH) + "x" + str(INITIAL_WINDOW_HEIGHT))
         # set minimum window size
         self.minsize(width=MIN_WINDOW_WIDTH,height=MIN_WINDOW_HEIGHT)
 
-        menubar = tk.Menu(self)
-        menubar.add_command(label="Clear cache", command=self.clear_cache())
+        self.iniitalise_menu_bar()
 
         # the container is where we'll stack a bunch of frames
         # on top of each other, then the one we want visible
@@ -53,6 +63,24 @@ class App(tk.Tk):
         self.frames = {}
         self.initialse_frames(container)
         self.show_frame("StartPage")
+
+    def iniitalise_menu_bar(self):
+        """Initialises a menu bar"""
+
+        if sys.platform.startswith('darwin'):
+            menubar = tk.Menu(self)
+            appmenu = tk.Menu(menubar, name='apple', tearoff=0)
+            menubar.add_cascade(menu=appmenu)
+            filemenu = tk.Menu(menubar, tearoff=0)
+            menubar.add_cascade(label="File", menu=filemenu)
+            filemenu.add_command(label="Clear cache", command=self.clear_cache)
+        else:
+            menubar = tk.Menu(self)
+            filemenu = tk.Menu(menubar, tearoff=0)
+            menubar.add_cascade(label="File", menu=filemenu)
+            filemenu.add_command(label="Clear cache", command=self.clear_cache)
+
+        self.config(menu=menubar)
 
     def initialse_frames(self, container):
         """Initialises each page and stores them within the container."""
@@ -103,6 +131,7 @@ class App(tk.Tk):
             return 'UPb'
         return 'TE'
 
-    def clear_cache(self):
+    def clear_cache(self, *event):
         """Deletes all files in the /gui/temps/ directory"""
-        print("clear cache")
+
+        shutil.rmtree(GUI_TEMPS_DIR)

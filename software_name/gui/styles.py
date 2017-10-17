@@ -6,6 +6,7 @@ SMALL_FONT = ('Helvetica', 14)
 TINY_FONT = ('Helvetica', 12)
 
 BG_COLOUR = '#f5f5f5'
+BLACK = '#000000'
 
 ERROR_COLOUR_LIGHT = '#ffafaf'
 ERROR_COLOUR_MED = '#ff8989'
