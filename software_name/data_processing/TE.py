@@ -163,30 +163,32 @@ def summary(full, Classifiers, workbook):
         avg.write(r,n*e+3,"mean "+el)
         avg.write(r,n*e+4,"stdev "+el)
         avg.write(r,n*e+5,"median "+el)
-        for r in range(2,len(z)+2):
-            vals = values(full,e+2,z[r-2])
-            print(vals)
-            avg.write(r,0,z[r-2])
-            total = sum(vals)
-            count = len(vals)
-            i = count/2
-            if count%2==0:
-                try:
+        for r in range(2, len(z)+2):
+            vals = values(full, e+2, z[r-2])
+            if len(vals) > 0:
+                avg.write(r, 0, z[r-2])
+
+                total = sum(vals)
+                count = len(vals)
+                mean = total/count
+
+                i = count/2
+                if i % 1 == 0.0:
                     median = (vals[round(i)-1]+vals[round(i)])/2
-                except:
-                    print(i,len(vals))
-                    print(vals)
-            else:
-                median = vals[round(i)-1]
-            mean = record(total,count)
-            stdev = 0
-            for v in vals:
-                stdev=stdev+record(pow(mean-v,2),(count-1))
-            avg.write(r,n*e+1,total)
-            avg.write(r,n*e+2,count)
-            avg.write(r,n*e+3,mean)
-            avg.write(r,n*e+4,stdev)
-            avg.write(r,n*e+5,median)
+                else:
+                    median = vals[round(i-0.5)]
+
+                variance = 0
+                for v in vals:
+                    variance = variance + pow(v-mean, 2)
+                variance = variance/count
+                stddev = pow(variance, 0.5)
+
+                avg.write(r,n*e+1,total)
+                avg.write(r,n*e+2,count)
+                avg.write(r,n*e+3,mean)
+                avg.write(r,n*e+4,stddev)
+                avg.write(r,n*e+5,median)
 
 def values(t, c, c0):
     v = []
