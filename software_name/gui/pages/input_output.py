@@ -83,24 +83,24 @@ class InputOutputPage(ttk.Frame):
         save_button = Button(output_button_frame, text="Choose", command=self.setOutputPath)
 
         # content_frame children
-        input_title_label.grid(column=0, row=0, sticky=(W), columnspan=2)
-        input_list_frame.grid(column=0, row=1, sticky=(W, E), columnspan=2)
-        input_button_frame.grid(column=1, row=2, sticky=(E))
-        output_title_label.grid(column=0, row=4, sticky=(W), columnspan=2)
-        output_instruction_label.grid(column=1, row=4, sticky=(E))
-        self.outputPathLabel.grid(column=0, row=5, sticky=(W, E), columnspan=2)
-        output_button_frame.grid(column=0, row=6, sticky=(E), columnspan=2)
+        input_title_label.grid(column=0, row=0, sticky=(W), columnspan=4)
+        input_list_frame.grid(column=0, row=1, sticky=(W, E), columnspan=4)
+        input_button_frame.grid(column=2, row=2, sticky=(E))
+        output_title_label.grid(column=0, row=4, sticky=(W))
+        output_instruction_label.grid(column=2, row=4, sticky=(E))
+        self.outputPathLabel.grid(column=0, row=5, sticky=(W, E), columnspan=4)
+        output_button_frame.grid(column=2, row=6, sticky=(E))
 
         # input_list_frame children
         self.input_list.grid(column=0, row=0, sticky=(W, E))
         scroll_bar.grid(column=1, row=0, sticky=(N, S, E))
 
         # input_button_frame children
-        remove_button.grid(column=1, row=0, sticky=(E))
-        open_button.grid(column=2, row=0, sticky=(E))
+        remove_button.grid(column=0, row=0, sticky=(E))
+        open_button.grid(column=1, row=0, sticky=(E))
 
         # output_button_frame children
-        save_button.grid(column=1, row=0, sticky=(E))
+        save_button.grid(column=0, row=0, sticky=(E))
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
