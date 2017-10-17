@@ -3,7 +3,7 @@ from os import path
 
 from PIL import Image, ImageDraw, ImageColor
 
-from defaults import LINE_COLORS, LINE_MARKERS, \
+from defaults import LINE_COLORS, \
     CLASS_COLORS, CLASS_MARKERS, CONVEX_HULL_IMAGE_FILE, CONVEX_HULL_IMAGE_DIR, \
     CHART_HEIGHT, CHART_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, PLOT_X_OFFSET, PLOT_Y_OFFSET
 
@@ -26,6 +26,13 @@ def line_chart(sheet_data, sheet_name, workbook):
 
         # add data and formatting to chart
         zircon_chart.set_title({'name': 'Trace Element Patterns of Zircons'})
+        # generate colors - TODO fix this up once line charts are being drawn again
+        #max_value = 16581375  # 255**3
+        #interval = int(max_value / (len(sheet_data)-1))
+        #colors = [hex(I)[2:].zfill(6) for I in range(0, max_value, interval)]
+
+        #colors = [(int(i[:2], 16), int(i[2:4], 16), int(i[4:], 16)) for i in colors]
+        #print(colors)
         for i in range(1, len(sheet_data)):
             color = LINE_COLORS[i % len(LINE_COLORS)]
             zircon_chart.add_series({
@@ -33,12 +40,7 @@ def line_chart(sheet_data, sheet_name, workbook):
                 'values': [sheet_name, i, 2, i, len(sheet_data[0])-2],
                 'name': sheet_data[i][1],
                 'line': {'width': 1.0, 'color': color},
-                'marker': {
-                    'type': LINE_MARKERS[i % len(LINE_MARKERS)],
-                    'size': 4,
-                    'border': {'color': color},
-                    'fill': {'none': True}
-                }
+                'marker': {'type': 'none'}
             })
         zircon_chart.set_x_axis({
             'name': '<--- Increasing Ionic Radius <---',

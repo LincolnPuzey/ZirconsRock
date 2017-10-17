@@ -17,7 +17,7 @@ allChondriteElements = ['La139', 'Ce140', 'Pr141', 'Nd146', 'Sm147', 'Eu151', 'G
 ChondriteValues = [0.237, 0.613, 0.0928, 0.457, 0.148, 0.0563, 0.199, 0.0294, 0.246, 1.57, 0.0546, 0.16, 0.0074, 0.161,
                    0.0246, 0.103, 0.24, 0.0136, 440, 1080, 0.0361, 0.0247]
 
-# colors and markers used for line graphs
+# colors used for line graphs
 LINE_COLORS = [
     '#CC3300',  # dark red
     '#558000',  # dark green
@@ -32,15 +32,6 @@ LINE_COLORS = [
     '#000000',  # black
     '#FF6600',  # orange
     '#FF1A1A',  # red
-]
-LINE_MARKERS = [
-    'square',
-    'diamond',
-    'x',
-    'circle',
-    'triangle',
-    'plus',
-    'star',
 ]
 # colors and markers used for scatterplots and convex hulls for each class of CART1
 CLASSES = [
