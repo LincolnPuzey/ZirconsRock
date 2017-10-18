@@ -6,6 +6,7 @@ virtual_python/**
 *.pkl
 
 # ignore local changes to chondrite_values.csv made as a result of running program
+chondrite_values.csv
 **/chondrite_values.csv
 
 # ignore images generated as part of TE chart process
