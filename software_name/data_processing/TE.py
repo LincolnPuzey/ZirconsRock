@@ -307,7 +307,19 @@ def addClassifier(full, sheet, carts):
     classifier = [classifier[0]] + sorted(classifier[1:], key=lambda row: row[-3])
 
     # write to excel
-    addSheet(sheet, classifier)
+    for r in range(len(classifier)):
+        for c in range(len(classifier[r])):
+            value_to_write = evalif(classifier[r][c])
+            if classifier[0][c] == 'Hf' and r > 0:
+                # special case - divide by 10,000 to give output as % weight rather than ppm
+                try:
+                    sheet.write(r, c, value_to_write/10000)
+                except TypeError:
+                    # if something goes wrong write regular value
+                    sheet.write(r, c, value_to_write)
+            else:
+                # regular case
+                sheet.write(r, c, value_to_write)
 
     return classifier
 
