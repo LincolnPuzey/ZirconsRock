@@ -12,7 +12,7 @@ Unknown,P31,Ca43,Ti49,Y89,Zr92,Nb93,La139,Ce140,Pr141,Nd146,Sm147,Eu151,Gd157,Tb
 ,CARTS,Y-ThU data,CART1,Y,Th/U,,,,,,,,,,,,,,,,,,,
 ,CARTS,Y-CeCe data,CART1,Y,Ce/Ce,,,,,,,,,,,,,,,,,,,
 ,CARTS,Y-EuEu data,CART1,Y,Eu/Eu,,,,,,,,,,,,,,,,,,,
-,CARTS,Y-Hf-Y data,CART1,Hf,Y,,,,,,,,,,,,,,,,,,,
+,CARTS,Hf-Y data,CART1,Hf,Y,,,,,,,,,,,,,,,,,,,
 ,CARTS,Nb-Ta data,CART1,Nb,Ta,,,,,,,,,,,,,,,,,,,
 ,CARTS,U-Th data,CART1,U,Th,,,,,,,,,,,,,,,,,,,
 ,CARTS,CeCe-EuEu data,CART1,Ce/Ce,Eu/Eu,,,,,,,,,,,,,,,,,,,
