@@ -1,10 +1,13 @@
-CITS3200
+Zircons Rock
 ==========
-Repository for CITS3200 Project
+Repository for Zircons Rock Data Processing Software
 
 Project Requires Python 3.5 or later
 
 ## Instructions for WINDOWS
+
+For help with running python programs on Windows, see:
+https://docs.python.org/3.5/faq/windows.html
 
 ##### Installation
   * First ensure you have Python 3 version 3.5 or later installed
