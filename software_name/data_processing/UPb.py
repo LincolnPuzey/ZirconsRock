@@ -11,10 +11,6 @@ shortNames = ['Istopic ratios',
               'Age 1 sigma uncertainty',
               'Mean Raw CPS background']
 EndOfTableIndicator = ""
-denomTh = 649.9625
-denomU = 753.2491
-testInputLocation = 'C:/Users/mark/Google Drive/CITS3200/CITS3200/test_files/inputs/Dec04_RUN[1-4]_UPb.csv'
-testOutputLocation = 'C:/Users/mark/Google Drive/CITS3200/CITS3200/test_files/outputs/UPbOutput.xlsx'
 '''
 Reads a csv file then filters out the appropriate zircons and elements
 sheet = workbook.add_worksheet(f) if you wish to add this sheet to table
@@ -24,10 +20,27 @@ excludedZircons = Which zircon do you wish to remove at every table?
 '''
 def addUPbSheet(sheet,csvfile,IncludedFields,excludedZircons=["610"]):
     t=table(csvfile,getSplitter(csvfile))
+    #workbook = xlsxwriter.Workbook(now("micro")+".xlsx")
+    #worksheet = workbook.add_worksheet("Initial table")
+    #addSheet(worksheet,t)
+    #worksheet.write(0,1,str(IncludedFields))
+    i=0
     for r in t:
         if standard(r[0]) in excludedZircons or r[0] in excludedZircons:
             t.remove(r)
+            #addSheet(worksheet,[r],i)
+        #else:
+            #addSheet(worksheet,[[r[0]]],i)
+        i+=1
+    #addSheet(workbook.add_worksheet("Removed Zircons table"),t)
     t,full = filterfields(t,csvTableNames[4],IncludedFields)
+    '''
+    try:
+        addSheet(workbook.add_worksheet("t"),t)
+        addSheet(workbook.add_worksheet("full"),full)
+    except Exception as e:
+        print(excludedZircons)
+    '''
     try:
         addSheet(sheet,t)
     except:
@@ -211,10 +224,11 @@ Given a list of run csv files:
 def getAllZircons(fileList):
     tlist=[]
     for f in fileList:
-        tlist.append(addUPbSheet("workbook.add_worksheet(f)",f,['Analysis_#']))
-    a = column(combine(tlist,0,'*'),0)
-    a.remove('Analysis_#')
-    return a
+        t=table(f,getSplitter(f))
+        for stn in column(t,0):
+            if stn not in tlist and '-' in stn:
+                tlist.append(stn)
+    return tlist
 '''
 Main Function called to run the entire program
 '''
@@ -231,17 +245,16 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
     workbook = xlsxwriter.Workbook(output)
     tlist = []
     conc = []
-    badzircons = getAllZircons(files)
+    badstandards = standard(getAllZircons(files))
     for x in [control,unknown,[normalised]]:
         for y in x:
-            if y in badzircons:
-                print(y)
-                badzircons.remove(y)
-    print(badzircons)
+            if y in badstandards:
+                badstandards.remove(y)
+    print("badstandards = ",badstandards)
     for f in files:
         #If you need the run files in the Output then remove "" below
-        tlist.append(addUPbSheet("workbook.add_worksheet(f)",f,IncludedFields,badzircons))
-        conc.append(addUPbSheet("workbook.add_worksheet(f)",f,['Analysis_#','Th232','U238'],badzircons))
+        tlist.append(addUPbSheet("workbook.add_worksheet(f)",f,IncludedFields,badstandards))
+        conc.append(addUPbSheet("workbook.add_worksheet(f)",f,['Analysis_#','Th232','U238'],badstandards))
     allZircons=column(combine(tlist,0,'*'),0)
     standards = standard(allZircons)
     for s in standards:
@@ -289,4 +302,4 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
     except:
         input("You must close "+output+" before continuing...")
         UPb(control, unknown, files, output)
-    styleUPb(output,standards)
+    styleUPb(output)

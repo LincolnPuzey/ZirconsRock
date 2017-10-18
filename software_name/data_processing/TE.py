@@ -150,13 +150,13 @@ def summary(full, Classifiers, workbook):
             for p in range(len(rocktype)):
                 r = p+2
                 sheet.write(r,3,"=(E"+str(r+1)+"/SUM($E$3:$E$"+str(len(rocktype)+2)+"))*100")
+            bar_chart(rocktype,s,workbook)
     elements = full[0][2:]
     z = standard(column(full, 1)[1:])
     avg = workbook.add_worksheet("Statistics of "+full[0][1])
     avg.write(0, 0, "Sample")
     avg.write(0, 1, "Number of Analyses")
     avg.write(0, 2, "Stat. Parameter")
-
     for i in range(len(elements)):
         avg.write(0, i+3, elements[i])
 
@@ -192,8 +192,6 @@ def summary(full, Classifiers, workbook):
                 avg.write(1 + (i * rows_per_sample) + 0, j + 3, mean)
                 avg.write(1 + (i * rows_per_sample) + 1, j + 3, stddev)
                 avg.write(1 + (i * rows_per_sample) + 2, j + 3, median)
-
-
 def values(t, c, c0):
     v = []
     for r in t:
@@ -202,23 +200,38 @@ def values(t, c, c0):
     return v
 
 
-def getChondrite(file, unknown, stand, detected):
-    if type(unknown)!=type(["list"]):
+def getChondrite(available,file, unknown, stand, detected):
+    if type(unknown)!=type(["list"]) and len(stand)==0:
         return table(file)
     chond = table(file)
-    i=2
-    control = copy.deepcopy(unknown)
-    control.extend(copy.deepcopy(stand))
+    i=0
+    if len(unknown)>0:
+        control = copy.deepcopy(unknown)
+        control.extend(copy.deepcopy(stand))
+    else:
+        control = detected
     while i<len(chond) and len(chond[i])>=2:
         if chond[i][1]=="Excluded Zircons or Standards":
             known = []
             for d in detected:
                 if d not in control:
                     known.append(d)
-            un = str(known).replace("[","").replace("]","").replace("\'","")
+            un = str(known).replace("[","").replace("]","").replace("\'","").replace(" ","").replace("\t","")
             text = ',Excluded Zircons or Standards,' + un
             writeln(i,text,file)
-            control = unknown
+            if len(unknown)>0:
+                control = unknown
+            else:
+                control = stand
+        if chond[i][0]!="":
+            includedElements = chond[i][1:]
+            for e in range(len(includedElements)):
+                for a in range(len(available)):
+                    if rnums(includedElements[e])==rnums(available[a]):
+                        includedElements[e] = available[a]
+            un = str(includedElements).replace("[","").replace("]","").replace("\'","").replace(" ","").replace("\t","")
+            text = chond[i][0]+","+un
+            writeln(i,text,file)
         i=i+1
     return table(file)
 
@@ -240,19 +253,22 @@ def te(files, output, ChondFile, control,unknown):
     print("     Row >3: indicats the CART classification that you wish to be done for this given data")
     print("         Column B here Always states CARTS followed by the name of the new Spreadsheet")
     workbook = xlsxwriter.Workbook(output)
-    t = getChondrite(ChondFile,unknown,control,standard(getAllZircons(files)))
+    t = getChondrite(getElements(files[0]),ChondFile,unknown,control,standard(getAllZircons(files)))
     NotDoneClassifiers = True
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
         full[0][1] = t[i][0]
+        line_chart(full,t[i][0],workbook)
         k=3
         while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
             carts = nospaces(t[i+k][3:])
             if len(carts)>0:
                 worksheet = workbook.add_worksheet(t[i+k][2])
-                addSheet(workbook.add_worksheet("Full of "+t[i+k][2]),full)
                 Classifiers = addClassifier(full,worksheet,carts)
-                chart(Classifiers,t[i+k][2],workbook)
+                try:
+                    chart(Classifiers,t[i+k][2],workbook)
+                except:
+                    print(t[i+k][2],"cannot produce a chart")
                 if NotDoneClassifiers:
                     summary(full,Classifiers,workbook)
                 NotDoneClassifiers=False
@@ -336,18 +352,29 @@ def addTESheet(files, sheet, includedElements, Chondrites, excludedZircons):
     full=[[""]*(3+len(includedElements))]
     full[0][0] = BeginningCell
     excludedZircons.append(BeginningCell)
-    for i in range(len(includedElements)):
-        sheet.write(0,2+i,rnums(includedElements[i]))
-        full[0][2+i] = rnums(includedElements[i])
+    available = getElements(files[0])
+    i=2
+    for e in includedElements:
+        if e in available:
+            sheet.write(0,i,rnums(e))
+            full[0][i] = rnums(e)
+            i=i+1
     r=1
     for f in files:
         rstart = r
         t = table(f)
+        ss = f.split('TE')[-1]
         bi=begr(t,BeginningCell)
         i=0 #Column Index starting after 'Element'
         si = [] #Sample Indicies matching from the input
         for row in t[bi]:
+            
             inZirconList = (row not in excludedZircons) and (standard(row) not in excludedZircons)
+            '''
+            addSheet(ts,[[inZirconList]],1,i)
+            addSheet(ts,[['Included Elements'],includedElements],2)
+            addSheet(ts,[['Excluded Zircons'],excludedZircons],4)
+            '''
             if inZirconList:
                 full.append([""]*(3+len(includedElements)))
                 sheet.write(r,1,row)
@@ -368,8 +395,6 @@ def addTESheet(files, sheet, includedElements, Chondrites, excludedZircons):
                     sheet.write(y+rstart,c+1,data)
             x=x+1
     return full
-
-
 def teSheetNamesIndicies(Chondtable):
     sn=[]
     indicies = []
@@ -389,8 +414,3 @@ def chond(element):
         if element in e:
             return ChondriteValues[i]
         i=i+1
-def withoutGUI():
-    run = 'C:/Users/markc_000/Google Drive/CITS3200/CITS3200/test_files/inputs/Dec04_RUN[1-4]_TE.csv'
-    output = 'C:/Users/markc_000/Google Drive/CITS3200/CITS3200/test_files/outputs/test_te_output.xlsx'
-    chondfile = 'C:/Users/markc_000/Google Drive/CITS3200/CITS3200/software_name/chondrite_values.csv'
-    te(getFileList(run),output,chondfile,['STDGJ','MT'],['INT1','INT2'])

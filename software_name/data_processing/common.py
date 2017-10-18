@@ -3,7 +3,13 @@ File for functions common to TE and U-Pb processing
 """
 import copy
 import xlsxwriter
-
+import time
+import datetime
+def now(form='%A %d/%m/%Y %-I:%M:%S:%f'):
+    ts = time.time()
+    if form=="micro":
+        return str(ts).split('.')[1]
+    return datetime.datetime.fromtimestamp(ts).strftime(form)
 '''
 Tries to evaluate and divide a variable for each record in a table.
 Variable = can be a string int or float to be evaluated
@@ -132,20 +138,7 @@ def column(t,n):
     for row in t:
         col.append(row[n])
     return col
-'''
-Returns a list of files with their corresponding number range
-eg. getFileList('example[1-3].csv') = ['example1.csv','example2.csv','example3.csv']
-'''
-def getFileList(filename="example[1-3].csv"):
-    beg = filename.split('[')[0]
-    end = filename.split(']')[1]
-    nrange = filename.split('[')[1].split(']')[0]
-    start = eval(nrange.split('-')[0])
-    finish = eval(nrange.split('-')[1])
-    files = []
-    for i in range(start,finish+1):
-        files.append(beg+str(i)+end)
-    return files
+
 '''
 Removes spaces or empty Strings from a list
 '''
