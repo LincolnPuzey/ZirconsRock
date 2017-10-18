@@ -1,11 +1,11 @@
-from math import log10
 from os import path
 
-from PIL import Image, ImageDraw, ImageColor
+from PIL import Image
 
-from defaults import LINE_COLORS, \
-    CLASS_COLORS, CLASS_MARKERS, TE_PLOTS, TE_PLOT_AXES, TE_PLOT_IMAGE_DIR,TE_PLOT_FIELDS, TE_PLOT_FIELD_FILE, TE_PLOT_LEGEND_FILE, \
-    CHART_HEIGHT, CHART_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, PLOT_X_OFFSET, PLOT_Y_OFFSET
+from defaults import LINE_COLORS, CLASS_MARKERS, \
+    TE_PLOTS, TE_PLOT_FIELDS, TE_PLOT_AXES, TE_PLOT_IMAGE_DIR, TE_PLOT_FIELD_FILE, TE_PLOT_LEGEND_FILE, \
+    CHART_HEIGHT, CHART_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, PLOT_X_OFFSET, PLOT_Y_OFFSET, \
+    LEGEND_SCALE, LEGEND_X_OFFSET, LEGEND_Y_OFFSET
 
 
 def line_chart(sheet_data, sheet_name, workbook):
@@ -201,18 +201,7 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
         current_series_name: []
     }
 
-    #x_axis_min = 1
-    #x_axis_max = 10
-    #y_axis_min = 1
-    #y_axis_max = 10
-
     for i in range(1, len(classifiers)):
-
-        # keep track of x/y min/max
-        #x_axis_min = x_axis_min/10 if classifiers[i][x_column] < x_axis_min else x_axis_min
-        #x_axis_max = x_axis_max*10 if classifiers[i][x_column] > x_axis_max else x_axis_max
-        #y_axis_min = y_axis_min/10 if classifiers[i][y_column] < y_axis_min else y_axis_min
-        #y_axis_max = y_axis_max*10 if classifiers[i][y_column] > y_axis_max else y_axis_max
 
         if current_series_name == classifiers[i][class_column]:
             # still in same series - update end index
@@ -310,13 +299,28 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
     scatterplot_worksheet.insert_chart('A1', scatterplot)
 
     if TE_PLOT_FIELDS[plot_name]:
+        field_image_file = path.join(TE_PLOT_IMAGE_DIR, TE_PLOT_FIELD_FILE.format(plot_name))
+        image = Image.open(field_image_file)
+        image_width, image_height = image.size
         scatterplot_worksheet.insert_image(
             'A1',
-            path.join(TE_PLOT_IMAGE_DIR, TE_PLOT_FIELD_FILE.format(plot_name)),
+            field_image_file,
             {
                 'x_offset': int(PLOT_X_OFFSET*CHART_WIDTH),
                 'y_offset': int(PLOT_Y_OFFSET*CHART_HEIGHT),
-                'x_scale': 0.7,
-                'y_scale': 0.7
+                'x_scale': (CHART_WIDTH*PLOT_WIDTH)/image_width,
+                'y_scale': (CHART_HEIGHT*PLOT_HEIGHT)/image_height
+            }
+        )
+
+        legend_image_file = path.join(TE_PLOT_IMAGE_DIR, TE_PLOT_LEGEND_FILE.format(plot_name))
+        scatterplot_worksheet.insert_image(
+            'A1',
+            legend_image_file,
+            {
+                'x_offset': int(LEGEND_X_OFFSET * CHART_WIDTH),
+                'y_offset': int(LEGEND_Y_OFFSET * CHART_HEIGHT),
+                'x_scale': LEGEND_SCALE,
+                'y_scale': LEGEND_SCALE
             }
         )

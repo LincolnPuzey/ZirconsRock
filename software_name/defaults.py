@@ -35,7 +35,8 @@ LINE_COLORS = [
     '#FF6600',  # orange
     '#FF1A1A',  # red
 ]
-# colors and markers used for scatterplots for each class of CART1
+
+# colors and markers used for scatterplots for TE plots
 CLASSES = [
     "Carbonite",
     "Granitoid(>5% SiO2)",
@@ -72,6 +73,7 @@ CLASS_MARKERS = {
     CLASSES[8]: {'type': 'star',      'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[8], '#000000')}, },
     CLASSES[9]: {'type': 'long_dash', 'size': 7, 'border': {'color': CLASS_COLORS.get(CLASSES[9], '#000000')}, 'fill': {'color': CLASS_COLORS.get(CLASSES[9], '#000000')}},
 }
+# Each TE scatterplot, and if they have a field image, and what axes to use for each
 TE_PLOTS = [
     "Y-U",
     "Y-Th",
@@ -112,14 +114,19 @@ TE_PLOT_AXES = {
     TE_PLOTS[9]:  (0.1,   100000, 0.01, 100000),
     TE_PLOTS[10]: (0.001, 10,     0.1,  1000),
 }
-# Used for generating charts and convex hull images
+# Size of chart and its elements for TE scatterplots, see for more info:
+# http://xlsxwriter.readthedocs.io/working_with_charts.html#chart-layout
 CHART_WIDTH = 1100
 CHART_HEIGHT = 1000
-# expressed as percentages of CHART_WIDTH and CHART_HEIGHT
+# expressed as percentages of CHART_WIDTH and CHART_HEIGHT:
 PLOT_X_OFFSET = 0.1
 PLOT_Y_OFFSET = 0.07
 PLOT_WIDTH = 0.58
 PLOT_HEIGHT = 0.55
+LEGEND_X_OFFSET = 0.1
+LEGEND_Y_OFFSET = 0.7
+LEGEND_SCALE = 0.7  # percentage scale of original size
+
 # where to store TE plot fields image files
 TE_PLOT_IMAGE_DIR = "te_plot_fields"
 TE_PLOT_FIELD_FILE = "{}.PNG"
