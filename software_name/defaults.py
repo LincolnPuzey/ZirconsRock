@@ -19,23 +19,6 @@ allChondriteElements = ['La139', 'Ce140', 'Pr141', 'Nd146', 'Sm147', 'Eu151', 'G
 ChondriteValues = [0.237, 0.613, 0.0928, 0.457, 0.148, 0.0563, 0.199, 0.0294, 0.246, 1.57, 0.0546, 0.16, 0.0074, 0.161,
                    0.0246, 0.103, 0.24, 0.0136, 440, 1080, 0.0361, 0.0247]
 
-# colors used for line graphs
-LINE_COLORS = [
-    '#CC3300',  # dark red
-    '#558000',  # dark green
-    '#00FF99',  # aqua green
-    '#00B3B3',  # dark aqua
-    '#E6E600',  # dark yellow
-    '#0066CC',  # blue
-    '#6600FF',  # blue-purple
-    '#B800E6',  # purple
-    '#FF0080',  # pink
-    '#661A00',  # brown
-    '#000000',  # black
-    '#FF6600',  # orange
-    '#FF1A1A',  # red
-]
-
 # colors and markers used for scatterplots for TE plots
 CLASSES = [
     "Carbonite",

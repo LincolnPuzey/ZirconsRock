@@ -2,7 +2,7 @@ from os import path
 
 from PIL import Image
 
-from defaults import LINE_COLORS, CLASS_MARKERS, \
+from defaults import CLASS_MARKERS, \
     TE_PLOTS, TE_PLOT_FIELDS, TE_PLOT_AXES, TE_PLOT_IMAGE_DIR, TE_PLOT_FIELD_FILE, TE_PLOT_LEGEND_FILE, \
     CHART_HEIGHT, CHART_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, PLOT_X_OFFSET, PLOT_Y_OFFSET, \
     LEGEND_SCALE, LEGEND_X_OFFSET, LEGEND_Y_OFFSET
@@ -26,15 +26,14 @@ def line_chart(sheet_data, sheet_name, workbook):
 
         # add data and formatting to chart
         zircon_chart.set_title({'name': 'Trace Element Patterns of Zircons'})
-        # generate colors - TODO fix this up once line charts are being drawn again
-        #max_value = 16581375  # 255**3
-        #interval = int(max_value / (len(sheet_data)-1))
-        #colors = [hex(I)[2:].zfill(6) for I in range(0, max_value, interval)]
+        # generate colors from the RGB cube
+        max_value = 16581375  # 255**3
+        interval = int(max_value / (len(sheet_data)-1))
+        colors = [hex(I)[2:].zfill(6) for I in range(0, max_value, interval)]
+        colors = [(int(i[:2], 16), int(i[2:4], 16), int(i[4:], 16)) for i in colors]
 
-        #colors = [(int(i[:2], 16), int(i[2:4], 16), int(i[4:], 16)) for i in colors]
-        #print(colors)
         for i in range(1, len(sheet_data)):
-            color = LINE_COLORS[i % len(LINE_COLORS)]
+            color = "#{0:0>2X}{1:0>2X}{2:0>2X}".format(colors[i-1][0], colors[i-1][1], colors[i-1][2])
             zircon_chart.add_series({
                 'categories': [sheet_name, 0, 2, 0, len(sheet_data[0])-2],
                 'values': [sheet_name, i, 2, i, len(sheet_data[0])-2],
@@ -271,7 +270,7 @@ def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, 
         }
     })
     y_axis_options = {
-        'name': [sheet_name, 0, y_column],
+        'name': classifiers[0][y_column]+" (wt%)" if classifiers[0][y_column] == "Hf" else [sheet_name, 0, y_column],
         'max': TE_PLOT_AXES[plot_name][3],
         'min': TE_PLOT_AXES[plot_name][2],
         'major_gridlines': {'visible': True},
