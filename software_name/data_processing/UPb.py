@@ -223,11 +223,16 @@ Given a list of run csv files:
 '''
 def getAllZircons(fileList):
     tlist=[]
+    err = True
     for f in fileList:
         t=table(f,getSplitter(f))
-        for stn in column(t,0):
+        r=begr(t,csvTableNames[0])
+        for stn in column(t[r:],0):
             if stn not in tlist and '-' in stn:
                 tlist.append(stn)
+                err = False
+    if err:
+        GIVING_YOU_A_SPECIAL_GIFT_HAHAHA=AN_ERROR
     return tlist
 '''
 Main Function called to run the entire program
