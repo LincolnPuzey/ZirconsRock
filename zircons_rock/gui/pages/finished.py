@@ -121,6 +121,7 @@ class FinishedPage(ttk.Frame):
 
         return path.replace('/', '\\')
 
+
     def get_input_output_page(self):
         """
         Returns 'UPbInputOutputPage' if the user selected UPb processing at the StartPage

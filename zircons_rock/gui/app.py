@@ -64,6 +64,7 @@ class App(tk.Tk):
         self.initialse_frames(container)
         self.show_frame("StartPage")
 
+
     def iniitalise_menu_bar(self):
         """Initialises a menu bar"""
 
@@ -81,6 +82,7 @@ class App(tk.Tk):
             filemenu.add_command(label="Clear cache", command=self.clear_cache)
 
         self.config(menu=menubar)
+
 
     def initialse_frames(self, container):
         """Initialises each page and stores them within the container."""
@@ -114,13 +116,14 @@ class App(tk.Tk):
         self.frames["FinishedPage"] = frame
         frame.grid(row=0, column=0, sticky="nsew")
 
+
     def show_frame(self, page_name):
         """Displays the page called page_name"""
 
         frame = self.frames[page_name]
         frame.tkraise()
 
-    # returns either 'U-Pb' or 'TE'
+
     def getProcessName(self):
         """
         Returns 'UPb' if UPb was selected at the StartPage
@@ -130,6 +133,7 @@ class App(tk.Tk):
         if self.isUpb:
             return 'UPb'
         return 'TE'
+
 
     def clear_cache(self, *event):
         """Deletes all files in the /gui/temps/ directory"""

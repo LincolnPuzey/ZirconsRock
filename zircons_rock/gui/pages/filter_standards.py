@@ -347,6 +347,7 @@ class FilterStandardsPage(ttk.Frame):
 
                 row += 1
 
+
     def clear_standards(self):
         """Resets all standard information by clearing lists"""
 
@@ -381,10 +382,12 @@ class FilterStandardsPage(ttk.Frame):
 
         return standards
 
+
     def on_frame_configure(self, event):
         """Reset the scroll region to encompass the inner frame"""
 
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
 
     def select_all_checkbuttons(self):
         """Selects all checkbuttons on the page"""
@@ -394,6 +397,7 @@ class FilterStandardsPage(ttk.Frame):
         for btn in self.unknown_checkbuttons:
             btn.select()
 
+
     def deselect_all_checkbuttons(self):
         """Deselects all checkbuttons on the page"""
 
@@ -402,10 +406,12 @@ class FilterStandardsPage(ttk.Frame):
         for btn in self.unknown_checkbuttons:
             btn.deselect()
 
+
     def set_default_ppms(self):
         """Sets Uranium PPM and Thorium PPM as their default values"""
         self.uranium_ppm.set(DEFAULT_URANIUM_PPM)
         self.thorium_ppm.set(DEFAULT_THORIUM_PPM)
+
 
     def load_std_prefs(self):
         """
@@ -455,6 +461,7 @@ class FilterStandardsPage(ttk.Frame):
             if self.title == "TE": pickled_use_cart.close()
         except UnboundLocalError:
             pass
+
 
     def save_std_prefs(self):
         """
@@ -521,7 +528,6 @@ class FilterStandardsPage(ttk.Frame):
             if self.title == "TE": pickled_use_cart.close()
         except UnboundLocalError:
             pass
-
 
 
     def validate(self, action, index, value_if_allowed,

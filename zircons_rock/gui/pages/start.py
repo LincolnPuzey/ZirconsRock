@@ -78,6 +78,7 @@ class StartPage(ttk.Frame):
         self.controller.frames["UPbInputOutputPage"].initialise()
         self.controller.show_frame("UPbInputOutputPage")
 
+
     def onPressTE(self):
         """Initialises TEInputOutputPage and sets the controller to TE processing"""
 

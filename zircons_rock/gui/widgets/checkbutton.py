@@ -24,6 +24,7 @@ class CustomCheckbutton(ttk.Checkbutton):
 
         self.bind("<Return>", self.toggle)
 
+
     def toggle(self, event):
         """Toggles the checkbutton's state"""
 
