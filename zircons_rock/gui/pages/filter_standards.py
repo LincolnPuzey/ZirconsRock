@@ -134,8 +134,7 @@ class FilterStandardsPage(ttk.Frame):
             self.unknown_leg_label.grid(column=0, row=1, sticky=(N,W))
 
 
-        if title =="UPb":
-
+        if title == "UPb":
             self.ppm_frame = ttk.Labelframe(self.right_col_frame, text="PPM Values", padding="10 10 10 10")
             self.uranium_ppm_frame = ttk.Frame(self.ppm_frame, padding="0 0 0 5")
             self.thorium_ppm_frame = ttk.Frame(self.ppm_frame)
@@ -160,6 +159,33 @@ class FilterStandardsPage(ttk.Frame):
             self.thorium_ppm_label.grid(column=1, row=0, sticky=(N,W,E,S))
             self.thorium_ppm_entry.grid(column=1, row=1, sticky=(N,W,E,S))
 
+        else:
+            self.cart_frame = ttk.Labelframe(self.right_col_frame, text="Scatterplots", padding="10 10 10 10")
+            self.cart_question = ttk.Label(self.cart_frame, text="Use cart\nclassifications\nfor scatterplots?", padding="0 0 0 5")
+            self.yes_button_frame = ttk.Frame(self.cart_frame, padding="10 0 0 0")
+            self.no_button_frame = ttk.Frame(self.cart_frame, padding="10 0 0 0")
+
+            self.use_cart_for_plots = tk.BooleanVar(value=True)
+            self.yes_button = CustomRadiobutton(self.yes_button_frame, variable=self.use_cart_for_plots, value=True, padding="0 0 0 0", num_columns=2)
+            self.yes_label = ttk.Label(self.yes_button_frame, text="Yes")
+            self.no_button = CustomRadiobutton(self.no_button_frame, variable=self.use_cart_for_plots, value=False, padding="0 0 0 0", num_columns=2)
+            self.no_label = ttk.Label(self.no_button_frame, text="No")
+
+            # content_frame children
+            self.cart_frame.grid(column=0, row=1, sticky=(N,S,E,W))
+
+            # cart_frame children
+            self.cart_question.grid(column=0, row=0, sticky=(W))
+            self.yes_button_frame.grid(column=0, row=1, sticky=(N,S,E,W))
+            self.no_button_frame.grid(column=0, row=2, sticky=(N,S,E,W))
+
+            # yes_button_frame children
+            self.yes_button.grid(column=0, row=0, sticky=(N,S,E,W))
+            self.yes_label.grid(column=1, row=0, sticky=(W))
+
+            # no_button_frame children
+            self.no_button.grid(column=0, row=0, sticky=(N,S,E,W))
+            self.no_label.grid(column=1, row=0, sticky=(W))
 
         self.canvas.create_window(
             (0, 0), window=self.inner_canvas_frame, anchor="nw", tags="self.inner_canvas_frame")
@@ -494,8 +520,6 @@ class FilterStandardsPage(ttk.Frame):
 
         self.save_std_prefs()
 
-
-
         if self.controller.isUpb:
             output_filepath = self.controller.frames["UPbInputOutputPage"].output_filepath.get()
             files = self.controller.frames["UPbInputOutputPage"].valid_input_filepaths
@@ -504,12 +528,6 @@ class FilterStandardsPage(ttk.Frame):
         else:
             output_filepath = self.controller.frames["TEInputOutputPage"].output_filepath.get()
             files = self.controller.frames["TEInputOutputPage"].valid_input_filepaths
-
-            # print("files: " + str(files))
-            # print("output_filepath: " + output_filepath)
-            # print("CHONDRITE_FILE: " + CHONDRITE_FILE)
-            # print("Control standards: " + str(control_standards))
-            # print("Unknown standards: " + str(unknown_standards))
 
             TE.te(files, output_filepath, CHONDRITE_FILE, control_standards, unknown_standards)
             self.footer_frame.go_to_next_page()

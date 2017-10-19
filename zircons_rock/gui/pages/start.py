@@ -1,5 +1,5 @@
 from gui.resources import *
-import defaults as defaults
+from defaults import UPB_IMAGE, TE_IMAGE
 import data_processing.UPb as UPb
 import data_processing.TE as TE
 import data_processing.common as common
@@ -28,8 +28,8 @@ class StartPage(ttk.Frame):
         content_frame = Content(self, controller)
 
         # can use GIF, PPM/PGP - http://effbot.org/tkinterbook/photoimage.html
-        uranium_img = PhotoImage(file='./gui/images/placeholder.gif')
-        trace_img = PhotoImage(file='./gui/images/placeholder.gif')
+        uranium_img = PhotoImage(file=UPB_IMAGE)
+        trace_img = PhotoImage(file=TE_IMAGE)
 
         button_frame = ttk.Frame(content_frame, padding="0 20 0 20");
 

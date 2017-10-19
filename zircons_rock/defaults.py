@@ -144,6 +144,9 @@ INITIAL_WINDOW_HEIGHT = 500
 DEFAULT_URANIUM_PPM = 288
 DEFAULT_THORIUM_PPM = 18
 
+UPB_IMAGE = './gui/images/upb.gif'
+TE_IMAGE = './gui/images/te.gif'
+
 # # Temporary: List of TE input filepaths for testing
 # TEMP_TE_INPUT_FILEPATHS = [INPUT_DIR + '/Dec04_RUN1_TE.csv',
 #                       INPUT_DIR + '/Dec04_RUN2_TE.csv',
