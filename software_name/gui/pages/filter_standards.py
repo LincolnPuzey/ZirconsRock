@@ -23,6 +23,9 @@ from defaults import TE_OUTPUT_FILEPATH
 from defaults import TE_OUTPUT_FILENAME
 from defaults import TE_OUTPUT_DIR
 
+from defaults import DEFAULT_URANIUM_PPM
+from defaults import DEFAULT_THORIUM_PPM
+
 class FilterStandardsPage(ttk.Frame):
     """
     Page for specifying which standards are normalising, control and unknown.
@@ -137,8 +140,8 @@ class FilterStandardsPage(ttk.Frame):
             self.uranium_ppm_frame = ttk.Frame(self.ppm_frame, padding="0 0 0 5")
             self.thorium_ppm_frame = ttk.Frame(self.ppm_frame)
 
-            self.uranium_ppm = tk.StringVar(value="290")
-            self.thorium_ppm = tk.StringVar(value="20")
+            self.uranium_ppm = tk.StringVar(value=DEFAULT_URANIUM_PPM)
+            self.thorium_ppm = tk.StringVar(value=DEFAULT_THORIUM_PPM)
 
             self.uranium_ppm_label = ttk.Label(self.uranium_ppm_frame, text="Uranium", padding="0 0 10 5")
             self.thorium_ppm_label = ttk.Label(self.thorium_ppm_frame, text="Thorium", padding="0 0 10 5")
