@@ -203,7 +203,7 @@ def values(t, c, c0):
     return v
 
 
-def getChondrite(available,file, unknown, stand, detected):
+def getChondrite(available,file, unknown, stand, detected,PerformByRockType):
     if type(unknown)!=type(["list"]) and len(stand)==0:
         return get_table(file)
     chond = get_table(file)
@@ -219,8 +219,7 @@ def getChondrite(available,file, unknown, stand, detected):
             for d in detected:
                 if d not in control:
                     known.append(d)
-            un = str(known).replace("[","").replace("]","").replace("\'","").replace(" ","").replace("\t","")
-            text = ',Excluded Zircons or Standards,' + un
+            text = ',Excluded Zircons or Standards,' + commas(known)
             writeln(i,text,file)
             if len(unknown)>0:
                 control = unknown
@@ -232,14 +231,25 @@ def getChondrite(available,file, unknown, stand, detected):
                 for a in range(len(available)):
                     if rnums(includedElements[e])==rnums(available[a]):
                         includedElements[e] = available[a]
-            un = str(includedElements).replace("[","").replace("]","").replace("\'","").replace(" ","").replace("\t","")
-            text = chond[i][0]+","+un
+            text = chond[i][0]+","+commas(includedElements)
             writeln(i,text,file)
+        if chond[i][1]=="CARTS":
+            if PerformByRockType and "CART" not in chond[i][3]:
+                first = commas(chond[i][:3])
+                second = commas(chond[i][3:])
+                writeln(i,first+",CART1,"+second,file)
+            if not PerformByRockType and "CART" in chond[i][3]:
+                first = commas(chond[i][:3])
+                second = commas(chond[i][4:])
+                writeln(i,first+","+second,file)
+                
         i=i+1
     return get_table(file)
 
+def commas(lis):
+    return str(lis).replace("[","").replace("]","").replace("\'","").replace(" ","").replace("\t","")
 
-def te(files, output, ChondFile, control,unknown):
+def te(files, output, ChondFile, control,unknown,PerformByRockType=True):
     """
     Main function that will call everything as needed
     """
@@ -256,7 +266,7 @@ def te(files, output, ChondFile, control,unknown):
     print("     Row >3: indicats the CART classification that you wish to be done for this given data")
     print("         Column B here Always states CARTS followed by the name of the new Spreadsheet")
     workbook = xlsxwriter.Workbook(output)
-    t = getChondrite(getElements(files[0]),ChondFile,unknown,control,standard(getAllZircons(files)))
+    t = getChondrite(getElements(files[0]),ChondFile,unknown,control,standard(getAllZircons(files)),PerformByRockType)
     NotDoneClassifiers = True
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
@@ -269,7 +279,7 @@ def te(files, output, ChondFile, control,unknown):
                 worksheet = workbook.add_worksheet(t[i+k][2])
                 Classifiers = addClassifier(full,worksheet,carts)
                 try:
-                    chart(Classifiers,t[i+k][2],workbook)
+                    chart(Classifiers,t[i+k][2],workbook,PerformByRockType)
                 except:
                     print(t[i+k][2],"cannot produce a chart")
                 if NotDoneClassifiers:

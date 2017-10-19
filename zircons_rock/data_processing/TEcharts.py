@@ -8,7 +8,7 @@ from defaults import CLASS_MARKERS, \
     LEGEND_SCALE, LEGEND_X_OFFSET, LEGEND_Y_OFFSET
 
 
-def line_chart(sheet_data, sheet_name, workbook):
+def line_chart(sheet_data, sheet_name, workbook, perform_by_rock_type = True):
     """
     Does a line graph of the sheets TrElem and REE
     Each line (series) is a different sample
