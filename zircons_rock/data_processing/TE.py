@@ -1,7 +1,7 @@
 from .common import *
 from .TEcharts import *
 from .StyleOfTE import *
-from defaults import BeginningCell, EndingCell, SheetName, allChondriteElements, ChondriteValues
+from defaults import BeginningCell, EndingCell, SheetName, allChondriteElements, ChondriteValues, UnrecognisedInputFileError
 
 
 def classify(cart, t, z="zircon eg. STDGJ-01"):
@@ -360,7 +360,9 @@ def getAllZircons(files):
     zlist = []
     for f in files:
         t = get_table(f)
-        bi=begr(t,BeginningCell)
+        bi = begr(t, BeginningCell)
+        if bi == len(t):
+            raise UnrecognisedInputFileError("Could not read TE data from file")
         for row in t[bi]:
             if row != BeginningCell:
                 zlist.append(row)
