@@ -71,8 +71,8 @@ class InputOutputPage(ttk.Frame):
             content_frame, text="Unrecognised files will be ignored", style="error.TLabel", padding='0 0 5 0')
 
         input_button_frame = ttk.Frame(content_frame, padding='0 5 0 15')
-        remove_button = Button(input_button_frame, text="Remove", command=self.removeSelectedInputFiles)
-        open_button = Button(input_button_frame, text="Add", command=self.addInputFile)
+        remove_button = Button(input_button_frame, text="Remove", command=self.remove_selected_input_files)
+        open_button = Button(input_button_frame, text="Add", command=self.add_input_file)
 
         output_title_label = ttk.Label(content_frame, text="Output Excel workbook", style='subtitle.TLabel', padding='0 0 0 5')
         output_instruction_label = ttk.Label(content_frame, text="(Choose a name and location)", style="tiny.TLabel")
@@ -80,7 +80,7 @@ class InputOutputPage(ttk.Frame):
         self.outputPathLabel = ttk.Label(
             content_frame, anchor='w', textvariable=self.output_filepath, style='filepath.TLabel', padding='0 5 0 5')
         output_button_frame = ttk.Frame(content_frame, padding='0 5 0 0')
-        save_button = Button(output_button_frame, text="Choose", command=self.setOutputPath)
+        save_button = Button(output_button_frame, text="Choose", command=self.set_output_path)
 
         # content_frame children
         input_title_label.grid(column=0, row=0, sticky=(W), columnspan=4)
@@ -112,11 +112,11 @@ class InputOutputPage(ttk.Frame):
         input_list_frame.rowconfigure(0, weight=1)
 
         # remove input files by selecting items and pressing the backspace button
-        self.input_list.bind("<BackSpace>", self.removeSelectedInputFiles)
-        self.input_list.bind("<Delete>", self.removeSelectedInputFiles)
+        self.input_list.bind("<BackSpace>", self.remove_selected_input_files)
+        self.input_list.bind("<Delete>", self.remove_selected_input_files)
 
 
-    def addInputFile(self):
+    def add_input_file(self):
         """
         Opens the operating system's file manager so a user can add
         input CSV files.
@@ -129,7 +129,7 @@ class InputOutputPage(ttk.Frame):
                 self.input_filepaths.append(path)
         self.input_listbox_items.set(self.input_filepaths)
 
-        self.updateFilterStandardsPage()
+        self.update_filter_standards_page()
         self.save_filepaths()
         self.check_next_button()
 
@@ -137,7 +137,7 @@ class InputOutputPage(ttk.Frame):
     # using *event to accept 1 or 2 parameters
     #      gui button press:       passes 1 argument
     #      bound backspace press:  passes 2 arguments
-    def removeSelectedInputFiles(self, *event):
+    def remove_selected_input_files(self, *event):
         """
         Removes the selected input CSV files.
         """
@@ -148,12 +148,12 @@ class InputOutputPage(ttk.Frame):
             self.input_filepaths.remove(self.input_list.get(index))
         self.input_listbox_items.set(self.input_filepaths)
 
-        self.updateFilterStandardsPage()
+        self.update_filter_standards_page()
         self.save_filepaths()
         self.check_next_button()
 
 
-    def updateFilterStandardsPage(self):
+    def update_filter_standards_page(self):
         """
         Called whenever the list of input CSV files changes.
 
@@ -201,7 +201,7 @@ class InputOutputPage(ttk.Frame):
 
 
 
-    def setOutputPath(self):
+    def set_output_path(self):
         """
         Opens the operating system's file manager so the user can specify
         the name and location of the output Excel workbook.
@@ -241,7 +241,7 @@ class InputOutputPage(ttk.Frame):
         finished_page = self.controller.frames["FinishedPage"]
         finished_page.input_output_page = self.title + InputOutputPage.__name__
 
-        self.updateFilterStandardsPage()
+        self.update_filter_standards_page()
         self.load_filepaths()
         self.check_next_button()
 
@@ -332,7 +332,7 @@ class InputOutputPage(ttk.Frame):
                     self.output_filename.set("")
                     self.output_dir.set("")
 
-                self.updateFilterStandardsPage()
+                self.update_filter_standards_page()
                 self.save_filepaths()
 
             try:
