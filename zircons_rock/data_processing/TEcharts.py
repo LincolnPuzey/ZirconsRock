@@ -8,7 +8,7 @@ from defaults import CLASS_MARKERS, \
     LEGEND_SCALE, LEGEND_X_OFFSET, LEGEND_Y_OFFSET
 
 
-def line_chart(sheet_data, sheet_name, workbook, perform_by_rock_type = True):
+def line_chart(sheet_data, sheet_name, workbook):
     """
     Does a line graph of the sheets TrElem and REE
     Each line (series) is a different sample
@@ -82,7 +82,7 @@ def bar_chart(rock_type_list, sheet_name, workbook):
         chartsheet.set_chart(rock_chart)
 
 
-def chart(classifiers, sheet_name, workbook):
+def scatterplot(classifiers, sheet_name, workbook, perform_by_rock_type):
     """
     The main funtion for chart Processing
     classifiers = 2D array of the contents of the worksheet containing the data to the plotted on the chart

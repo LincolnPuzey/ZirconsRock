@@ -279,7 +279,7 @@ def te(files, output, ChondFile, control, unknown, PerformByRockType=True):
                 worksheet = workbook.add_worksheet(t[i+k][2])
                 Classifiers = addClassifier(full,worksheet,carts)
                 try:
-                    chart(Classifiers,t[i+k][2],workbook,PerformByRockType)
+                    scatterplot(Classifiers, t[i+k][2], workbook, PerformByRockType)
                 except:
                     print(t[i+k][2],"cannot produce a chart")
                 if NotDoneClassifiers:
