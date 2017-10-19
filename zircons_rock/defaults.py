@@ -152,6 +152,20 @@ DEFAULT_THORIUM_PPM = 18
 UPB_IMAGE = './gui/images/upb.gif'
 TE_IMAGE = './gui/images/te.gif'
 
+
+class UnrecognisedInputFileError(Exception):
+    """Exception raised for input files that
+        - are not formatted like Glitter CSV files
+        - contain UPb data when program was expecting TE data
+        - contain TE data when program was expecting UPb data
+
+    Attributes:
+        message -- explanation of the error
+    """
+
+    def __init__(self, message):
+        self.message = message
+
 # # Temporary: List of TE input filepaths for testing
 # TEMP_TE_INPUT_FILEPATHS = [INPUT_DIR + '/Dec04_RUN1_TE.csv',
 #                       INPUT_DIR + '/Dec04_RUN2_TE.csv',

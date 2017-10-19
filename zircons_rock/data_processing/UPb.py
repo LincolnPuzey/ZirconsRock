@@ -1,5 +1,7 @@
 from .common import *
 from .StyleOfUPb import *
+from defaults import UnrecognisedInputFileError
+
 csvTableNames = ['GLITTER!: Isotope ratios.',
                  'GLITTER!: Isotopic ratios: 1 sigma uncertainty.',
                  'GLITTER!: Age estimates (ma).',
@@ -219,8 +221,10 @@ def getAllZircons(fileList):
                 tlist.append(stn)
                 err = False
     if err:
-        GIVING_YOU_A_SPECIAL_GIFT_HAHAHA=AN_ERROR
+        raise UnrecognisedInputFileError("Failed whilst extracting standards from input file")
     return tlist
+
+
 '''
 Main Function called to run the entire program
 '''

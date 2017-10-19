@@ -8,6 +8,7 @@ from defaults import TE_INPUT_FILEPATHS
 from defaults import TE_OUTPUT_FILEPATH
 from defaults import TE_OUTPUT_FILENAME
 from defaults import TE_OUTPUT_DIR
+from defaults import UnrecognisedInputFileError
 
 import pickle
 
@@ -194,8 +195,7 @@ class InputOutputPage(ttk.Frame):
                                           'selectbackground': styles.ERROR_COLOUR_MED,
                                           'selectforeground': styles.BLACK})
                 self.error_label.grid(column=0, row=2, sticky=(W, N, S))
-                # print(path)
-                # print("\t", e)
+                print(e.args[0])
                 pass
             index += 1
 
