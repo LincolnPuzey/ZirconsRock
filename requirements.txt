@@ -1,4 +1,4 @@
 ipython==5.4.1
 XlsxWriter==1.0.0
-openpyxl==2.5.0a3
+openpyxl==2.4.8
 Pillow==4.3.0
