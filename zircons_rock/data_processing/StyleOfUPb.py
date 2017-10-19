@@ -228,11 +228,15 @@ def main(fileLocation):
     # completed = False
 
     # while ~completed:
-    # 	try:
+    #   try:
+    for sheet in new_wb.worksheets:
+        if sheet.title == 'Sheet':
+            new_wb.remove_sheet(sheet)
+            
     new_wb.save('%s' % fileLocation)
     # os.remove('%s' % fileLocation)
-    # 		completed = True
-    # 	except:
-    # 		print "Please close the final.xlsx file before continuing..."
+    #       completed = True
+    #   except:
+    #       print "Please close the final.xlsx file before continuing..."
 
     #Deletes the original xlsx file
