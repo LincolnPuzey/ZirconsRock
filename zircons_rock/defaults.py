@@ -156,7 +156,7 @@ TE_UNKNOWNS = GUI_TEMPS_DIR + '/te_unknown.pkl'
 THORIUM_PPM = GUI_TEMPS_DIR + '/thorium_ppm.pkl'
 URANIUM_PPM = GUI_TEMPS_DIR + '/uranium_ppm.pkl'
 
-USE_CART_FOR_PLOTS = GUI_TEMPS_DIR + '/use_cart_for_plots.pkl'
+PERFORM_BY_ROCK_TYPE = GUI_TEMPS_DIR + '/use_cart_for_plots.pkl'
 
 MIN_WINDOW_WIDTH = 400
 MIN_WINDOW_HEIGHT = 410

@@ -123,7 +123,8 @@ class InputOutputPage(ttk.Frame):
         input CSV files.
         """
 
-        filepaths = filedialog.askopenfilenames()  # paths is a tuple of filenames
+        filepaths = filedialog.askopenfilenames(title = "Select input CSV files",
+                filetypes=[('CSV', ('*.csv'))])  # filepaths is a tuple of filenames
 
         for path in filepaths:
             if path not in self.input_filepaths:
