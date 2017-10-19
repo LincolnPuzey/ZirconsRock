@@ -3,6 +3,7 @@ from .TEcharts import *
 from .StyleOfTE import *
 from defaults import BeginningCell, EndingCell, SheetName, allChondriteElements, ChondriteValues
 
+
 def classify(cart, t, z="zircon eg. STDGJ-01"):
     if cart == "CART1":
         if data(t,z,"Lu")<20.7:
@@ -192,6 +193,8 @@ def summary(full, Classifiers, workbook):
                 avg.write(1 + (i * rows_per_sample) + 0, j + 3, mean)
                 avg.write(1 + (i * rows_per_sample) + 1, j + 3, stddev)
                 avg.write(1 + (i * rows_per_sample) + 2, j + 3, median)
+
+
 def values(t, c, c0):
     v = []
     for r in t:
@@ -407,6 +410,8 @@ def addTESheet(files, sheet, includedElements, Chondrites, excludedZircons):
                     sheet.write(y+rstart,c+1,data)
             x=x+1
     return full
+
+
 def teSheetNamesIndicies(Chondtable):
     sn=[]
     indicies = []
