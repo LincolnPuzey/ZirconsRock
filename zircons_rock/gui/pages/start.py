@@ -4,7 +4,6 @@ import data_processing.UPb as UPb
 import data_processing.TE as TE
 import data_processing.common as common
 
-
 class StartPage(ttk.Frame):
     """
     Page for selecting between UPb or TE processing.

@@ -15,7 +15,7 @@ from defaults import TE_CONTROLS
 from defaults import TE_UNKNOWNS
 from defaults import URANIUM_PPM
 from defaults import THORIUM_PPM
-from defaults import USE_CART_FOR_PLOTS
+from defaults import PERFORM_BY_ROCK_TYPE
 
 from defaults import UPB_INPUT_FILEPATHS
 from defaults import UPB_OUTPUT_FILEPATH
@@ -176,10 +176,10 @@ class FilterStandardsPage(ttk.Frame):
             self.yes_button_frame = ttk.Frame(self.cart_frame, padding="10 0 0 0")
             self.no_button_frame = ttk.Frame(self.cart_frame, padding="10 0 0 0")
 
-            self.use_cart_for_plots = tk.BooleanVar(value=True)
-            self.yes_button = CustomRadiobutton(self.yes_button_frame, variable=self.use_cart_for_plots, value=True, padding="0 0 0 0", num_columns=2)
+            self.perform_by_rock_type = tk.BooleanVar(value=True)
+            self.yes_button = CustomRadiobutton(self.yes_button_frame, variable=self.perform_by_rock_type, value=False, padding="0 0 0 0", num_columns=2)
             self.yes_label = ttk.Label(self.yes_button_frame, text="Yes")
-            self.no_button = CustomRadiobutton(self.no_button_frame, variable=self.use_cart_for_plots, value=False, padding="0 0 0 0", num_columns=2)
+            self.no_button = CustomRadiobutton(self.no_button_frame, variable=self.perform_by_rock_type, value=True, padding="0 0 0 0", num_columns=2)
             self.no_label = ttk.Label(self.no_button_frame, text="No")
 
             # right_col_frame children
@@ -437,7 +437,7 @@ class FilterStandardsPage(ttk.Frame):
             try:
                 pickled_controls_stds = open(TE_CONTROLS, 'rb')
                 pickled_unknown_stds = open(TE_UNKNOWNS, 'rb')
-                pickled_use_cart = open(USE_CART_FOR_PLOTS, 'rb')
+                pickled_perform_by_rock_type = open(PERFORM_BY_ROCK_TYPE, 'rb')
             except FileNotFoundError:
                 successful_load = False
 
@@ -449,7 +449,7 @@ class FilterStandardsPage(ttk.Frame):
             self.control_std_prefs = pickle.load(pickled_controls_stds)
             self.unknown_std_prefs = pickle.load(pickled_unknown_stds)
             if self.title == "TE":
-                self.use_cart_for_plots.set(pickle.load(pickled_use_cart))
+                self.perform_by_rock_type.set(pickle.load(pickled_perform_by_rock_type))
 
         try:
             if self.title == "UPb":
@@ -458,7 +458,7 @@ class FilterStandardsPage(ttk.Frame):
                 pickled_th_ppm.close()
             pickled_controls_stds.close()
             pickled_unknown_stds.close()
-            if self.title == "TE": pickled_use_cart.close()
+            if self.title == "TE": pickled_perform_by_rock_type.close()
         except UnboundLocalError:
             pass
 
@@ -484,7 +484,7 @@ class FilterStandardsPage(ttk.Frame):
             try:
                 pickled_controls_stds = open(TE_CONTROLS, 'wb')
                 pickled_unknown_stds = open(TE_UNKNOWNS, 'wb')
-                pickled_use_cart = open(USE_CART_FOR_PLOTS, 'wb')
+                pickled_perform_by_rock_type = open(PERFORM_BY_ROCK_TYPE, 'wb')
             except FileNotFoundError:
                 successful_load = False
 
@@ -514,7 +514,7 @@ class FilterStandardsPage(ttk.Frame):
                 pickle.dump(self.control_std_prefs, pickled_controls_stds)
                 pickle.dump(self.unknown_std_prefs, pickled_unknown_stds)
                 if self.title == "TE":
-                    pickle.dump(self.use_cart_for_plots.get(), pickled_use_cart)
+                    pickle.dump(self.perform_by_rock_type.get(), pickled_perform_by_rock_type)
             except:
                 pass
 
@@ -525,7 +525,7 @@ class FilterStandardsPage(ttk.Frame):
                 pickled_th_ppm.close()
             pickled_controls_stds.close()
             pickled_unknown_stds.close()
-            if self.title == "TE": pickled_use_cart.close()
+            if self.title == "TE": pickled_perform_by_rock_type.close()
         except UnboundLocalError:
             pass
 
@@ -574,5 +574,5 @@ class FilterStandardsPage(ttk.Frame):
             output_filepath = self.controller.frames["TEInputOutputPage"].output_filepath.get()
             files = self.controller.frames["TEInputOutputPage"].valid_input_filepaths
 
-            TE.te(files, output_filepath, CHONDRITE_FILE, control_standards, unknown_standards)
+            TE.te(files, output_filepath, CHONDRITE_FILE, control_standards, unknown_standards, self.perform_by_rock_type.get())
             self.footer_frame.go_to_next_page()
