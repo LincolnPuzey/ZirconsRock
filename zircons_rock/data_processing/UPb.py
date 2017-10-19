@@ -19,14 +19,14 @@ IncludedFields = Which fields on the table at csvTableNames[4] you wish to inclu
 excludedZircons = Which zircon do you wish to remove at every table?
 '''
 def addUPbSheet(sheet,csvfile,IncludedFields,excludedZircons=["610"]):
-    orig=table(csvfile,getSplitter(csvfile))
+    orig=get_table(csvfile,getSplitter(csvfile))
     i=0
     t=[]
     for r in orig:
         if standard(r[0]) in excludedZircons or r[0] in excludedZircons:
             IncludeInTable=False
         else:
-            t.append(r)    
+            t.append(r)
     t,full = filterfields(t,csvTableNames[4],IncludedFields)
     try:
         addSheet(sheet,t)
@@ -37,7 +37,7 @@ def addUPbSheet(sheet,csvfile,IncludedFields,excludedZircons=["610"]):
 Compares functions to determine whether they work.
 '''
 def test():
-    assertEquals([[1,2],[3,4]],table('new.csv'),"Function table:")
+    assertEquals([[1,2],[3,4]],get_table('new.csv'),"Function table:")
     assertEquals(':',getSplitter('new.csv'),"Function getSplitter")
     assertEquals(['example1.csv','example2.csv'],getFileList('example[1-2].csv'),"Function getFileList")
     assertEquals(['run1.csv','run2.csv','run3.csv'],getFileList('run[1-3].csv'),"Function getFileList")
@@ -212,7 +212,7 @@ def getAllZircons(fileList):
     tlist=[]
     err = True
     for f in fileList:
-        t=table(f,getSplitter(f))
+        t=get_table(f,getSplitter(f))
         r=begr(t,csvTableNames[0])
         for stn in column(t[r:],0):
             if stn not in tlist and '-' in stn:

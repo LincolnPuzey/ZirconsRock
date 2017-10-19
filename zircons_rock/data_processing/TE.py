@@ -109,7 +109,7 @@ def getElements(file):
     """
     Returns all Trace Elements given a specific file
     """
-    t=table(file)
+    t=get_table(file)
     r=begr(t,BeginningCell)
     e=begr(t[r:],EndingCell)
     return column(t[r+1:r+e],0)
@@ -205,8 +205,8 @@ def values(t, c, c0):
 
 def getChondrite(available,file, unknown, stand, detected):
     if type(unknown)!=type(["list"]) and len(stand)==0:
-        return table(file)
-    chond = table(file)
+        return get_table(file)
+    chond = get_table(file)
     i=0
     if len(unknown)>0:
         control = copy.deepcopy(unknown)
@@ -236,7 +236,7 @@ def getChondrite(available,file, unknown, stand, detected):
             text = chond[i][0]+","+un
             writeln(i,text,file)
         i=i+1
-    return table(file)
+    return get_table(file)
 
 
 def te(files, output, ChondFile, control,unknown):
@@ -349,7 +349,7 @@ def getAllZircons(files):
     """
     zlist = []
     for f in files:
-        t = table(f)
+        t = get_table(f)
         bi=begr(t,BeginningCell)
         for row in t[bi]:
             if row != BeginningCell:
@@ -377,13 +377,13 @@ def addTESheet(files, sheet, includedElements, Chondrites, excludedZircons):
     r=1
     for f in files:
         rstart = r
-        t = table(f)
+        t = get_table(f)
         ss = f.split('TE')[-1]
         bi=begr(t,BeginningCell)
         i=0 #Column Index starting after 'Element'
         si = [] #Sample Indicies matching from the input
         for row in t[bi]:
-            
+
             inZirconList = (row not in excludedZircons) and (standard(row) not in excludedZircons)
             '''
             addSheet(ts,[[inZirconList]],1,i)

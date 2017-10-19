@@ -138,7 +138,7 @@ def addSheet(sheet, t, sheetr=0, sheetc=0):
     return t
 
 
-def table(FileName='C:/run.csv', Splitter=','):
+def get_table(FileName='C:/run.csv', Splitter=','):
     """
     Return a 2D array from reading a file
     fileName = 'single.txt' will look in current directory

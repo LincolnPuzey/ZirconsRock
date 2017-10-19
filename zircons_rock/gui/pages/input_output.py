@@ -153,7 +153,6 @@ class InputOutputPage(ttk.Frame):
         self.check_next_button()
 
 
-    # updates the list of standards on the FilterStandardsPage
     def updateFilterStandardsPage(self):
         """
         Called whenever the list of input CSV files changes.
@@ -195,10 +194,11 @@ class InputOutputPage(ttk.Frame):
                                           'selectbackground': styles.ERROR_COLOUR_MED,
                                           'selectforeground': styles.BLACK})
                 self.error_label.grid(column=0, row=2, sticky=(W, N, S))
-                # print("Unrecognised: ", path)
+                # print(path)
                 # print("\t", e)
                 pass
             index += 1
+
 
 
     def setOutputPath(self):
