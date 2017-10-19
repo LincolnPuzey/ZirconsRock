@@ -19,28 +19,15 @@ IncludedFields = Which fields on the table at csvTableNames[4] you wish to inclu
 excludedZircons = Which zircon do you wish to remove at every table?
 '''
 def addUPbSheet(sheet,csvfile,IncludedFields,excludedZircons=["610"]):
-    t=table(csvfile,getSplitter(csvfile))
-    #workbook = xlsxwriter.Workbook(now("micro")+".xlsx")
-    #worksheet = workbook.add_worksheet("Initial table")
-    #addSheet(worksheet,t)
-    #worksheet.write(0,1,str(IncludedFields))
+    orig=table(csvfile,getSplitter(csvfile))
     i=0
-    for r in t:
+    t=[]
+    for r in orig:
         if standard(r[0]) in excludedZircons or r[0] in excludedZircons:
-            t.remove(r)
-            #addSheet(worksheet,[r],i)
-        #else:
-            #addSheet(worksheet,[[r[0]]],i)
-        i+=1
-    #addSheet(workbook.add_worksheet("Removed Zircons table"),t)
+            IncludeInTable=False
+        else:
+            t.append(r)    
     t,full = filterfields(t,csvTableNames[4],IncludedFields)
-    '''
-    try:
-        addSheet(workbook.add_worksheet("t"),t)
-        addSheet(workbook.add_worksheet("full"),full)
-    except Exception as e:
-        print(excludedZircons)
-    '''
     try:
         addSheet(sheet,t)
     except:
@@ -250,6 +237,8 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
     workbook = xlsxwriter.Workbook(output)
     tlist = []
     conc = []
+    print("control =",control)
+    print("unknown =",unknown)
     badstandards = standard(getAllZircons(files))
     for x in [control,unknown,[normalised]]:
         for y in x:
@@ -262,6 +251,7 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
         conc.append(addUPbSheet("workbook.add_worksheet(f)",f,['Analysis_#','Th232','U238'],badstandards))
     allZircons=column(combine(tlist,0,'*'),0)
     standards = standard(allZircons)
+    print("standards =",standards)
     for s in standards:
         if s == 'Analysis_#':
             IncludedZircons=allZircons
@@ -306,5 +296,5 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
         workbook.close()
     except:
         input("You must close "+output+" before continuing...")
-        UPb(control, unknown, files, output)
+        UPb(files, output, normalised, control, unknown, UPPM, ThPPM)
     styleUPb(output)
