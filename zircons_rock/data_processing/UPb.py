@@ -241,12 +241,9 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
     """
     Main Function called to run the entire U-Pb processing
     """
-    print("This particular python file will read the data recorded by the Laser device for U-Pb data.")
-    print("Please ensure you are using Python version 3.6.2 on your computer")
     IncludedFields = ['Analysis_#','Pb206','Pb207','Pb208','Th232','U238']
     print("The Mean Raw CPS background table will include only these following fields:")
     print(IncludedFields)
-    print("This program was created and developed by Mark Collier in September 2017 [Contact:+61466523090]\n")
     # files = getFileList(testInputLocation)#getFileList(input("Enter the location and number range of run files eg. run[2-4].csv : "))
     # output = testOutputLocation#input("Enter the location of the new excel file with a .xlsx extension : ")
     workbook = xlsxwriter.Workbook(output)

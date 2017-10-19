@@ -1,12 +1,11 @@
-import sys
-
 from gui.app import App
-
-import data_processing.UPb as uranium_lead
-import data_processing.TE as trace_elements
 
 
 def main():
+    print("This program comes with ABSOLUTELY NO WARRANTY")
+    print("This is free software, and you are welcome to redistribute it under the terms of the GNU GPL:")
+    print("    https://www.gnu.org/licenses/gpl-3.0.en.html")
+
     app = App()
     while True:
         try:

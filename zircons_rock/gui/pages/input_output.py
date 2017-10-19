@@ -187,7 +187,7 @@ class InputOutputPage(ttk.Frame):
                                           'selectforeground': styles.BLACK})
                 self.num_valid_files += 1
                 self.valid_input_filepaths.append(path)
-            except Exception as e:
+            except UnrecognisedInputFileError as e:
                 #  unsuccessfully retrieved standards from file -> red
                 self.input_list.itemconfig(index, {
                                           'background': styles.ERROR_COLOUR_LIGHT,
