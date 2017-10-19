@@ -4,12 +4,14 @@ def install_requirements():
     try:
         import pip
         pip.main(['install', '-r', 'requirements.txt'])
-        print("Success")
+        print("-----------------------------------")
+        print("")
+        print("SUCCESS: Requirements Installed")
         input("Press Enter to exit...")
     except Exception as e:
-        print("Could not import pip. Do you have Python 3.5 or later?")
         print("Exception:")
         print(str(e))
+        print("Could not import pip. Do you have Python 3.5 or later?")
         input("Press Enter to exit...")
 
 
