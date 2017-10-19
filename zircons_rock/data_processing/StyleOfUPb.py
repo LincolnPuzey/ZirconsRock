@@ -209,7 +209,6 @@ def main(fileLocation):
 
 		elif sheetNames[i] == "ToBeCommonLeadCorrected":
 			tbclc(sheetNames[i], wb, new_wb,bold, border)
-			print "\n"
 		else:
 			sheetName = sheetNames[i]
 			ws1 = wb['%s' % (sheetName)]
