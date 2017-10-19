@@ -1,9 +1,3 @@
-Zircons Rock
-==========
-Repository for Zircons Rock Data Processing Software
-
-Project Requires Python 3.5 or later
-
 ## Instructions for WINDOWS
 
 For help with running python programs on Windows, see:
@@ -11,19 +5,19 @@ https://docs.python.org/3.5/faq/windows.html
 
 ##### Installation
   * First ensure you have Python 3 version 3.5 or later installed
-  * Install program files by either cloning this Github repository or unzipping 
+  * Install program files by either cloning this Github repository or unzipping
     ZIP file containing repository to your installation location.
     We recommend using your home directory as the installation location so you
     have full permissions over the program files.
   * Run install_requirements.py script to install the program's requirements.
 
-#### Running the program
+##### Running the program
   * To start the program run the python file zircons_rock.pyw (located in the directory zircons_rock).
   * To start with the program with the python shell visible run the python file zircons_rock_terminal.py
     (also located in the directory zircons_rock).
 
 
-### Instructions for LINUX
+## Instructions for LINUX
 To set up your dev environment and install the program you will need to have the following installed:
   * Python 3 (Version 3.5 or later)
 
