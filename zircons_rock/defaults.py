@@ -136,6 +136,11 @@ UPB_UNKNOWNS = GUI_TEMPS_DIR + '/upb_unknown.pkl'
 TE_CONTROLS = GUI_TEMPS_DIR + '/te_controls.pkl'
 TE_UNKNOWNS = GUI_TEMPS_DIR + '/te_unknown.pkl'
 
+THORIUM_PPM = GUI_TEMPS_DIR + '/thorium_ppm.pkl'
+URANIUM_PPM = GUI_TEMPS_DIR + '/uranium_ppm.pkl'
+
+USE_CART_FOR_PLOTS = GUI_TEMPS_DIR + '/use_cart_for_plots.pkl'
+
 MIN_WINDOW_WIDTH = 400
 MIN_WINDOW_HEIGHT = 410
 INITIAL_WINDOW_WIDTH = 450
