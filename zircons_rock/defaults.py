@@ -19,6 +19,23 @@ allChondriteElements = ['La139', 'Ce140', 'Pr141', 'Nd146', 'Sm147', 'Eu151', 'G
 ChondriteValues = [0.237, 0.613, 0.0928, 0.457, 0.148, 0.0563, 0.199, 0.0294, 0.246, 1.57, 0.0546, 0.16, 0.0074, 0.161,
                    0.0246, 0.103, 0.24, 0.0136, 440, 1080, 0.0361, 0.0247]
 
+# Variables used in UPb.py:
+csvTableNames = [
+    'GLITTER!: Isotope ratios.',
+    'GLITTER!: Isotopic ratios: 1 sigma uncertainty.',
+    'GLITTER!: Age estimates (ma).',
+    'GLITTER!: Age estimates: 1 sigma uncertainty (ma).',
+    'GLITTER!: Mean Raw CPS background subtracted.'
+]
+shortNames = [
+    'Istopic ratios',
+    'Ratio 1 sigma uncertainty',
+    'Age',
+    'Age 1 sigma uncertainty',
+    'Mean Raw CPS background'
+]
+EndOfTableIndicator = ""
+
 # colors and markers used for scatterplots for TE plots
 CLASSES = [
     "Carbonite",
@@ -136,13 +153,35 @@ UPB_UNKNOWNS = GUI_TEMPS_DIR + '/upb_unknown.pkl'
 TE_CONTROLS = GUI_TEMPS_DIR + '/te_controls.pkl'
 TE_UNKNOWNS = GUI_TEMPS_DIR + '/te_unknown.pkl'
 
+THORIUM_PPM = GUI_TEMPS_DIR + '/thorium_ppm.pkl'
+URANIUM_PPM = GUI_TEMPS_DIR + '/uranium_ppm.pkl'
+
+USE_CART_FOR_PLOTS = GUI_TEMPS_DIR + '/use_cart_for_plots.pkl'
+
 MIN_WINDOW_WIDTH = 400
 MIN_WINDOW_HEIGHT = 410
-INITIAL_WINDOW_WIDTH = 450
+INITIAL_WINDOW_WIDTH = 510
 INITIAL_WINDOW_HEIGHT = 500
 
 DEFAULT_URANIUM_PPM = 288
 DEFAULT_THORIUM_PPM = 18
+
+UPB_IMAGE = './gui/images/upb.gif'
+TE_IMAGE = './gui/images/te.gif'
+
+
+class UnrecognisedInputFileError(Exception):
+    """Exception raised for input files that
+        - are not formatted like Glitter CSV files
+        - contain UPb data when program was expecting TE data
+        - contain TE data when program was expecting UPb data
+
+    Attributes:
+        message -- explanation of the error
+    """
+
+    def __init__(self, message):
+        self.message = message
 
 # # Temporary: List of TE input filepaths for testing
 # TEMP_TE_INPUT_FILEPATHS = [INPUT_DIR + '/Dec04_RUN1_TE.csv',

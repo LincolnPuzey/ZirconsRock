@@ -13,6 +13,9 @@ from defaults import UPB_CONTROLS
 from defaults import UPB_UNKNOWNS
 from defaults import TE_CONTROLS
 from defaults import TE_UNKNOWNS
+from defaults import URANIUM_PPM
+from defaults import THORIUM_PPM
+from defaults import USE_CART_FOR_PLOTS
 
 from defaults import UPB_INPUT_FILEPATHS
 from defaults import UPB_OUTPUT_FILEPATH
@@ -134,32 +137,66 @@ class FilterStandardsPage(ttk.Frame):
             self.unknown_leg_label.grid(column=0, row=1, sticky=(N,W))
 
 
-        if title =="UPb":
-
+        if title == "UPb":
             self.ppm_frame = ttk.Labelframe(self.right_col_frame, text="PPM Values", padding="10 10 10 10")
             self.uranium_ppm_frame = ttk.Frame(self.ppm_frame, padding="0 0 0 5")
-            self.thorium_ppm_frame = ttk.Frame(self.ppm_frame)
+            self.thorium_ppm_frame = ttk.Frame(self.ppm_frame, padding="0 0 0 5")
 
             self.uranium_ppm = tk.StringVar(value=DEFAULT_URANIUM_PPM)
             self.thorium_ppm = tk.StringVar(value=DEFAULT_THORIUM_PPM)
 
             self.uranium_ppm_label = ttk.Label(self.uranium_ppm_frame, text="Uranium", padding="0 0 10 5")
             self.thorium_ppm_label = ttk.Label(self.thorium_ppm_frame, text="Thorium", padding="0 0 10 5")
+            self.reset_button = Button(self.ppm_frame, text="Reset", command=self.set_default_ppms)
 
             # restricts entry box to numbers only
             vcmd = (self.ppm_frame.register(self.validate), '%d', '%i', '%P', '%s', '%S', '%v', '%V', '%W')
             self.uranium_ppm_entry = ttk.Entry(self.uranium_ppm_frame, textvariable=self.uranium_ppm, width=10, validate = 'key', validatecommand = vcmd)
             self.thorium_ppm_entry = ttk.Entry(self.thorium_ppm_frame, textvariable=self.thorium_ppm, width=10, validate = 'key', validatecommand = vcmd)
 
+            # right_col_frame children
             self.ppm_frame.grid(column=0, row=1, sticky=(N,S,E,W))
+
+            # ppm_frame children
             self.uranium_ppm_frame.grid(column=0, row=0, sticky=(N,S,E,W))
             self.thorium_ppm_frame.grid(column=0, row=1, sticky=(N,S,E,W))
+            self.reset_button.grid(column=0, row=2, sticky=(N,S,E,W))
 
+            # uranium_ppm_frame children
             self.uranium_ppm_label.grid(column=0, row=0, sticky=(N,W,E,S))
             self.uranium_ppm_entry.grid(column=0, row=1, sticky=(N,W,E,S))
+
+            # thorium_ppm_frame children
             self.thorium_ppm_label.grid(column=1, row=0, sticky=(N,W,E,S))
             self.thorium_ppm_entry.grid(column=1, row=1, sticky=(N,W,E,S))
 
+        else:
+            self.cart_frame = ttk.Labelframe(self.right_col_frame, text="Scatterplots", padding="10 10 10 10")
+            self.cart_question = ttk.Label(self.cart_frame, text="Use cart\nclassifications\nfor scatterplots?", padding="0 0 0 5")
+            self.yes_button_frame = ttk.Frame(self.cart_frame, padding="10 0 0 0")
+            self.no_button_frame = ttk.Frame(self.cart_frame, padding="10 0 0 0")
+
+            self.use_cart_for_plots = tk.BooleanVar(value=True)
+            self.yes_button = CustomRadiobutton(self.yes_button_frame, variable=self.use_cart_for_plots, value=True, padding="0 0 0 0", num_columns=2)
+            self.yes_label = ttk.Label(self.yes_button_frame, text="Yes")
+            self.no_button = CustomRadiobutton(self.no_button_frame, variable=self.use_cart_for_plots, value=False, padding="0 0 0 0", num_columns=2)
+            self.no_label = ttk.Label(self.no_button_frame, text="No")
+
+            # right_col_frame children
+            self.cart_frame.grid(column=0, row=1, sticky=(N,S,E,W))
+
+            # cart_frame children
+            self.cart_question.grid(column=0, row=0, sticky=(W))
+            self.yes_button_frame.grid(column=0, row=1, sticky=(N,S,E,W))
+            self.no_button_frame.grid(column=0, row=2, sticky=(N,S,E,W))
+
+            # yes_button_frame children
+            self.yes_button.grid(column=0, row=0, sticky=(N,S,E,W))
+            self.yes_label.grid(column=1, row=0, sticky=(W))
+
+            # no_button_frame children
+            self.no_button.grid(column=0, row=0, sticky=(N,S,E,W))
+            self.no_label.grid(column=1, row=0, sticky=(W))
 
         self.canvas.create_window(
             (0, 0), window=self.inner_canvas_frame, anchor="nw", tags="self.inner_canvas_frame")
@@ -310,6 +347,7 @@ class FilterStandardsPage(ttk.Frame):
 
                 row += 1
 
+
     def clear_standards(self):
         """Resets all standard information by clearing lists"""
 
@@ -344,10 +382,12 @@ class FilterStandardsPage(ttk.Frame):
 
         return standards
 
+
     def on_frame_configure(self, event):
         """Reset the scroll region to encompass the inner frame"""
 
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
 
     def select_all_checkbuttons(self):
         """Selects all checkbuttons on the page"""
@@ -357,6 +397,7 @@ class FilterStandardsPage(ttk.Frame):
         for btn in self.unknown_checkbuttons:
             btn.select()
 
+
     def deselect_all_checkbuttons(self):
         """Deselects all checkbuttons on the page"""
 
@@ -364,6 +405,13 @@ class FilterStandardsPage(ttk.Frame):
             btn.deselect()
         for btn in self.unknown_checkbuttons:
             btn.deselect()
+
+
+    def set_default_ppms(self):
+        """Sets Uranium PPM and Thorium PPM as their default values"""
+        self.uranium_ppm.set(DEFAULT_URANIUM_PPM)
+        self.thorium_ppm.set(DEFAULT_THORIUM_PPM)
+
 
     def load_std_prefs(self):
         """
@@ -379,6 +427,8 @@ class FilterStandardsPage(ttk.Frame):
         if self.title == "UPb":
             try:
                 pickled_norm_stds = open(UPB_NORMALISING, 'rb')
+                pickled_upb_ppm = open(URANIUM_PPM, 'rb')
+                pickled_th_ppm = open(THORIUM_PPM, 'rb')
                 pickled_controls_stds = open(UPB_CONTROLS, 'rb')
                 pickled_unknown_stds = open(UPB_UNKNOWNS, 'rb')
             except FileNotFoundError:
@@ -387,20 +437,31 @@ class FilterStandardsPage(ttk.Frame):
             try:
                 pickled_controls_stds = open(TE_CONTROLS, 'rb')
                 pickled_unknown_stds = open(TE_UNKNOWNS, 'rb')
+                pickled_use_cart = open(USE_CART_FOR_PLOTS, 'rb')
             except FileNotFoundError:
                 successful_load = False
 
         if successful_load:
-            if self.title == "UPb": self.norm_std_prefs = pickle.load(pickled_norm_stds)
+            if self.title == "UPb":
+                self.norm_std_prefs = pickle.load(pickled_norm_stds)
+                self.uranium_ppm.set(pickle.load(pickled_upb_ppm))
+                self.thorium_ppm.set(pickle.load(pickled_th_ppm))
             self.control_std_prefs = pickle.load(pickled_controls_stds)
             self.unknown_std_prefs = pickle.load(pickled_unknown_stds)
+            if self.title == "TE":
+                self.use_cart_for_plots.set(pickle.load(pickled_use_cart))
 
         try:
-            if self.title == "UPb": pickled_norm_stds.close
+            if self.title == "UPb":
+                pickled_norm_stds.close()
+                pickled_upb_ppm.close()
+                pickled_th_ppm.close()
             pickled_controls_stds.close()
             pickled_unknown_stds.close()
+            if self.title == "TE": pickled_use_cart.close()
         except UnboundLocalError:
             pass
+
 
     def save_std_prefs(self):
         """
@@ -413,6 +474,8 @@ class FilterStandardsPage(ttk.Frame):
         if self.title == "UPb":
             try:
                 pickled_norm_stds = open(UPB_NORMALISING, 'wb')
+                pickled_upb_ppm = open(URANIUM_PPM, 'wb')
+                pickled_th_ppm = open(THORIUM_PPM, 'wb')
                 pickled_controls_stds = open(UPB_CONTROLS, 'wb')
                 pickled_unknown_stds = open(UPB_UNKNOWNS, 'wb')
             except FileNotFoundError:
@@ -421,6 +484,7 @@ class FilterStandardsPage(ttk.Frame):
             try:
                 pickled_controls_stds = open(TE_CONTROLS, 'wb')
                 pickled_unknown_stds = open(TE_UNKNOWNS, 'wb')
+                pickled_use_cart = open(USE_CART_FOR_PLOTS, 'wb')
             except FileNotFoundError:
                 successful_load = False
 
@@ -434,8 +498,6 @@ class FilterStandardsPage(ttk.Frame):
                         self.control_std_prefs[std] = 1
                     else:
                         self.control_std_prefs[std] = 0
-                # else:
-                #     del self.control_std_prefs[std]
 
             for std in self.unknown_std_prefs.copy():
                 if std in self.is_unknown_str_vars:
@@ -443,28 +505,37 @@ class FilterStandardsPage(ttk.Frame):
                         self.unknown_std_prefs[std] = 1
                     else:
                         self.unknown_std_prefs[std] = 0
-                # else:
-                #     del self.unknown_std_prefs[std]
 
             try:
-                if self.title == "UPb": pickle.dump(self.norm_std_prefs, pickled_norm_stds)
+                if self.title == "UPb":
+                    pickle.dump(self.norm_std_prefs, pickled_norm_stds)
+                    pickle.dump(self.uranium_ppm.get(), pickled_upb_ppm)
+                    pickle.dump(self.thorium_ppm.get(), pickled_th_ppm)
                 pickle.dump(self.control_std_prefs, pickled_controls_stds)
                 pickle.dump(self.unknown_std_prefs, pickled_unknown_stds)
+                if self.title == "TE":
+                    pickle.dump(self.use_cart_for_plots.get(), pickled_use_cart)
             except:
                 pass
 
         try:
-            if self.title == "UPb": pickled_norm_stds.close
+            if self.title == "UPb":
+                pickled_norm_stds.close()
+                pickled_upb_ppm.close()
+                pickled_th_ppm.close()
             pickled_controls_stds.close()
             pickled_unknown_stds.close()
+            if self.title == "TE": pickled_use_cart.close()
         except UnboundLocalError:
             pass
 
 
-    # https://stackoverflow.com/questions/8959815/restricting-the-value-in-tkinter-entry-widget
     def validate(self, action, index, value_if_allowed,
     prior_value, text, validation_type, trigger_type, widget_name):
-        """Returns True if an entry box contains an integer or float"""
+        """
+        Returns True if an entry box contains an integer or float
+        Source: https://stackoverflow.com/questions/8959815/restricting-the-value-in-tkinter-entry-widget
+        """
 
         if(action=='1'):
             if text in '0123456789.-+':
@@ -494,8 +565,6 @@ class FilterStandardsPage(ttk.Frame):
 
         self.save_std_prefs()
 
-
-
         if self.controller.isUpb:
             output_filepath = self.controller.frames["UPbInputOutputPage"].output_filepath.get()
             files = self.controller.frames["UPbInputOutputPage"].valid_input_filepaths
@@ -504,12 +573,6 @@ class FilterStandardsPage(ttk.Frame):
         else:
             output_filepath = self.controller.frames["TEInputOutputPage"].output_filepath.get()
             files = self.controller.frames["TEInputOutputPage"].valid_input_filepaths
-
-            # print("files: " + str(files))
-            # print("output_filepath: " + output_filepath)
-            # print("CHONDRITE_FILE: " + CHONDRITE_FILE)
-            # print("Control standards: " + str(control_standards))
-            # print("Unknown standards: " + str(unknown_standards))
 
             TE.te(files, output_filepath, CHONDRITE_FILE, control_standards, unknown_standards)
             self.footer_frame.go_to_next_page()

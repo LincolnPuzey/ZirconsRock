@@ -249,22 +249,24 @@ def getChondrite(available,file, unknown, stand, detected,PerformByRockType):
 def commas(lis):
     return str(lis).replace("[","").replace("]","").replace("\'","").replace(" ","").replace("\t","")
 
+<<<<<<< HEAD
 def te(files, output, ChondFile, control,unknown,PerformByRockType=True):
+=======
+def te(files, output, ChondFile, control, unknown):
+>>>>>>> 908bd5a538506358461d9a8bf4531ad707fa02e6
     """
     Main function that will call everything as needed
     """
-    print("This particular python file will read the data recorded by the Laser device for Trace Elements.")
-    print("Please ensure you are using Python version 3.6.2 on your computer")
-    print("This program was created and developed by Mark Collier September 2017 [Contact:+61466523090]")
-    print("You have to specify the name of the csv file and input the range of numbers within that name:")
-    print("This program uses chondrite_values.csv file:")
-    print("     Column A lists the names of the sheets you will use in the Output xl file")
-    print("     Every other column beside it will have 4 rows")
-    print("     Row 1: You may add or remove as many elements you like")
-    print("     Row 2: Enter the Chondrite values for each element")
-    print("     Row 3: Include a list of zircons or standards that you wish to exclude")
-    print("     Row >3: indicats the CART classification that you wish to be done for this given data")
-    print("         Column B here Always states CARTS followed by the name of the new Spreadsheet")
+    # You have to specify the name of the csv file and input the range of numbers within that name:
+    # This program uses chondrite_values.csv file:
+    #      Column A lists the names of the sheets you will use in the Output xl file
+    #      Every other column beside it will have 4 rows
+    #      Row 1: You may add or remove as many elements you like
+    #      Row 2: Enter the Chondrite values for each element
+    #      Row 3: Include a list of zircons or standards that you wish to exclude
+    #      Row >3: indicats the CART classification that you wish to be done for this given data
+    #          Column B here Always states CARTS followed by the name of the new Spreadsheet
+
     workbook = xlsxwriter.Workbook(output)
     t = getChondrite(getElements(files[0]),ChondFile,unknown,control,standard(getAllZircons(files)),PerformByRockType)
     NotDoneClassifiers = True
