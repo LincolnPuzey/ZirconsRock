@@ -1,26 +1,16 @@
 from .common import *
 from .StyleOfUPb import *
-from defaults import UnrecognisedInputFileError
+from defaults import csvTableNames, shortNames, EndOfTableIndicator, UnrecognisedInputFileError
 
-csvTableNames = ['GLITTER!: Isotope ratios.',
-                 'GLITTER!: Isotopic ratios: 1 sigma uncertainty.',
-                 'GLITTER!: Age estimates (ma).',
-                 'GLITTER!: Age estimates: 1 sigma uncertainty (ma).',
-                 'GLITTER!: Mean Raw CPS background subtracted.']
-shortNames = ['Istopic ratios',
-              'Ratio 1 sigma uncertainty',
-              'Age',
-              'Age 1 sigma uncertainty',
-              'Mean Raw CPS background']
-EndOfTableIndicator = ""
-'''
-Reads a csv file then filters out the appropriate zircons and elements
-sheet = workbook.add_worksheet(f) if you wish to add this sheet to table
-csvfile = the string name of file your reading eg. 'run.csv'
-IncludedFields = Which fields on the table at csvTableNames[4] you wish to include
-excludedZircons = Which zircon do you wish to remove at every table?
-'''
-def addUPbSheet(sheet,csvfile,IncludedFields,excludedZircons=["610"]):
+
+def addUPbSheet(sheet, csvfile, IncludedFields, excludedZircons=["610"]):
+    """
+    Reads a csv file then filters out the appropriate zircons and elements
+    sheet = workbook.add_worksheet(f) if you wish to add this sheet to table
+    csvfile = the string name of file your reading eg. 'run.csv'
+    IncludedFields = Which fields on the table at csvTableNames[4] you wish to include
+    excludedZircons = Which zircon do you wish to remove at every table?
+    """
     orig=get_table(csvfile,getSplitter(csvfile))
     i=0
     t=[]
@@ -35,22 +25,26 @@ def addUPbSheet(sheet,csvfile,IncludedFields,excludedZircons=["610"]):
     except:
         InvalidSpreadsheet = True
     return t
-'''
-Compares functions to determine whether they work.
-'''
+
+
 def test():
+    """
+    Compares functions to determine whether they work.
+    """
     assertEquals([[1,2],[3,4]],get_table('new.csv'),"Function table:")
     assertEquals(':',getSplitter('new.csv'),"Function getSplitter")
     assertEquals(['example1.csv','example2.csv'],getFileList('example[1-2].csv'),"Function getFileList")
     assertEquals(['run1.csv','run2.csv','run3.csv'],getFileList('run[1-3].csv'),"Function getFileList")
     assertEquals(['STDGJ', '91500', 'MT', 'INT1', 'INT2'],standard(getAllZircons(getFileList(testInputLocation))),"Function standard(getAllZircons)")
-'''
-Returns the table with a cetain amount of includedFields by specifying the name of table first
-t = the table that has it's name above it's contents eg. ['Table Name',['field','data','field']]
-tablename = 'Table Name' or 0 if talking about a position
-IncludedFields = the fields you wish to include eg. ['data']
-'''
-def filterfields(t,tablename,IncludedFields):
+
+
+def filterfields(t, tablename, IncludedFields):
+    """
+    Returns the table with a cetain amount of includedFields by specifying the name of table first
+    t = the table that has it's name above it's contents eg. ['Table Name',['field','data','field']]
+    tablename = 'Table Name' or 0 if talking about a position
+    IncludedFields = the fields you wish to include eg. ['data']
+    """
     current=0
     future=0
     cps = begr(t,tablename)
@@ -74,13 +68,15 @@ def filterfields(t,tablename,IncludedFields):
         #for j in range(len(IncludedFields)-1,len(t[i])):
         t[i]= t[i][:len(IncludedFields)]
     return t,t[cps+1:cps+x+1]
-'''
-Using 1 type of table for every sheet combine this type into one big 2D array
-tlist = list of 2D arrays of each csv file contents
-tablenameIndex = The index of the table within each sheet
-IncludedZircons = Zircons we want to search for or * for all of them
-'''
-def combine(tlist,tablenameIndex,IncludedZircons):
+
+
+def combine(tlist, tablenameIndex, IncludedZircons):
+    """
+    Using 1 type of table for every sheet combine this type into one big 2D array
+    tlist = list of 2D arrays of each csv file contents
+    tablenameIndex = The index of the table within each sheet
+    IncludedZircons = Zircons we want to search for or * for all of them
+    """
     comb = [tlist[0][begr(tlist[0],csvTableNames[tablenameIndex])+1]]
     for t in tlist:
         r=begr(t,csvTableNames[tablenameIndex])+1
@@ -92,11 +88,12 @@ def combine(tlist,tablenameIndex,IncludedZircons):
         #print(comb)
     return comb
 
-'''
-For each column in table t:
-    Place the next column of s beside it
-'''
-def alternate(t,s):
+
+def alternate(t, s):
+    """
+    For each column in table t:
+        Place the next column of s beside it
+    """
     a = [column(t,0)]
     for i in range(1,len(t[0])):
         a.append(column(t,i))
@@ -105,10 +102,12 @@ def alternate(t,s):
     for j in range(2,len(alt[0]),2):
         alt[0][j] = "1 sigma"
     return alt
-'''
-Add sequence numbers, Zircon numbers and Concentrations together in table t in groups
-'''
+
+
 def groups(t):
+    """
+    Add sequence numbers, Zircon numbers and Concentrations together in table t in groups
+    """
     if len(t[0])<4:
         t[0].append("Zircon number")
         t[0].append("Sequence number")
@@ -120,10 +119,12 @@ def groups(t):
                 t[r][c]=record(t[r][c])
         t[r].append(r)
     return t
-'''
-Mutates the concentration values
-'''
-def ThUppm(conc,normalised,ThPPM,UPPM):
+
+
+def ThUppm(conc, normalised, ThPPM,UPPM):
+    """
+    Mutates the concentration values
+    """
     i=0
     for t in range(len(conc)):
         i=i+1
@@ -134,7 +135,9 @@ def ThUppm(conc,normalised,ThPPM,UPPM):
         for i in range(r+2,len(conc[t])-1):
             conc[t][i][1]=record(conc[t][i][1],Th)
             conc[t][i][2]=record(conc[t][i][2],U)
-def avg(values,normalised,c):
+
+
+def avg(values, normalised, c):
     sumNormalised = 0
     count = 0
     for z in range(len(values)):
@@ -142,10 +145,12 @@ def avg(values,normalised,c):
             sumNormalised = sumNormalised + record(values[z][c])
             count = count +1
     return record(sumNormalised,count)
-'''
-Create the Normal Concordia data which calculates the rho values
-'''
+
+
 def rho(ratios):
+    """
+    Create the Normal Concordia data which calculates the rho values
+    """
     t = []
     for i in range(5):
         t.append(column(ratios,-i))
@@ -154,10 +159,12 @@ def rho(ratios):
     for i in range(1,len(t)):
         t[i].append(record(t[i][-1],t[i][-2])/record(t[i][-3],t[i][-4]))
     return t
-'''
-Create the Inverse Concordia data which calculates the RSD values
-'''
+
+
 def inverse(concordia):
+    """
+    Create the Inverse Concordia data which calculates the RSD values
+    """
     docols = [1,3]
     for d in docols:
         for r in range(1,len(concordia)):
@@ -179,12 +186,13 @@ def inverse(concordia):
                 concordia[r][c] = ""
     return concordia
 
-'''
-Change the sigma values by a multiple of sig
-t = table with 1 sigma values
-sig = multiplier by the 1 sigma values
-'''
-def sigma(t,sig):
+
+def sigma(t, sig):
+    """
+    Change the sigma values by a multiple of sig
+    t = table with 1 sigma values
+    sig = multiplier by the 1 sigma values
+    """
     sigmas = []
     for i in range(len(t[0])):
         if 'sigma' in t[0][i]:
@@ -194,23 +202,27 @@ def sigma(t,sig):
         for c in sigmas:
             t[r][c] = record(t[r][c],1/sig)
     return t
-'''
-Function that cares for a specified standard names sheet
-sheet = The sheet with the name of the Standard
-tables = list of 2D table arrays to add to the sheet
-titles = list of titles that need to be added to the sheet
-'''
-def SplitStandards(sheet,tables,titles):
+
+
+def SplitStandards(sheet, tables, titles):
+    """
+    Function that cares for a specified standard names sheet
+    sheet = The sheet with the name of the Standard
+    tables = list of 2D table arrays to add to the sheet
+    titles = list of titles that need to be added to the sheet
+    """
     c=0
     for t in range(len(tables)):
         sheet.write(0,c,titles[t])
         addSheet(sheet,tables[t],1,c)
         c=c+len(tables[t][0])+1
-'''
-Given a list of run csv files:
-    return all of the zircons in the fileList
-'''
+
+
 def getAllZircons(fileList):
+    """
+    Given a list of run csv files:
+        return all of the zircons in the fileList
+    """
     tlist=[]
     err = True
     for f in fileList:
@@ -225,11 +237,10 @@ def getAllZircons(fileList):
     return tlist
 
 
-'''
-Main Function called to run the entire program
-'''
-
 def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
+    """
+    Main Function called to run the entire U-Pb processing
+    """
     print("This particular python file will read the data recorded by the Laser device for U-Pb data.")
     print("Please ensure you are using Python version 3.6.2 on your computer")
     IncludedFields = ['Analysis_#','Pb206','Pb207','Pb208','Th232','U238']
@@ -273,12 +284,12 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
             addSheet(commonPb,ratios[:1],3)
             addSheet(commonPb,combine(tlist,4,IncludedZircons)[1:],6,len(ratios[0])-1)
             addSheet(commonPb,ratios[1:],6)
-            '''
-            ctrl = workbook.add_worksheet("Control Report")
-            norm = workbook.add_worksheet("Normalized Report")
-            addSheet(ctrl,alternate(combine(tlist,0,control),combine(tlist,1,control)))
-            addSheet(norm,alternate(combine(tlist,0,normalised),combine(tlist,1,normalised)))
-            '''
+
+            # ctrl = workbook.add_worksheet("Control Report")
+            # norm = workbook.add_worksheet("Normalized Report")
+            # addSheet(ctrl,alternate(combine(tlist,0,control),combine(tlist,1,control)))
+            # addSheet(norm,alternate(combine(tlist,0,normalised),combine(tlist,1,normalised)))
+
             ThUppm(conc,normalised,ThPPM,UPPM)
             report = workbook.add_worksheet("Report")
             addSheet(report,sigma(alternate(combine(tlist,0,unknown),combine(tlist,1,unknown)),2))

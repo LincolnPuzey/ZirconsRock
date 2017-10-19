@@ -19,6 +19,23 @@ allChondriteElements = ['La139', 'Ce140', 'Pr141', 'Nd146', 'Sm147', 'Eu151', 'G
 ChondriteValues = [0.237, 0.613, 0.0928, 0.457, 0.148, 0.0563, 0.199, 0.0294, 0.246, 1.57, 0.0546, 0.16, 0.0074, 0.161,
                    0.0246, 0.103, 0.24, 0.0136, 440, 1080, 0.0361, 0.0247]
 
+# Variables used in UPb.py:
+csvTableNames = [
+    'GLITTER!: Isotope ratios.',
+    'GLITTER!: Isotopic ratios: 1 sigma uncertainty.',
+    'GLITTER!: Age estimates (ma).',
+    'GLITTER!: Age estimates: 1 sigma uncertainty (ma).',
+    'GLITTER!: Mean Raw CPS background subtracted.'
+]
+shortNames = [
+    'Istopic ratios',
+    'Ratio 1 sigma uncertainty',
+    'Age',
+    'Age 1 sigma uncertainty',
+    'Mean Raw CPS background'
+]
+EndOfTableIndicator = ""
+
 # colors and markers used for scatterplots for TE plots
 CLASSES = [
     "Carbonite",
