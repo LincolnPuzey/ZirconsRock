@@ -246,14 +246,12 @@ def getChondrite(available,file, unknown, stand, detected,PerformByRockType):
         i=i+1
     return get_table(file)
 
+
 def commas(lis):
     return str(lis).replace("[","").replace("]","").replace("\'","").replace(" ","").replace("\t","")
 
-<<<<<<< HEAD
-def te(files, output, ChondFile, control,unknown,PerformByRockType=True):
-=======
-def te(files, output, ChondFile, control, unknown):
->>>>>>> 908bd5a538506358461d9a8bf4531ad707fa02e6
+
+def te(files, output, ChondFile, control, unknown, PerformByRockType=True):
     """
     Main function that will call everything as needed
     """
