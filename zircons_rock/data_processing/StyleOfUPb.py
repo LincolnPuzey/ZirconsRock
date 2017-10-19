@@ -1,5 +1,5 @@
 def styleUPb(fileLocation):
-    dirfile=str(FileLocation).replace('\\','/').replace('\t','/t').replace('\n','/n').replace('\0','/0')
+    dirfile=str(fileLocation).replace('\\','/').replace('\t','/t').replace('\n','/n').replace('\0','/0')
     ogFileName = dirfile.split('/')[-1]
 
     main(fileLocation)
@@ -23,7 +23,7 @@ def addRows(wb1, ws1, shift, sheetName):
 			start_col += 1
 		start_row += 1
 		start_col = 1
-	
+
 def report(sheetName, wb, new_wb, bold, border):
 	ws1 = wb['%s' % (sheetName)]
 	addRows(new_wb, ws1, 2, sheetName)
@@ -216,19 +216,19 @@ def main(fileLocation):
 
 			if maxColumns == 25:
 				column25(sheetName, wb, new_wb, bold)
-				
+
 			else:
 				column38(sheetName, wb, new_wb, bold)
 	# completed = False
-	
-	# while ~completed:		
+
+	# while ~completed:
 	# 	try:
-	new_wb.save('final.xlsx')
-	os.remove('%s' % fileLocation)
+	new_wb.save('%s' % fileLocation)
+	# os.remove('%s' % fileLocation)
 	# 		completed = True
 	# 	except:
 	# 		print "Please close the final.xlsx file before continuing..."
-	
+
 	#Deletes the original xlsx file
 
 if __name__ == "__main__":

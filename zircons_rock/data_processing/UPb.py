@@ -297,4 +297,5 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
     except:
         input("You must close "+output+" before continuing...")
         UPb(files, output, normalised, control, unknown, UPPM, ThPPM)
+    print(output)
     styleUPb(output)
