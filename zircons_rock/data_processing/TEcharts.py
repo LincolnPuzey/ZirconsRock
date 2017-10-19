@@ -84,18 +84,158 @@ def bar_chart(rock_type_list, sheet_name, workbook):
 
 def scatterplot(classifiers, sheet_name, workbook, perform_by_rock_type):
     """
-    The main funtion for chart Processing
+    Function to create a scatterplot from trace element data
     classifiers = 2D array of the contents of the worksheet containing the data to the plotted on the chart
     is indexed as classifiers[row][column], where row and row are zero-indexed
     sheet_name = the string of name of the worksheet containing the data
     workbook = The xlsxwriter standard of implementing the workbook
+
+    Creates a worksheet in a workbook that plots the data with a colour of their classified type.
     """
 
     # Find which columns in classifiers hold data
     x_column, y_column, class_column = identify(classifiers)
     # If we found appropriate data
-    if x_column is not None and y_column is not None:
-        draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook)
+    if x_column is None or y_column is None:
+        return
+
+    plot_name = sheet_name.replace("data", "").replace(" ", "")
+    # plot_name should match with an element of defaults.TE_PLOTS
+
+    if plot_name not in TE_PLOTS:
+        return  # don't draw plot if cant find a matching entry
+
+    # build the list of series to add to chart, each series specifies a range of data
+    series_list = []
+    current_series_name = classifiers[1][class_column]
+    current_series_start, current_series_end = 1, 1
+    series_data = {
+        current_series_name: []
+    }
+
+    for i in range(1, len(classifiers)):
+
+        if current_series_name == classifiers[i][class_column]:
+            # still in same series - update end index
+            current_series_end = i
+            # add values
+
+        else:
+            # encountered new series - add previous one to list
+            series_list.append({
+                'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
+                'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
+                'name': current_series_name,
+                'marker': CLASS_MARKERS.get(
+                    current_series_name,
+                    {
+                        # default marker
+                        'type': 'square',
+                        'size': 7,
+                        'border': {'color': '#808080'},
+                        'fill': {'color': '#808080'}
+                    }
+                )
+            })
+            # new series
+            current_series_start = i
+            current_series_end = i
+            current_series_name = classifiers[i][class_column]
+            series_data[current_series_name] = []
+
+        series_data[current_series_name].append((classifiers[i][x_column], classifiers[i][y_column]))
+
+    # add last series:
+    series_list.append({
+        'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
+        'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
+        'name': current_series_name,
+        'marker': CLASS_MARKERS.get(
+            current_series_name,
+            {
+                # default marker
+                'type': 'square',
+                'size': 7,
+                'border': {'color': '#808080'},
+                'fill': {'color': '#808080'}
+            }
+        )
+    })
+    #
+
+    # create a chartsheet in the workbook for the plot
+    # a chartsheet is a worksheet that only contains a chart.
+    scatterplot_worksheet = workbook.add_worksheet("{} Plot".format(plot_name))
+
+    # the scatter plot
+    scatter_plot = workbook.add_chart({'type': 'scatter'})
+    scatter_plot.set_title({'name': "{} vs {} in Zircon".format(classifiers[0][y_column], classifiers[0][x_column])})
+    # default size is 480 x 288 pixels
+    # we want 2x default size
+    scatter_plot.set_size({'width': CHART_WIDTH, 'height': CHART_HEIGHT})
+    scatter_plot.set_chartarea({'border': {'none': True}})
+    scatter_plot.set_plotarea({
+        'layout': {
+            'x': PLOT_X_OFFSET,
+            'y': PLOT_Y_OFFSET,
+            'width': PLOT_WIDTH,
+            'height': PLOT_HEIGHT
+        }
+    })
+    y_axis_options = {
+        'name': classifiers[0][y_column]+" (wt%)" if classifiers[0][y_column] == "Hf" else [sheet_name, 0, y_column],
+        'max': TE_PLOT_AXES[plot_name][3],
+        'min': TE_PLOT_AXES[plot_name][2],
+        'major_gridlines': {'visible': True},
+        'major_tick_mark': 'outside',
+        'minor_tick_mark': 'inside',
+        'label_position': 'low'
+    }
+    if plot_name != "Hf-Y":
+        y_axis_options['log_base'] = 10
+    scatter_plot.set_y_axis(y_axis_options)
+    scatter_plot.set_x_axis({
+        'name': [sheet_name, 0, x_column],
+        'max': TE_PLOT_AXES[plot_name][1],
+        'min': TE_PLOT_AXES[plot_name][0],
+        'log_base': 10,
+        'major_gridlines': {'visible': True},
+        'major_tick_mark': 'outside',
+        'minor_tick_mark': 'inside',
+        'label_position': 'low'
+    })
+
+    for series in series_list:
+        scatter_plot.add_series(series)
+
+    scatterplot_worksheet.insert_chart('A1', scatter_plot)
+
+    if TE_PLOT_FIELDS[plot_name]:
+        field_image_file = path.join(TE_PLOT_IMAGE_DIR, TE_PLOT_FIELD_FILE.format(plot_name))
+        image = Image.open(field_image_file)
+        image_width, image_height = image.size
+        scatterplot_worksheet.insert_image(
+            'A1',
+            field_image_file,
+            {
+                'x_offset': int(PLOT_X_OFFSET*CHART_WIDTH),
+                'y_offset': int(PLOT_Y_OFFSET*CHART_HEIGHT),
+                'x_scale': (CHART_WIDTH*PLOT_WIDTH)/image_width,
+                'y_scale': (CHART_HEIGHT*PLOT_HEIGHT)/image_height
+            }
+        )
+
+        legend_image_file = path.join(TE_PLOT_IMAGE_DIR, TE_PLOT_LEGEND_FILE.format(plot_name))
+        scatterplot_worksheet.insert_image(
+            'A1',
+            legend_image_file,
+            {
+                'x_offset': int(LEGEND_X_OFFSET * CHART_WIDTH),
+                'y_offset': int(LEGEND_Y_OFFSET * CHART_HEIGHT),
+                'x_scale': LEGEND_SCALE,
+                'y_scale': LEGEND_SCALE
+            }
+        )
 
 
 def identify(classifiers):
@@ -175,151 +315,3 @@ def identify(classifiers):
         return x_column, y_column, class_column
     else:
         return None, None, None
-
-
-def draw_scatterplot(x_column, y_column, class_column, classifiers, sheet_name, workbook):
-    """
-    Creates a worksheet in a workbook that plots the data with a colour of their classified type.
-    Calculates the points that make a convex hull around each series, then generates an image to
-    overlay over the chart to illustrate the convex hulls.
-    sheet_name cannot contain any of the characters ' [ ] : * ? / \ ' and it must be less than 20 characters.
-    x_column, y_column and class_column are indexes of columns in classifiers to use as x-values, y-values and
-    series names, respectively.
-    """
-
-    plot_name = sheet_name[:-5]  # should match with an element of defaults.TE_PLOTS
-
-    if plot_name not in TE_PLOTS:
-        return  # don't draw plot if cant find a matching entry
-
-    # build the list of series to add to chart, each series specifies a range of data
-    series_list = []
-    current_series_name = classifiers[1][class_column]
-    current_series_start, current_series_end = 1, 1
-    series_data = {
-        current_series_name: []
-    }
-
-    for i in range(1, len(classifiers)):
-
-        if current_series_name == classifiers[i][class_column]:
-            # still in same series - update end index
-            current_series_end = i
-            # add values
-
-        else:
-            # encountered new series - add previous one to list
-            series_list.append({
-                'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
-                'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
-                'name': current_series_name,
-                'marker': CLASS_MARKERS.get(
-                    current_series_name,
-                    {
-                        # default marker
-                        'type': 'square',
-                        'size': 7,
-                        'border': {'color': '#808080'},
-                        'fill': {'color': '#808080'}
-                    }
-                )
-            })
-            # new series
-            current_series_start = i
-            current_series_end = i
-            current_series_name = classifiers[i][class_column]
-            series_data[current_series_name] = []
-
-        series_data[current_series_name].append((classifiers[i][x_column], classifiers[i][y_column]))
-
-    # add last series:
-    series_list.append({
-        'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
-        'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
-        'name': current_series_name,
-        'marker': CLASS_MARKERS.get(
-            current_series_name,
-            {
-                # default marker
-                'type': 'square',
-                'size': 7,
-                'border': {'color': '#808080'},
-                'fill': {'color': '#808080'}
-            }
-        )
-    })
-    #
-
-    # create a chartsheet in the workbook for the plot
-    # a chartsheet is a worksheet that only contains a chart.
-    scatterplot_worksheet = workbook.add_worksheet("{} Plot".format(sheet_name))
-
-    # the scatter plot
-    scatterplot = workbook.add_chart({'type': 'scatter'})
-    scatterplot.set_title({'name': "{} vs {} in Zircon".format(classifiers[0][y_column], classifiers[0][x_column])})
-    # default size is 480 x 288 pixels
-    # we want 2x default size
-    scatterplot.set_size({'width': CHART_WIDTH, 'height': CHART_HEIGHT})
-    scatterplot.set_chartarea({'border': {'none': True}})
-    scatterplot.set_plotarea({
-        'layout': {
-            'x': PLOT_X_OFFSET,
-            'y': PLOT_Y_OFFSET,
-            'width': PLOT_WIDTH,
-            'height': PLOT_HEIGHT
-        }
-    })
-    y_axis_options = {
-        'name': classifiers[0][y_column]+" (wt%)" if classifiers[0][y_column] == "Hf" else [sheet_name, 0, y_column],
-        'max': TE_PLOT_AXES[plot_name][3],
-        'min': TE_PLOT_AXES[plot_name][2],
-        'major_gridlines': {'visible': True},
-        'major_tick_mark': 'outside',
-        'minor_tick_mark': 'inside',
-        'label_position': 'low'
-    }
-    if plot_name != "Hf-Y":
-        y_axis_options['log_base'] = 10
-    scatterplot.set_y_axis(y_axis_options)
-    scatterplot.set_x_axis({
-        'name': [sheet_name, 0, x_column],
-        'max': TE_PLOT_AXES[plot_name][1],
-        'min': TE_PLOT_AXES[plot_name][0],
-        'log_base': 10,
-        'major_gridlines': {'visible': True},
-        'major_tick_mark': 'outside',
-        'minor_tick_mark': 'inside',
-        'label_position': 'low'
-    })
-
-    for series in series_list:
-        scatterplot.add_series(series)
-
-    scatterplot_worksheet.insert_chart('A1', scatterplot)
-
-    if TE_PLOT_FIELDS[plot_name]:
-        field_image_file = path.join(TE_PLOT_IMAGE_DIR, TE_PLOT_FIELD_FILE.format(plot_name))
-        image = Image.open(field_image_file)
-        image_width, image_height = image.size
-        scatterplot_worksheet.insert_image(
-            'A1',
-            field_image_file,
-            {
-                'x_offset': int(PLOT_X_OFFSET*CHART_WIDTH),
-                'y_offset': int(PLOT_Y_OFFSET*CHART_HEIGHT),
-                'x_scale': (CHART_WIDTH*PLOT_WIDTH)/image_width,
-                'y_scale': (CHART_HEIGHT*PLOT_HEIGHT)/image_height
-            }
-        )
-
-        legend_image_file = path.join(TE_PLOT_IMAGE_DIR, TE_PLOT_LEGEND_FILE.format(plot_name))
-        scatterplot_worksheet.insert_image(
-            'A1',
-            legend_image_file,
-            {
-                'x_offset': int(LEGEND_X_OFFSET * CHART_WIDTH),
-                'y_offset': int(LEGEND_Y_OFFSET * CHART_HEIGHT),
-                'x_scale': LEGEND_SCALE,
-                'y_scale': LEGEND_SCALE
-            }
-        )
