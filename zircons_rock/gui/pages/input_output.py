@@ -200,7 +200,6 @@ class InputOutputPage(ttk.Frame):
             index += 1
 
 
-
     def set_output_path(self):
         """
         Opens the operating system's file manager so the user can specify
@@ -278,7 +277,6 @@ class InputOutputPage(ttk.Frame):
         self.footer_frame.go_to_next_page()
 
 
-    # unpickles the input and ouput filepaths
     def load_filepaths(self):
         """Loads previously saved input/output filepaths from pickled objects."""
 
@@ -346,7 +344,6 @@ class InputOutputPage(ttk.Frame):
             pass
 
 
-    # pickles the input and output filepaths so they can be loaded after closing the application
     def save_filepaths(self):
         """Saves the input/output filepaths as pickled objects."""
 
