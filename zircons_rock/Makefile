@@ -4,6 +4,6 @@
 ipython:
 	PYTHONPATH=. ../virtual_python/bin/ipython
 
-# start the main method in main.py
-main:
+# start the program with the main method in zircons_rock_terminal.py
+zircons_rock:
 	PYTHONPATH=. ../virtual_python/bin/python ./zircons_rock_terminal.py
