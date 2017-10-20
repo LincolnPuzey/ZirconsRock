@@ -576,6 +576,6 @@ class FilterStandardsPage(ttk.Frame):
         else:
             output_filepath = self.controller.frames["TEInputOutputPage"].output_filepath.get()
             files = self.controller.frames["TEInputOutputPage"].valid_input_filepaths
-            passed = TE.te(files, output_filepath, CHONDRITE_FILE, control_standards, unknown_standards, self.perform_by_rock_type.get())
+            successful = TE.te(files, output_filepath, CHONDRITE_FILE, control_standards, unknown_standards, self.perform_by_rock_type.get())
             finished_page.initialise(successful)
             self.footer_frame.go_to_next_page()
