@@ -277,7 +277,7 @@ def te(files, output, ChondFile, control, unknown, ScatterPlotCarts):
             carts = nospaces(t[i+k][3:])
             if len(carts)>0:
                 worksheet = workbook.add_worksheet(t[i+k][2])
-                Classifiers = addClassifier(full,worksheet,carts)
+                Classifiers = addClassifier(full,worksheet,carts, PerformByRockType)
                 try:
                     scatterplot(Classifiers, t[i+k][2], workbook, PerformByRockType)
                 except:
@@ -297,7 +297,7 @@ def te(files, output, ChondFile, control, unknown, ScatterPlotCarts):
     styleTE(output)
 
 
-def addClassifier(full, sheet, carts):
+def addClassifier(full, sheet, carts, perform_by_rock_type):
     """
     Adds a sheet based upon the outline of a Classification sheet
     full = 2D array of the table
@@ -316,9 +316,11 @@ def addClassifier(full, sheet, carts):
             content = classify(carts[c], full, z)
             classifier[r].append(content)
 
-    # sort 'classifier' except for first row
-    classifier = [classifier[0]] + sorted(classifier[1:], key=lambda row: row[-3])
-
+    # sort 'classifier' except for first row. column to sort on depends on how we want to graph data
+    if perform_by_rock_type:
+        classifier = [classifier[0]] + sorted(classifier[1:], key=lambda row: row[-3])
+    else:
+        classifier = [classifier[0]] + sorted(classifier[1:], key=lambda row: row[0])
     # write to excel
     for r in range(len(classifier)):
         for c in range(len(classifier[r])):

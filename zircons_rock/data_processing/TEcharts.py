@@ -2,7 +2,7 @@ from os import path
 
 from PIL import Image
 
-from defaults import CLASS_MARKERS, \
+from defaults import CLASS_MARKERS, CLASS_COLORS, CLASSES, \
     TE_PLOTS, TE_PLOT_FIELDS, TE_PLOT_AXES, TE_PLOT_IMAGE_DIR, TE_PLOT_FIELD_FILE, TE_PLOT_LEGEND_FILE, \
     CHART_HEIGHT, CHART_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, PLOT_X_OFFSET, PLOT_Y_OFFSET, \
     LEGEND_SCALE, LEGEND_X_OFFSET, LEGEND_Y_OFFSET
@@ -94,7 +94,7 @@ def scatterplot(classifiers, sheet_name, workbook, perform_by_rock_type):
     """
 
     # Find which columns in classifiers hold data
-    x_column, y_column, class_column = identify(classifiers)
+    x_column, y_column, class_column = identify(classifiers, perform_by_rock_type)
     # If we found appropriate data
     if x_column is None or y_column is None:
         return
@@ -122,11 +122,8 @@ def scatterplot(classifiers, sheet_name, workbook, perform_by_rock_type):
 
         else:
             # encountered new series - add previous one to list
-            series_list.append({
-                'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
-                'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
-                'name': current_series_name,
-                'marker': CLASS_MARKERS.get(
+            if perform_by_rock_type:
+                marker = CLASS_MARKERS.get(
                     current_series_name,
                     {
                         # default marker
@@ -136,6 +133,19 @@ def scatterplot(classifiers, sheet_name, workbook, perform_by_rock_type):
                         'fill': {'color': '#808080'}
                     }
                 )
+            else:
+                marker = {
+                    # default marker
+                    'type': 'diamond',
+                    'size': 7,
+                    'border': {'color': CLASS_COLORS[CLASSES[(3+len(series_list))%len(CLASS_COLORS)]]},
+                    'fill': {'color': CLASS_COLORS[CLASSES[(3+len(series_list))%len(CLASS_COLORS)]]}
+                }
+            series_list.append({
+                'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
+                'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
+                'name': current_series_name,
+                'marker': marker
             })
             # new series
             current_series_start = i
@@ -146,11 +156,8 @@ def scatterplot(classifiers, sheet_name, workbook, perform_by_rock_type):
         series_data[current_series_name].append((classifiers[i][x_column], classifiers[i][y_column]))
 
     # add last series:
-    series_list.append({
-        'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
-        'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
-        'name': current_series_name,
-        'marker': CLASS_MARKERS.get(
+    if perform_by_rock_type:
+        marker = CLASS_MARKERS.get(
             current_series_name,
             {
                 # default marker
@@ -160,8 +167,20 @@ def scatterplot(classifiers, sheet_name, workbook, perform_by_rock_type):
                 'fill': {'color': '#808080'}
             }
         )
+    else:
+        marker = {
+            # default marker
+            'type': 'diamond',
+            'size': 7,
+            'border': {'color': CLASS_COLORS[CLASSES[(3+len(series_list))%len(CLASS_COLORS)]]},
+            'fill': {'color': CLASS_COLORS[CLASSES[(3+len(series_list))%len(CLASS_COLORS)]]}
+        }
+    series_list.append({
+        'categories': [sheet_name, current_series_start, x_column, current_series_end, x_column],
+        'values': [sheet_name, current_series_start, y_column, current_series_end, y_column],
+        'name': current_series_name,
+        'marker': marker
     })
-    #
 
     # create a chartsheet in the workbook for the plot
     # a chartsheet is a worksheet that only contains a chart.
@@ -238,7 +257,7 @@ def scatterplot(classifiers, sheet_name, workbook, perform_by_rock_type):
         )
 
 
-def identify(classifiers):
+def identify(classifiers, perform_by_rock_type):
     """
     Identifies which columns from parameter classifiers are to be used as the x, y and series in the scatterplot
 
@@ -309,7 +328,10 @@ def identify(classifiers):
     width = len(classifiers[0])
     x_column = width-1
     y_column = width-2
-    class_column = width-3
+    if perform_by_rock_type:
+        class_column = width-3
+    else:
+        class_column = 0
     # check columns contain numbers
     if isinstance(classifiers[1][x_column], float) and isinstance(classifiers[1][y_column], float):
         return x_column, y_column, class_column

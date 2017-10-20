@@ -51,9 +51,9 @@ CLASSES = [
 ]
 CLASS_COLORS = {
     CLASSES[0]: '#CC3300',  # dark red
-    CLASSES[1]: '#669900',  # dark green
-    CLASSES[2]: '#00CC66',  # aqua green
-    CLASSES[3]: '#00B3B3',  # dark aqua
+    CLASSES[1]: '#66AA00',  # dark green
+    CLASSES[2]: '#00CC77',  # aqua green
+    CLASSES[3]: '#00B3B9',  # dark aqua
     CLASSES[4]: '#E6E600',  # dark yellow
     CLASSES[5]: '#0066CC',  # blue
     CLASSES[6]: '#6600FF',  # blue-purple
