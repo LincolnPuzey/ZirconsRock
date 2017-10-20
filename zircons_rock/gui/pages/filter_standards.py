@@ -172,7 +172,7 @@ class FilterStandardsPage(ttk.Frame):
 
         else:
             self.cart_frame = ttk.Labelframe(self.right_col_frame, text="Scatterplots", padding="10 10 10 10")
-            self.cart_question = ttk.Label(self.cart_frame, text="Use cart\nclassifications\nfor scatterplots?", padding="0 0 0 5")
+            self.cart_question = ttk.Label(self.cart_frame, text="Use CART\nclassifications\nfor scatterplots?", padding="0 0 0 5")
             self.yes_button_frame = ttk.Frame(self.cart_frame, padding="10 0 0 0")
             self.no_button_frame = ttk.Frame(self.cart_frame, padding="10 0 0 0")
 
