@@ -310,6 +310,6 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
         return True
     except Exception as e:
         print(e)
-        print("ERROR: Could not create output file - maybe file is open in another program?"
+        print("ERROR: Could not create output file - maybe file is open in another program?")
         return False
     
