@@ -251,7 +251,7 @@ def commas(lis):
     return str(lis).replace("[","").replace("]","").replace("\'","").replace(" ","").replace("\t","")
 
 
-def te(files, output, ChondFile, control, unknown, PerformByRockType=True):
+def te(files, output, ChondFile, control, unknown, ScatterPlotCarts):
     """
     Main function that will call everything as needed
     """
@@ -264,7 +264,7 @@ def te(files, output, ChondFile, control, unknown, PerformByRockType=True):
     #      Row 3: Include a list of zircons or standards that you wish to exclude
     #      Row >3: indicats the CART classification that you wish to be done for this given data
     #          Column B here Always states CARTS followed by the name of the new Spreadsheet
-
+    PerformByRockType = not ScatterPlotCarts
     workbook = xlsxwriter.Workbook(output)
     t = getChondrite(getElements(files[0]),ChondFile,unknown,control,standard(getAllZircons(files)),PerformByRockType)
     NotDoneClassifiers = True
