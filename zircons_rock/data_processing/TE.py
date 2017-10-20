@@ -204,8 +204,6 @@ def values(t, c, c0):
 
 
 def getChondrite(available,file, unknown, stand, detected,PerformByRockType,PassParameterOnly):
-    print(stand)
-    print(len(stand))
     if type(unknown)!=type(["list"]) or len(stand)==0:
         return get_table(file)
     chond = get_table(file)
@@ -269,8 +267,6 @@ def te(files, output, ChondFile, control, unknown, ScatterPlotCarts,PassParamete
     #      Row >3: indicats the CART classification that you wish to be done for this given data
     #          Column B here Always states CARTS followed by the name of the new Spreadsheet
     PerformByRockType = not ScatterPlotCarts
-    print(control)
-    print(unknown)
     workbook = xlsxwriter.Workbook(output)
     t = getChondrite(getElements(files[0]),ChondFile,unknown,control,standard(getAllZircons(files)),PerformByRockType,PassParameterOnly)
     NotDoneClassifiers = True
