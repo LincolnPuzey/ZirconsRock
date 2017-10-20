@@ -208,7 +208,8 @@ def scatterplot(classifiers, sheet_name, workbook, perform_by_rock_type):
         'major_gridlines': {'visible': True},
         'major_tick_mark': 'outside',
         'minor_tick_mark': 'inside',
-        'label_position': 'low'
+        'label_position': 'low',
+        'crossing': TE_PLOT_AXES[plot_name][2]
     }
     if plot_name != "Hf-Y":
         y_axis_options['log_base'] = 10
@@ -221,7 +222,8 @@ def scatterplot(classifiers, sheet_name, workbook, perform_by_rock_type):
         'major_gridlines': {'visible': True},
         'major_tick_mark': 'outside',
         'minor_tick_mark': 'inside',
-        'label_position': 'low'
+        'label_position': 'low',
+        'crossing': TE_PLOT_AXES[plot_name][0]
     })
 
     for series in series_list:
