@@ -1,10 +1,10 @@
 data,P31,Ca43,Ti49,Y89,Zr92,Nb93,La139,Ce140,Pr141,Nd146,Sm147,Eu151,Gd157,Tb159,Dy163,Ho165,Er166,Tm169,Yb173,Lu175,Hf178,Ta181,Th232,U238
 ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-,Excluded Zircons or Standards,610,MT
+,Excluded Zircons or Standards,
 Unknown,P31,Ca43,Ti49,Y89,Zr92,Nb93,La139,Ce140,Pr141,Nd146,Sm147,Eu151,Gd157,Tb159,Dy163,Ho165,Er166,Tm169,Yb173,Lu175,Hf178,Ta181,Th232,U238
 ,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-,Excluded Zircons or Standards,STDGJ,91500,610,MT
-,CARTS,Class,CART1,,,,,,,,,,,,,,,,,,
+,Excluded Zircons or Standards,
+,CARTS,Class,CART1,CART2,,,,,,,,,,,,,,,,,
 ,CARTS,Y-Udata,CART1,Y,U,,,,,,,,,,,,,,,,,,,
 ,CARTS,Y-Thdata,CART1,Y,Th,,,,,,,,,,,,,,,,,,,
 ,CARTS,Y-YbSmdata,CART1,Y,Yb/Sm,,,,,,,,,,,,,,,,,,,
@@ -18,7 +18,7 @@ Unknown,P31,Ca43,Ti49,Y89,Zr92,Nb93,La139,Ce140,Pr141,Nd146,Sm147,Eu151,Gd157,Tb
 ,CARTS,CeCe-EuEudata,CART1,Ce/Ce,Eu/Eu,,,,,,,,,,,,,,,,,,,
 TrElem,La139,Ce140,Pr141,Nd146,Sm147,Eu151,Gd157,Th232,Dy163,Y89,Ho165,Er166,U238,Yb173,Lu175,Hf178,Nb93,Ta181,Ti49,P31,,,,
 ,0.237,0.613,0.0928,0.457,0.148,0.0563,0.199,0.0294,0.246,1.57,0.0546,0.16,0.0074,0.161,0.0246,0.103,0.24,0.0136,440,1080,,,,
-,Excluded Zircons or Standards,STDGJ,91500,610,MT
+,Excluded Zircons or Standards,
 REE,La139,Ce140,Pr141,Nd146,Sm147,Eu151,Gd157,Tb159,Dy163,Ho165,Er166,Tm169,Yb173,Lu175,,,,,,,,,,
 ,0.237,0.613,0.0928,0.457,0.148,0.0563,0.199,0.0361,0.246,0.0546,0.16,0.0247,0.161,0.0246,,,,,,,,,,
-,Excluded Zircons or Standards,STDGJ,91500,610,MT
+,Excluded Zircons or Standards,
