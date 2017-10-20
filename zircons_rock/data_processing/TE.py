@@ -203,7 +203,7 @@ def values(t, c, c0):
     return v
 
 
-def getChondrite(available,file, unknown, stand, detected,PerformByRockType):
+def getChondrite(available,file, unknown, stand, detected,PerformByRockType,PassParameterOnly):
     if type(unknown)!=type(["list"]) and len(stand)==0:
         return get_table(file)
     chond = get_table(file)
@@ -233,25 +233,27 @@ def getChondrite(available,file, unknown, stand, detected,PerformByRockType):
                         includedElements[e] = available[a]
             text = chond[i][0]+","+commas(includedElements)
             writeln(i,text,file)
-        if chond[i][1]=="CARTS":
-            if PerformByRockType and "CART" not in chond[i][3]:
-                first = commas(chond[i][:3])
-                second = commas(chond[i][3:])
-                writeln(i,first+",CART1,"+second,file)
-            if not PerformByRockType and "CART" in chond[i][3]:
-                first = commas(chond[i][:3])
-                second = commas(chond[i][4:])
-                writeln(i,first+","+second,file)
+        if not PassParameterOnly:
+            if chond[i][1]=="CARTS":
+                if PerformByRockType and "CART" not in chond[i][3]:
+                    first = commas(chond[i][:3])
+                    second = commas(chond[i][3:])
+                    writeln(i,first+",CART1,"+second,file)
+                if not PerformByRockType and "CART" in chond[i][3]:
+                    first = commas(chond[i][:3])
+                    second = commas(chond[i][4:])
+                    writeln(i,first+","+second,file)
                 
         i=i+1
     return get_table(file)
+
 
 
 def commas(lis):
     return str(lis).replace("[","").replace("]","").replace("\'","").replace(" ","").replace("\t","")
 
 
-def te(files, output, ChondFile, control, unknown, ScatterPlotCarts):
+def te(files, output, ChondFile, control, unknown, ScatterPlotCarts,PassParameterOnly=True):
     """
     Main function that will call everything as needed
     """
@@ -266,7 +268,7 @@ def te(files, output, ChondFile, control, unknown, ScatterPlotCarts):
     #          Column B here Always states CARTS followed by the name of the new Spreadsheet
     PerformByRockType = not ScatterPlotCarts
     workbook = xlsxwriter.Workbook(output)
-    t = getChondrite(getElements(files[0]),ChondFile,unknown,control,standard(getAllZircons(files)),PerformByRockType)
+    t = getChondrite(getElements(files[0]),ChondFile,unknown,control,standard(getAllZircons(files)),PerformByRockType,PassParameterOnly)
     NotDoneClassifiers = True
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
