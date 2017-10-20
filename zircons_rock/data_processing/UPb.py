@@ -306,8 +306,10 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
 
     try:
         workbook.close()
-    except:
-        input("You must close "+output+" before continuing...")
-        UPb(files, output, normalised, control, unknown, UPPM, ThPPM)
-    print(output)
-    styleUPb(output)
+        styleUPb(output)
+        return True
+    except Exception as e:
+        print(e)
+        print("ERROR: Could not create output file - maybe file is open in another program?"
+        return False
+    

@@ -289,12 +289,13 @@ def te(files, output, ChondFile, control, unknown, ScatterPlotCarts):
 
     try:
         workbook.close()
+        styleTE(output)
+        return True
     except Exception as e:
         print(e)
-        input("You must close "+output+" before continuing")
-        te(files, output, ChondFile, unknown, control)
-        workbook.close()
-    styleTE(output)
+        print("ERROR: Could not create output file - maybe file is open in another program?"
+        return False
+    
 
 
 def addClassifier(full, sheet, carts, perform_by_rock_type):
