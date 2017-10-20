@@ -20,9 +20,16 @@ class FinishedPage(ttk.Frame):
         content_frame = Content(self, controller)
         footer_frame = Footer(self, controller, False, "", "", "FilterStandardsPage", "FinishedPage")
 
-        done_label = ttk.Label(content_frame, text="Done.", style="title.TLabel")
+        self.results_frame = ttk.Frame(content_frame)
+        self.error_frame = ttk.Frame(content_frame)
 
-        out_info_frame = ttk.Frame(content_frame)
+        # -------------------------------------------------
+        # --------------- results_frame -------------------
+        # -------------------------------------------------
+
+        done_label = ttk.Label(self.results_frame, text="Done.", style="title.TLabel")
+
+        out_info_frame = ttk.Frame(self.results_frame)
         name_title_label = ttk.Label(out_info_frame, text="Name of results: ", style="subtitle.TLabel")
 
         # use a StringVar so the Label updates when the user changes the file name
@@ -34,16 +41,16 @@ class FinishedPage(ttk.Frame):
         self.out_dir_str = tk.StringVar()
         out_path_label = ttk.Label(out_info_frame, textvariable=self.out_dir_str, style="subtitle.TLabel")
 
-        button_frame_one = ttk.Frame(content_frame, padding="0 10 0 20")
-        button_frame_two = ttk.Frame(content_frame, padding="0 0 0 5")
-        button_frame_three = ttk.Frame(content_frame)
+        button_frame_one = ttk.Frame(self.results_frame, padding="0 10 0 20")
+        button_frame_two = ttk.Frame(self.results_frame, padding="0 0 0 5")
+        button_frame_three = ttk.Frame(self.results_frame)
 
         open_button = Button(button_frame_one, text="Open", command=lambda: self.open())
         show_in_folder_button = Button(button_frame_one, text="Show in folder", command=lambda: self.showInFolder())
         start_again_button = Button(button_frame_two, text="Start again", command=lambda: controller.show_frame("StartPage"))
         exit_button = Button(button_frame_three, text="Exit", command=lambda: sys.exit())
 
-        # content_frame children
+        # results_frame children
         done_label.grid(column=0, row=0, sticky=(W))
         out_info_frame.grid(column=0, row=2, sticky=(W))
         button_frame_one.grid(column=0, row=3, sticky=(W))
@@ -66,8 +73,40 @@ class FinishedPage(ttk.Frame):
         # button_frame_three children
         exit_button.grid(column=0, row=0, sticky=(W))
 
+        # -------------------------------------------------
+        # ---------------- error_frame --------------------
+        # -------------------------------------------------
 
-    def update(self, name, directory):
+        error_title_label = ttk.Label(self.error_frame, text="Uh-oh!", style="title.TLabel", padding="0 0 0 10")
+
+        error_msg_frame = ttk.Frame(self.error_frame)
+        error_msg_1_label = ttk.Label(error_msg_frame, text="An error has occured while creating the workbook.", style="subtitle.TLabel", padding="0 0 0 5")
+        error_msg_2_label = ttk.Label(error_msg_frame, text="Check the input files are correct then try again.", style="subtitle.TLabel")
+
+        button_frame_one = ttk.Frame(self.error_frame, padding="0 10 0 5")
+        button_frame_two = ttk.Frame(self.error_frame, padding="0 0 0 5")
+
+        start_again_button = Button(button_frame_one, text="Start again", command=lambda: controller.show_frame("StartPage"))
+        exit_button = Button(button_frame_two, text="Exit", command=lambda: sys.exit())
+
+        # error_frame children
+        error_title_label.grid(column=0, row=0, sticky=(W))
+        error_msg_frame.grid(column=0, row=1, sticky=(N,S,E,W))
+        button_frame_one.grid(column=0, row=2, sticky=(W))
+        button_frame_two.grid(column=0, row=3, sticky=(W))
+
+        # error_msg_frame
+        error_msg_1_label.grid(column=0, row=0, sticky=(W))
+        error_msg_2_label.grid(column=0, row=1, sticky=(W))
+
+        # button_frame_one children
+        start_again_button.grid(column=0, row=0, sticky=(W))
+
+        # button_frame_two children
+        exit_button.grid(column=0, row=0, sticky=(W))
+
+
+    def update_io_details(self, name, directory):
         """Updates the name and location of the generated workbook"""
 
         if sys.platform.startswith("win"):
@@ -75,6 +114,20 @@ class FinishedPage(ttk.Frame):
 
         self.out_name_str.set(name)
         self.out_dir_str.set(directory)
+
+
+    def initialise(self, successful):
+        """
+        If successful, display result
+        Else, display error message
+        """
+
+        if successful:
+            self.error_frame.grid_forget()
+            self.results_frame.grid(column=0, row=0, sticky=(N,S,E,W))
+        else:
+            self.results_frame.grid_forget()
+            self.error_frame.grid(column=0, row=0, sticky=(N,S,E,W))
 
 
     # https://stackoverflow.com/questions/13078071/start-another-program-from-python-separately

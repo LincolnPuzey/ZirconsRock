@@ -560,6 +560,8 @@ class FilterStandardsPage(ttk.Frame):
     def on_go(self, *event):
         """Executes UPb or TE dataprocessing"""
 
+        finished_page = self.controller.frames["FinishedPage"]
+
         control_standards = self.get_control_standards()
         unknown_standards = self.get_unknown_standards()
 
@@ -568,11 +570,12 @@ class FilterStandardsPage(ttk.Frame):
         if self.controller.isUpb:
             output_filepath = self.controller.frames["UPbInputOutputPage"].output_filepath.get()
             files = self.controller.frames["UPbInputOutputPage"].valid_input_filepaths
-            UPb.UPb(files, output_filepath, self.norm_std.get(), control_standards, unknown_standards, self.uranium_ppm.get(), self.thorium_ppm.get())
+            successful = UPb.UPb(files, output_filepath, self.norm_std.get(), control_standards, unknown_standards, self.uranium_ppm.get(), self.thorium_ppm.get())
+            finished_page.initialise(successful)
             self.footer_frame.go_to_next_page()
         else:
             output_filepath = self.controller.frames["TEInputOutputPage"].output_filepath.get()
             files = self.controller.frames["TEInputOutputPage"].valid_input_filepaths
-
-            TE.te(files, output_filepath, CHONDRITE_FILE, control_standards, unknown_standards, self.perform_by_rock_type.get())
+            passed = TE.te(files, output_filepath, CHONDRITE_FILE, control_standards, unknown_standards, self.perform_by_rock_type.get())
+            finished_page.initialise(successful)
             self.footer_frame.go_to_next_page()

@@ -274,7 +274,7 @@ class InputOutputPage(ttk.Frame):
         """Passes the name and location of the Excel workbook to the FinishedPage"""
 
         finished_page = self.controller.frames["FinishedPage"]
-        finished_page.update(self.output_filename.get(), self.output_dir.get())
+        finished_page.update_io_details(self.output_filename.get(), self.output_dir.get())
         self.footer_frame.go_to_next_page()
 
 
