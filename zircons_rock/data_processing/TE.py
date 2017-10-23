@@ -273,7 +273,8 @@ def te(files, output, ChondFile, control, unknown, ScatterPlotCarts,PassParamete
     for i in teSheetNamesIndicies(t):
         full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
         full[0][1] = t[i][0]
-        line_chart(full,t[i][0],workbook)
+        if t[i][0] == "TrElem" or t[i][0] == "REE":
+            line_chart(full, t[i][0], workbook)
         k=3
         while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
             carts = nospaces(t[i+k][3:])
