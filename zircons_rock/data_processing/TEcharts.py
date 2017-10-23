@@ -1,3 +1,4 @@
+from math import log10, floor
 from os import path
 
 from PIL import Image
@@ -31,6 +32,8 @@ def line_chart(sheet_data, sheet_name, workbook):
         interval = int(max_value / (len(sheet_data)-1))
         colors = [hex(I)[2:].zfill(6) for I in range(0, max_value, interval)]
         colors = [(int(i[:2], 16), int(i[2:4], 16), int(i[4:], 16)) for i in colors]
+        # keep track of smallest value
+        min_value = 1.0
 
         for i in range(1, len(sheet_data)):
             color = "#{0:0>2X}{1:0>2X}{2:0>2X}".format(colors[i-1][0], colors[i-1][1], colors[i-1][2])
@@ -41,13 +44,21 @@ def line_chart(sheet_data, sheet_name, workbook):
                 'line': {'width': 1.0, 'color': color},
                 'marker': {'type': 'none'}
             })
+            # keep track of smallest value
+            for value in sheet_data[i][2:]:
+                if value != "" and float(value) < min_value and float(value) != 0.0:
+                    min_value = float(value)
+
+        y_axis_min = 10**floor(log10(min_value))
         zircon_chart.set_x_axis({
             'name': '<--- Increasing Ionic Radius <---',
             'label_position': 'low'
         })
         zircon_chart.set_y_axis({
             'name': 'Zircon/Chrondrite',
-            'log_base': 10
+            'log_base': 10,
+            'min': y_axis_min,
+            'crossing': y_axis_min
         })
 
         # set chart to chartsheet
