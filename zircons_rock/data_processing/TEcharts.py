@@ -34,12 +34,17 @@ def line_chart(sheet_data, sheet_name, workbook):
         colors = [(int(i[:2], 16), int(i[2:4], 16), int(i[4:], 16)) for i in colors]
         # keep track of smallest value
         min_value = 1.0
+        # work out how many columns of data
+        last_column_index = len(sheet_data[0])-1
+        while sheet_data[0][last_column_index] == "":
+            last_column_index = last_column_index - 1
 
+        # add series to chart
         for i in range(1, len(sheet_data)):
             color = "#{0:0>2X}{1:0>2X}{2:0>2X}".format(colors[i-1][0], colors[i-1][1], colors[i-1][2])
             zircon_chart.add_series({
-                'categories': [sheet_name, 0, 2, 0, len(sheet_data[0])-2],
-                'values': [sheet_name, i, 2, i, len(sheet_data[0])-2],
+                'categories': [sheet_name, 0, 2, 0, last_column_index],
+                'values': [sheet_name, i, 2, i, last_column_index],
                 'name': sheet_data[i][1],
                 'line': {'width': 1.0, 'color': color},
                 'marker': {'type': 'none'}
