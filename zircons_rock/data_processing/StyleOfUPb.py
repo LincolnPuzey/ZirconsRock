@@ -34,7 +34,6 @@ def report(sheetName, wb, new_wb, bold, border):
     ws1_new['A1'] = "U-Pb AGES (Ma)"
     ws1_new['A1'].font = bold
     ws1_new.merge_cells('G1:I1')
-    ws1_new['G1'] = "Common-Lead Corrected"
     ws1_new['G1'].font = bold
     for i in range (0, 9):
         ws1_new.cell(row = 3, column = i + 1).font = bold
@@ -59,6 +58,7 @@ def tbclc(sheetName, wb, new_wb, bold, border):
         ws1_new['%s6' % alphabet[i]].border = Border(top=Side(border_style="thin",color='000000'),
      bottom=Side(border_style= "thin" ,color='000000'))
 
+    ws1_new['E4'] = ""
     ws1_new['C5'] = "1s"
     ws1_new['E4'] = ""
     ws1_new['E5'] = "1s"
@@ -69,8 +69,29 @@ def tbclc(sheetName, wb, new_wb, bold, border):
     ws1_new['B3'] = "Measured Ratios"
     ws1_new['J3'] = "Raw Counts"
     ws1_new['M3'] = "Mean Raw CPS Data"
+    ws1_new['D4'] = "Pb207/U235"
+    ws1_new['F4'] = "Pb206/U238"
 
     ws1_new['A6'].fill = PatternFill("solid", fgColor="1BB912")
+
+    columnE4 = []
+    columnG4 = []
+
+    i = 7
+    while ws1_new['E'+str(i)].value != None:
+        columnE4.append(ws1_new['E'+str(i)].value)
+        i += 1
+
+    i = 7
+    while ws1_new['G'+str(i)].value != None:
+        columnG4.append(ws1_new['G'+str(i)].value)
+        i += 1
+
+    for j in range(0,len(columnE4)):
+        ws1_new['G' + str(j+7)].value = columnE4[j]
+
+    for k in range(0,len(columnG4)):
+        ws1_new['E' + str(k+7)].value = columnG4[k]
 
 
 def column25(sheetName, wb, new_wb, bold):
@@ -83,10 +104,11 @@ def column25(sheetName, wb, new_wb, bold):
     delete_column(ws1_new, 11)
     delete_column(ws1_new, 13)
     delete_column(ws1_new, 13)
+    delete_column(ws1_new, 14)
     ws1_new.merge_cells('B2:I2')
     ws1_new.merge_cells('G1:I1')
     ws1_new.merge_cells('K2:L2')
-    ws1_new.merge_cells('O2:V2')
+    ws1_new.merge_cells('N2:U2')
 
     ws1_new['A2'] = ""
     ws1_new['N2'] = ""
@@ -103,14 +125,13 @@ def column25(sheetName, wb, new_wb, bold):
     ws1_new['O2'].alignment = Alignment(horizontal="center")
     ws1_new['A3'].font = bold
 
-    for i in range (0, 22):
+    for i in range (0, 21):
         if i == 0 or i == 9 or i == 12:
             continue
         else:
             ws1_new.cell(row = 3, column = i + 1).font = font
             ws1_new.cell(row = 3, column = i + 1).border = border
     new_wb["%s" % sheetName].freeze_panes = "B1"
-
 
 def column38(sheetName, wb, new_wb, bold):
     border = Border(top = Side(border_style = "double", color = '900000'))
@@ -139,18 +160,21 @@ def column38(sheetName, wb, new_wb, bold):
 
     delete_column(ws1_new, 14)
     delete_column(ws1_new, 14)
+    delete_column(ws1_new, 32)
+    delete_column(ws1_new, 25)
+    delete_column(ws1_new, 15)
+    delete_column(ws1_new, 11)
 
-
-    for i in range (0, 39):
+    for i in range (0, 35):
         ws1_new.cell(row = 3, column = i + 1).font = bold
 
     ws1_new.merge_cells('B2:I2')
     ws1_new.merge_cells('G1:I1')
-    ws1_new.merge_cells('K2:M2')
-    ws1_new.merge_cells('O2:V2')
-    ws1_new.merge_cells('Y2:AD2')
-    ws1_new.merge_cells('AF2:AJ2')
-    ws1_new.merge_cells('AL2:AM2')
+    ws1_new.merge_cells('K2:L2')
+    ws1_new.merge_cells('N2:U2')
+    ws1_new.merge_cells('W2:AA2')
+    ws1_new.merge_cells('AC2:AF2')
+    ws1_new.merge_cells('AH2:AI2')
 
     ws1_new['A2'] = ""
     ws1_new['G1'] = "Common-Lead Corrected"
@@ -161,21 +185,21 @@ def column38(sheetName, wb, new_wb, bold):
     ws1_new['K2'] = "CONCENTRATIONS (ppm)"
     ws1_new['K2'].font = font_heading
     ws1_new['K2'].alignment = Alignment(horizontal="center")
-    ws1_new['O2'] = "AGES (Ma)"
-    ws1_new['O2'].font = font_heading
-    ws1_new['O2'].alignment = Alignment(horizontal="center")
-    ws1_new['Y2'] = "NORMAL CONCORDIA PLOT DATA"
-    ws1_new['Y2'].font = font_heading
-    ws1_new['Y2'].alignment = Alignment(horizontal="center")
-    ws1_new['AF2'] = "INVERSE CONCORDIA PLOT DATA"
-    ws1_new['AF2'].font = font_heading
-    ws1_new['AF2'].alignment = Alignment(horizontal="center")
-    ws1_new['AL2'] = "SEQUENCE No."
-    ws1_new['AL2'].font = font_heading
-    ws1_new['AL2'].alignment = Alignment(horizontal="center")
+    ws1_new['N2'] = "AGES (Ma)"
+    ws1_new['N2'].font = font_heading
+    ws1_new['N2'].alignment = Alignment(horizontal="center")
+    ws1_new['W2'] = "NORMAL CONCORDIA PLOT DATA"
+    ws1_new['W2'].font = font_heading
+    ws1_new['W2'].alignment = Alignment(horizontal="center")
+    ws1_new['AC2'] = "INVERSE CONCORDIA PLOT DATA"
+    ws1_new['AC2'].font = font_heading
+    ws1_new['AC2'].alignment = Alignment(horizontal="center")
+    ws1_new['AH2'] = "SEQUENCE No."
+    ws1_new['AH2'].font = font_heading
+    ws1_new['AH2'].alignment = Alignment(horizontal="center")
 
-    for i in range (0, 39):
-        if i == 0 or i == 9 or i == 13 or i == 23 or i == 30 or i == 36:
+    for i in range (0, 35):
+        if i == 0 or i == 9 or i == 12 or i == 21 or i == 27 or i == 32:
             continue
         else:
             ws1_new.cell(row = 3, column = i + 1).font = font
@@ -183,7 +207,15 @@ def column38(sheetName, wb, new_wb, bold):
 
     new_wb["%s" % sheetName].freeze_panes = "B1"
 
-
+    if ws1_new['AC3'].value == "" and ws1_new['AD3'].value == "" and ws1_new['AE3'].value == "" and ws1_new['AF3'].value == "":
+        delete_column(ws1_new, 29)
+        delete_column(ws1_new, 29)
+        delete_column(ws1_new, 29)
+        delete_column(ws1_new, 29)
+        delete_column(ws1_new, 29)
+    else:
+        continue
+    
 def delete_column(ws, delete_column):
     if isinstance(delete_column, str):
         delete_column = openpyxl.cell.column_index_from_string(delete_column)
