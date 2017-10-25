@@ -171,7 +171,7 @@ def inverse(ratios):
         concordia[r][2]=record(1,concordia[r][2])
     for c in range(len(concordia[0])):
         header = concordia[0][c].split("/")
-        if len(header)==2:
+        if c==1:
             concordia[0][c] = header[1]+"/"+header[0]
         elif header[0]=="1 sigma":
             concordia[0][c] = "RSD"
