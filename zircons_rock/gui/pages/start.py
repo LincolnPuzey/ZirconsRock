@@ -33,7 +33,7 @@ class StartPage(ttk.Frame):
         button_frame = ttk.Frame(content_frame, padding="0 20 0 20");
 
         # define buttons
-        uranium_button = Button(button_frame, text="\nUranium Lead", image=uranium_img, compound="top",
+        uranium_button = Button(button_frame, text="\nU-Pb Dating", image=uranium_img, compound="top",
                                style="image.TButton", command=self.onPressUpb, padding="5 20 5 20")
         trace_button = Button(button_frame, text="\nTrace Element", image=trace_img, compound="top",
                              style="image.TButton", command=self.onPressTE, padding="5 20 5 20")
