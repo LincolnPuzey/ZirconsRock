@@ -213,8 +213,6 @@ def column38(sheetName, wb, new_wb, bold):
         delete_column(ws1_new, 29)
         delete_column(ws1_new, 29)
         delete_column(ws1_new, 29)
-    else:
-        continue
     
 def delete_column(ws, delete_column):
     if isinstance(delete_column, str):

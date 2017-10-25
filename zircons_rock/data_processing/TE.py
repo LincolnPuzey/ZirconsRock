@@ -96,7 +96,7 @@ def data(t, zircon, element):
         La = record(t[r][c-1])
         Pr = record(t[r][c+1])
         if e[0]:
-            return record(Ce,(La+Pr)/2)
+            return record(Ce/chond("Ce"),(La/chond("La")+Pr/chond("Pr"))*2)
         return record(Ce)
     except Exception as e:
         print(e)

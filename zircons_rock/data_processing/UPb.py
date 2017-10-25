@@ -147,13 +147,13 @@ def avg(values, normalised, c):
     return record(sumNormalised,count)
 
 
-def rho(ratios):
+def rho(ratios,places = [0,-4,-3,-6,-5]):
     """
     Create the Normal Concordia data which calculates the rho values
     """
     t = []
-    for i in range(5):
-        t.append(column(ratios,-i))
+    for i in places:
+        t.append(column(ratios,i))
     t = [list(x) for x in zip(*t)]
     t[0].append("RHO")
     for i in range(1,len(t)):
@@ -161,26 +161,27 @@ def rho(ratios):
     return t
 
 
-def inverse(concordia):
+def inverse(ratios):
     """
     Create the Inverse Concordia data which calculates the RSD values
     """
-    docols = [1,3]
-    for d in docols:
-        for r in range(1,len(concordia)):
-            concordia[r][d+1]=record(1,concordia[r][d+1])
-
+    concordia = rho(ratios,[0,-6,-5,-8,-7])
+    for r in range(1,len(concordia)):
+        concordia[r][1]=record(1,concordia[r][1])
+        concordia[r][2]=record(1,concordia[r][2])
     for c in range(len(concordia[0])):
         header = concordia[0][c].split("/")
         if len(header)==2:
             concordia[0][c] = header[1]+"/"+header[0]
         elif header[0]=="1 sigma":
             concordia[0][c] = "RSD"
-            for r in range(1,len(concordia)):
-                av = "/AVERAGE($AJ$3:$AJ$"+str(len(concordia)+1)+")"
-                if c==3:
-                    av=av.replace("J","L")
-                concordia[r][c] = "=100*"+str(concordia[r][c])+av
+            vals = column(concordia,c)[1:]
+            asum = 0
+            for r in range(len(vals)):
+                asum+=record(vals[r])
+            av = asum/len(vals)
+            for r in range(1,len(vals)):
+                concordia[r][c] = "=100*"+str(concordia[r][c])+"/"+str(av)
         if c==len(concordia[0])-1:
             for r in range(len(concordia)):
                 concordia[r][c] = ""
@@ -274,13 +275,15 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
         ages = alternate(combine(tlist,2,IncludedZircons),combine(tlist,3,IncludedZircons))
         concentrations = groups(combine(conc,4,IncludedZircons))
         if s=='raw':
+            uratios = alternate(combine(tlist,0,unknown),combine(tlist,1,unknown))
             addSheet(workbook.add_worksheet("Ratios raw"),ratios)
             addSheet(workbook.add_worksheet("Ages raw"),ages)
             commonPb = workbook.add_worksheet("ToBeCommonLeadCorrected")
-            addSheet(commonPb,combine(tlist,4,IncludedZircons)[:1],3,len(ratios[0])-1)
-            addSheet(commonPb,ratios[:1],3)
-            addSheet(commonPb,combine(tlist,4,IncludedZircons)[1:],6,len(ratios[0])-1)
-            addSheet(commonPb,ratios[1:],6)
+            meancps = combine(tlist,4,unknown)
+            addSheet(commonPb,meancps[:1],3,len(uratios[0])-1)
+            addSheet(commonPb,uratios[:1],3)
+            addSheet(commonPb,meancps[1:],6,len(uratios[0])-1)
+            addSheet(commonPb,uratios[1:],6)
 
             # ctrl = workbook.add_worksheet("Control Report")
             # norm = workbook.add_worksheet("Normalized Report")
@@ -289,7 +292,7 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
 
             ThUppm(conc,normalised,ThPPM,UPPM)
             report = workbook.add_worksheet("Report")
-            addSheet(report,sigma(alternate(combine(tlist,0,unknown),combine(tlist,1,unknown)),2))
+            addSheet(report,sigma(uratios,2))
         else:
             r = sigma(copy.deepcopy(ratios),2)
             tablesToPutOnThisStandard = [r,concentrations,sigma(ages,2)]
@@ -299,7 +302,7 @@ def UPb(files, output, normalised, control, unknown, UPPM, ThPPM):
                 tablesToPutOnThisStandard.append(concordia)
                 titlesOfEachTable.append("Normal Concordia Plots")
                 if len(concordia)>3:
-                    tablesToPutOnThisStandard.append(inverse(copy.deepcopy(concordia)))
+                    tablesToPutOnThisStandard.append(inverse(copy.deepcopy(ratios)))
                     titlesOfEachTable.append("Inverse Concordia Plots")
             ss = workbook.add_worksheet(s)
             SplitStandards(ss,tablesToPutOnThisStandard,titlesOfEachTable)
