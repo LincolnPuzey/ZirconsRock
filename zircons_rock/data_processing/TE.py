@@ -243,7 +243,6 @@ def getChondrite(available,file, unknown, stand, detected,PerformByRockType,Pass
                     first = commas(chond[i][:3])
                     second = commas(chond[i][4:])
                     writeln(i,first+","+second,file)
-                
         i=i+1
     return get_table(file)
 
@@ -271,9 +270,12 @@ def te(files, output, ChondFile, control, unknown, ScatterPlotCarts,PassParamete
     t = getChondrite(getElements(files[0]),ChondFile,unknown,control,standard(getAllZircons(files)),PerformByRockType,PassParameterOnly)
     NotDoneClassifiers = True
     for i in teSheetNamesIndicies(t):
-        full=addTESheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+1][1:]),nospaces(t[i+2][2:]))
+        Chondrites = nospaces(t[i+1][1:])
+        sheet = workbook.add_worksheet(t[i][0])
+        full=dataSheet(files,sheet,nospaces(t[i][1:]),nospaces(t[i+2][2:]))
         full[0][1] = t[i][0]
         if t[i][0] == "TrElem" or t[i][0] == "REE":
+            addTESheet(full,sheet,nospaces(t[i][1:]),Chondrites)
             line_chart(full, t[i][0], workbook)
         k=3
         while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
@@ -375,7 +377,7 @@ def getAllZircons(files):
     return zlist
 
 
-def addTESheet(files, sheet, includedElements, Chondrites, excludedZircons):
+def dataSheet(files, sheet, includedElements, excludedZircons):
     """
     Add a spreadsheet of zircons against elements with it's included Chondrite values and Elements to be included in the list
     Choose particular isotopes and zircons to be excluded from this spreadsheet
@@ -401,13 +403,7 @@ def addTESheet(files, sheet, includedElements, Chondrites, excludedZircons):
         i=0 #Column Index starting after 'Element'
         si = [] #Sample Indicies matching from the input
         for row in t[bi]:
-
             inZirconList = (row not in excludedZircons) and (standard(row) not in excludedZircons)
-            '''
-            addSheet(ts,[[inZirconList]],1,i)
-            addSheet(ts,[['Included Elements'],includedElements],2)
-            addSheet(ts,[['Excluded Zircons'],excludedZircons],4)
-            '''
             if inZirconList:
                 full.append([""]*(3+len(includedElements)))
                 sheet.write(r,1,row)
@@ -416,20 +412,33 @@ def addTESheet(files, sheet, includedElements, Chondrites, excludedZircons):
                 full[r][0] = standard(row)
                 si.append(i)
                 r=r+1
-            i=i+1
+            i=i+1    
         x=0
         c=0
         while t[bi+x][0]!=EndingCell:
             if t[bi+x][0] in includedElements:
                 c=c+1
                 for y in range(len(si)):
-                    data = record(t[bi+x][si[y]],Chondrites[c-1])
-                    full[y+rstart][c+1] = data
+                    data = record(t[bi+x][si[y]])
                     sheet.write(y+rstart,c+1,data)
+                    full[y+rstart][c+1] = data
             x=x+1
     return full
-
-
+def addTESheet(data,sheet,includedElements,Chondrites):
+    full = [data[0][0],data[0][1]]
+    for e in range(len(includedElements)):
+        full.append(rnums(includedElements[e]))
+    full=[full]
+    f=0
+    for r in range(1,len(data)):
+        t=[data[r][0],data[r][1]]
+        for c in range(2,len(data[r])):
+            if data[0][c] in full[0]:
+                t.append("=data!"+chr(65+c)+str(r+1)+"/"+str(chond(data[0][c])))
+        full.append(t)
+    return addSheet(sheet,full)
+                
+        
 def teSheetNamesIndicies(Chondtable):
     sn=[]
     indicies = []
