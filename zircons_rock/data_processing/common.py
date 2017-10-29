@@ -12,7 +12,13 @@ def now(form='%A %d/%m/%Y %-I:%M:%S:%f'):
     if form=="micro":
         return str(ts).split('.')[1]
     return datetime.datetime.fromtimestamp(ts).strftime(form)
-
+def allEqual(lis,to=False):
+    if type(to)==type(False):
+        to=lis[0]
+    for li in lis:
+        if li!=to:
+            return False
+    return True
 
 def record(Variable, d=1):
     """

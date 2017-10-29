@@ -1,7 +1,7 @@
 from .common import *
 from .TEcharts import *
 from .StyleOfTE import *
-from defaults import BeginningCell, EndingCell, SheetName, allChondriteElements, ChondriteValues, UnrecognisedInputFileError
+from defaults import BeginningCell, EndingCell, SheetName, allChondriteElements, ChondriteValues, UnrecognisedInputFileError, CHONDRITE_FILE
 
 
 def classify(cart, t, z="zircon eg. STDGJ-01"):
@@ -64,14 +64,8 @@ def classify(cart, t, z="zircon eg. STDGJ-01"):
                                     return "Granitoid 65-70% SiO2 (47%)"
                                 else:
                                     return "Granitoid 70-75% SiO2 (70%)"
-    elif cart in t[0]:
-        return data(t,z,cart)
-    elif '/' in cart:
-        return data(t,z,cart)
-    elif cart=="CART2000":
-        return "At the moment the python file only specifies CART 1 and CART 2"
     else:
-        return ""
+        return data(t,z,cart)
 
 
 def data(t, zircon, element):
@@ -87,24 +81,44 @@ def data(t, zircon, element):
             return record(data(t,zircon,e[0]),data(t,zircon,e[1]))
     r=0
     c=0
-    try:
-        while t[r][1]!=zircon:
-            r=r+1
-        while e[1]!=t[0][c]:
-            c=c+1
-        Ce = t[r][c]
-        La = record(t[r][c-1])
-        Pr = record(t[r][c+1])
-        if e[0]:
-            return record(Ce/chond("Ce"),(La/chond("La")+Pr/chond("Pr"))*2)
-        return record(Ce)
-    except Exception as e:
-        print(e)
-        print("For the",t[0][1],"spreadsheet:")
-        print("Cannot find value for Element:",element,"for zircon",zircon,"?")
-        return eval(input("Please enter the value here: "))
-
-
+    if zircon not in column(t,1):
+        return ("No such "+zircon+" in "+str(t[r]))
+    while t[r][1]!=zircon:
+        r=r+1
+    elements = nospaces(t[0][2:])
+    if e[1] not in elements:
+        for chon in elements:
+            if chon in e[1]:
+                e[0] = "eval element"
+                e.append(e[1])
+                e[1]=chon
+                
+    while e[1]!=t[0][c]:
+        c=c+1
+    Ce = t[r][c]
+    if e[0]=="eval element":
+        e[2]=e[2].replace(e[1],str(c))
+        try:
+            return t[r][eval(e[2])]
+        except:
+            return chond(e[1])
+            
+    if e[0]:
+        chondCe = chond(t[0][c])
+        if c==0:
+            La = 1
+            chondLa = 1
+        else:
+            La = record(t[r][c-1])
+            chondLa = chond(t[0][c-1])
+        try:
+            Pr = record(t[r][c+1])
+            chondPr = chond(t[0][c+1])
+        except:
+            Pr = 1
+            chondPr = 1
+        return record(Ce/chondCe,(La/chondLa+Pr/chondPr)*2)
+    return record(Ce)
 def getElements(file):
     """
     Returns all Trace Elements given a specific file
@@ -269,14 +283,21 @@ def te(files, output, ChondFile, control, unknown, ScatterPlotCarts,PassParamete
     workbook = xlsxwriter.Workbook(output)
     t = getChondrite(getElements(files[0]),ChondFile,unknown,control,standard(getAllZircons(files)),PerformByRockType,PassParameterOnly)
     NotDoneClassifiers = True
-    for i in teSheetNamesIndicies(t):
-        Chondrites = nospaces(t[i+1][1:])
+    inds =  teSheetNamesIndicies(t)
+    for i in inds:
         sheet = workbook.add_worksheet(t[i][0])
-        full=dataSheet(files,sheet,nospaces(t[i][1:]),nospaces(t[i+2][2:]))
+        if i==inds[0]:
+            data = dataSheet(files,sheet,nospaces(t[i][1:]),nospaces(t[i+2][2:]))
+        full = dataSheet(files,sheet,nospaces(t[i][1:]),nospaces(t[i+2][2:]))
         full[0][1] = t[i][0]
         if t[i][0] == "TrElem" or t[i][0] == "REE":
-            addTESheet(full,sheet,nospaces(t[i][1:]),Chondrites)
+            addTESheet(data,full,sheet,nospaces(t[i][1:]),nospaces(t[i+1][1:]))
             line_chart(full, t[i][0], workbook)
+        else:
+            try:
+                full = dataSheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+2][2:]))
+            except:
+                Log = "Sheet "+t[i][0]+" has already been created"
         k=3
         while i+k<len(t) and len(t[i+k])>1 and t[i+k][1]=="CARTS":
             carts = nospaces(t[i+k][3:])
@@ -424,20 +445,25 @@ def dataSheet(files, sheet, includedElements, excludedZircons):
                     full[y+rstart][c+1] = data
             x=x+1
     return full
-def addTESheet(data,sheet,includedElements,Chondrites):
-    full = [data[0][0],data[0][1]]
+def addTESheet(data,rdata,sheet,includedElements,Chondrites):
+    full = ['Sample','Analysis']
     for e in range(len(includedElements)):
         full.append(rnums(includedElements[e]))
+            
     full=[full]
     f=0
-    for r in range(1,len(data)):
-        t=[data[r][0],data[r][1]]
+    for r in range(1,len(rdata)):
+        t=[rdata[r][0],rdata[r][1]]
         for c in range(2,len(data[r])):
-            if data[0][c] in full[0]:
-                t.append("=data!"+chr(65+c)+str(r+1)+"/"+str(chond(data[0][c])))
+            try:
+                i = full[0].index(data[0][c])
+                while i>=len(t):
+                    t.append("")
+                t[i] = "=data!"+chr(65+c)+str(r+1)+"/"+str(chond(data[0][c]))
+            except:
+                Log = data[0][c] + " is not in Sheet "+ data[0][1]
         full.append(t)
     return addSheet(sheet,full)
-                
         
 def teSheetNamesIndicies(Chondtable):
     sn=[]
@@ -448,13 +474,22 @@ def teSheetNamesIndicies(Chondtable):
             indicies.append(i)
     return indicies
 
-
 def chond(element):
     """
     Returns the Chondrite value of a specific element
     """
-    i=0
-    for e in allChondriteElements:
-        if element in e:
-            return ChondriteValues[i]
-        i=i+1
+    t = get_table(CHONDRITE_FILE)
+    inds =  teSheetNamesIndicies(t)
+    chonds = []
+    for i in inds:
+        if allEqual(t[i+1][1:]):
+            continue
+        c=0
+        for elements in t[i][1:]:
+            c=c+1
+            if element in elements:
+                chonds.append(record(t[i+1][c]))
+    try:
+        return sum(chonds)/len(chonds)
+    except:
+        return sum(chonds)/len(chonds)
