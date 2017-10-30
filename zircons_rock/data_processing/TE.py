@@ -459,7 +459,7 @@ def addTESheet(data,rdata,sheet,includedElements,Chondrites):
                 i = full[0].index(data[0][c])
                 while i>=len(t):
                     t.append("")
-                t[i] = "=data!"+chr(65+c)+str(r+1)+"/"+str(chond(data[0][c]))
+                t[i] = "=Unknown!"+chr(65+c)+str(r+1)+"/"+str(chond(data[0][c]))
             except:
                 Log = data[0][c] + " is not in Sheet "+ data[0][1]
         full.append(t)
