@@ -9,7 +9,7 @@ from defaults import CLASS_MARKERS, CLASS_COLORS, CLASSES, \
     LEGEND_SCALE, LEGEND_X_OFFSET, LEGEND_Y_OFFSET
 
 
-def line_chart(sheet_data, sheet_name, workbook):
+def line_chart(sheet_data, sheet_name, workbook , name):
     """
     Does a line graph of the sheets TrElem and REE
     Each line (series) is a different sample
@@ -26,7 +26,7 @@ def line_chart(sheet_data, sheet_name, workbook):
         zircon_chart = workbook.add_chart({'type': 'line'})
 
         # add data and formatting to chart
-        zircon_chart.set_title({'name': 'Trace Element Patterns of Zircons'})
+        zircon_chart.set_title({'name': name + ' Patterns of Zircons'})
         # generate colors from the RGB cube
         max_value = 16581375  # 255**3
         interval = int(max_value / (len(sheet_data)-1))

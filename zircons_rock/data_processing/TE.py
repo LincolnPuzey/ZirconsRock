@@ -117,7 +117,7 @@ def data(t, zircon, element):
         except:
             Pr = 1
             chondPr = 1
-        return record(Ce/chondCe,(La/chondLa+Pr/chondPr)*2)
+        return record(Ce/chondCe,(La/chondLa+Pr/chondPr)/2)
     return record(Ce)
 def getElements(file):
     """
@@ -292,7 +292,11 @@ def te(files, output, ChondFile, control, unknown, ScatterPlotCarts,PassParamete
         full[0][1] = t[i][0]
         if t[i][0] == "TrElem" or t[i][0] == "REE":
             addTESheet(data,full,sheet,nospaces(t[i][1:]),nospaces(t[i+1][1:]))
-            line_chart(full, t[i][0], workbook)
+            if t[i][0]=="TrElem":
+                name = "Trace Element"
+            else:
+                name = "Rare Earth Element"
+            line_chart(full, t[i][0], workbook,name)
         else:
             try:
                 full = dataSheet(files,workbook.add_worksheet(t[i][0]),nospaces(t[i][1:]),nospaces(t[i+2][2:]))
